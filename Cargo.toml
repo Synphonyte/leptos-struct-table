@@ -2,6 +2,14 @@
 name = "leptos-struct-table"
 version = "0.1.0"
 edition = "2021"
+authors = ["Marc-Stefan Cassola"]
+categories = ["gui", "web-programming"]
+description = "Generate a complete batteries included leptos data table component from a struct definition."
+exclude = ["examples/", "tests/", "leptos-struct-table-macro"]
+keywords = ["leptos", "table", "data-sheet", "data-grid"]
+license = "MIT OR Apache-2.0"
+#readme = "README.md"
+repository = "https://github.com/Synphonyte/leptos-struct-table"
 
 [dependencies]
 leptos = "0.2"

@@ -2,6 +2,12 @@
 name = "leptos-struct-table-macro"
 version = "0.1.0"
 edition = "2021"
+authors = ["Marc-Stefan Cassola"]
+description = "Macros for the leptos-struct-table crate."
+exclude = ["examples/", "tests/"]
+license = "MIT OR Apache-2.0"
+#readme = "README.md"
+repository = "https://github.com/Synphonyte/leptos-struct-table"
 
 [lib]
 proc-macro = true

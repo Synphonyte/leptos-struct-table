@@ -28,11 +28,13 @@ jobs:
       #          cargo rdme --check
       #      - name: Run tests
       #        run: cargo test
-      - uses: katyo/publish-crates@v2
+      - name: Publish leptos-struct-table-macro
+        uses: katyo/publish-crates@v2
         with:
           path: leptos-struct-table-macro
           registry-token: ${{ secrets.CRATES_TOKEN }}
-      - uses: katyo/publish-crates@v2
+      - name: Publish leptos-struct-table
+        uses: katyo/publish-crates@v2
         with:
           registry-token: ${{ secrets.CRATES_TOKEN }}
 
