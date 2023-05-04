@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-leptos = { version = "0.2", git = "https://github.com/leptos-rs/leptos.git" }
+leptos = { version = "0.2" }
 leptos-struct-table-macro = { version = "0.1", path = "leptos-struct-table-macro" }
 paste = "1.0"
 async-trait = "0.1"
