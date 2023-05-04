@@ -30,6 +30,10 @@ jobs:
       #        run: cargo test
       - uses: katyo/publish-crates@v2
         with:
+          path: leptos-struct-table-macro
+          registry-token: ${{ secrets.CRATES_TOKEN }}
+      - uses: katyo/publish-crates@v2
+        with:
           registry-token: ${{ secrets.CRATES_TOKEN }}
 
 #  coverage:
