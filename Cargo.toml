@@ -4,5 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-leptos = "0.2"
+leptos = { version = "0.2", git = "https://github.com/leptos-rs/leptos.git" }
 leptos-struct-table-macro = { version = "0.1", path = "leptos-struct-table-macro" }
+paste = "1.0"
+async-trait = "0.1"
+chrono = "0.4" # TODO : feature flag
