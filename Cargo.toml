@@ -1,0 +1,8 @@
+[package]
+name = "leptos-struct-table"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+leptos = "0.2"
+leptos-struct-table-macro = { version = "0.1", path = "leptos-struct-table-macro" }
