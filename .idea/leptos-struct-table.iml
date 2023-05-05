@@ -2,8 +2,13 @@
 <module type="CPP_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/rest_datasource/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/simple/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/leptos-struct-table-macro/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/rest_datasource/target" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/simple/target" />
       <excludeFolder url="file://$MODULE_DIR$/leptos-struct-table-macro/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>

@@ -80,7 +80,7 @@ fn get_selection_logic(
     key_type: &syn::Type,
 ) -> (TokenStream2, TokenStream2, TokenStream2) {
     match selection_mode {
-        SelectionMode::None => (quote! {}, quote! {}, quote! {|_: K| false}),
+        SelectionMode::None => (quote! {}, quote! {}, quote! {|_| false}),
         SelectionMode::Single => (
             quote! {
                 selected_key.update(|selected_key| { *selected_key = Some(event.key); });
@@ -198,14 +198,7 @@ fn get_data_provider_logic(
             type ColumnName = #column_name_enum;
 
             async fn get_rows(&self, range: std::ops::Range<usize> ) -> Vec<#ident> {
-                if self.len() == 0 {
-                    return vec![];
-                }
-
-                let start = range.start.min(self.len() - 1);
-                let end = range.end.min(self.len());
-
-                self[start..end].to_vec()
+                leptos_struct_table::get_vec_range_clamped(self, range)
             }
 
             #set_sorting_impl
@@ -297,33 +290,22 @@ impl ToTokens for TableComponentDeriveInput {
                 syn::Ident::new(&name.to_string().to_upper_camel_case(), name.span());
 
             titles.push(quote! {
-                { move || {
-                    let sorting = sorting.clone();
-
-                    let column_sort = move || sorting().into_iter()
-                        .find(|(field, _)| *field == #column_name_enum::#column_name_variant)
-                        .map(|(_, sort)| sort)
-                        .unwrap_or(ColumnSort::None);
-
-                    view! { cx,
-                        <#head_renderer
-                            class=Signal::derive(cx, move || class_provider.clone().head_cell(column_sort.clone()(), #head_class))
-                            inner_class=class_provider.clone().head_cell_inner()
-                            index=#index
-                            column=#column_name_enum::#column_name_variant
-                            sort_priority=Signal::derive(cx, move || {
-                                if sorting().len() < 2 {
-                                    return None;
-                                }
-                                sorting().iter().position(|(field, _)| *field == #column_name_enum::#column_name_variant)
-                            })
-                            sort_direction=Signal::derive(cx, column_sort)
-                            on_click=on_head_click.clone()
-                        >
-                            #title
-                        </#head_renderer>
-                    }
-                }}
+                <#head_renderer
+                    class=Signal::derive(cx, move || class_provider.clone().head_cell(column_sort.clone()(#column_name_enum::#column_name_variant), #head_class))
+                    inner_class=class_provider.clone().head_cell_inner()
+                    index=#index
+                    column=#column_name_enum::#column_name_variant
+                    sort_priority=Signal::derive(cx, move || {
+                        if sorting().len() < 2 {
+                            return None;
+                        }
+                        sorting().iter().position(|(field, _)| *field == #column_name_enum::#column_name_variant)
+                    })
+                    sort_direction=Signal::derive(cx, move || column_sort.clone()(#column_name_enum::#column_name_variant))
+                    on_click=on_head_click.clone()
+                >
+                    #title
+                </#head_renderer>
             });
 
             let cell_renderer = get_renderer_for_field(name, f);
@@ -436,6 +418,15 @@ impl ToTokens for TableComponentDeriveInput {
                         rows.into_iter().enumerate().collect::<Vec<_>>()
                     }
                 );
+
+                let sort = sorting.clone();
+
+                let column_sort = move |name_variant: #column_name_enum| {
+                    sort().into_iter()
+                        .find(|(field, _)| *field == name_variant)
+                        .map(|(_, sort)| sort)
+                        .unwrap_or(ColumnSort::None)
+                };
 
                 view! { cx,
                     <#tag class=class_provider.table(&class)>

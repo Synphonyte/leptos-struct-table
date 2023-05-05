@@ -1,0 +1,19 @@
+[package]
+name = "simple"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+leptos = "0.2"
+leptos-struct-table = { path = "../..", features = ["chrono"] }
+chrono = { version = "0.4", features=["serde"] }
+console_error_panic_hook = "0.1"
+console_log = "1"
+log = "0.4"
+serde = "1"
+async-trait = "0.1"
+
+[dev-dependencies]
+wasm-bindgen = "0.2"
+wasm-bindgen-test = "0.3.0"
+web-sys = "0.3"
