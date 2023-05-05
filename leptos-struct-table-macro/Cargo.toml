@@ -1,6 +1,6 @@
 [package]
 name = "leptos-struct-table-macro"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 authors = ["Marc-Stefan Cassola"]
 description = "Macros for the leptos-struct-table crate."
@@ -13,8 +13,8 @@ repository = "https://github.com/Synphonyte/leptos-struct-table"
 proc-macro = true
 
 [dependencies]
-syn = "1"
+syn = "2.0"
 quote = "1.0"
-darling = "0.14"
+darling = "0.20"
 proc-macro2 = "1.0"
 heck = "0.4"
