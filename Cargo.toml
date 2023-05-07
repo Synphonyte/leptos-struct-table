@@ -16,7 +16,13 @@ leptos = "0.2"
 leptos-struct-table-macro = { version = "0.1", path = "leptos-struct-table-macro" }
 async-trait = "0.1"
 paste = { version = "1.0", optional = true }
-chrono = { version = "0.4", optional = true }
+chrono = { version = "0.4", optional = true, features = ["serde"] }
 
 [features]
 chrono = ["dep:chrono", "dep:paste"]
+
+[dev-dependencies]
+serde = "1"
+
+[package.metadata."docs.rs"]
+all-features = true

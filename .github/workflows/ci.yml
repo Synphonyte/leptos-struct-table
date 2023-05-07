@@ -18,16 +18,16 @@ jobs:
           toolchain: nightly
           profile: minimal
           override: true
-      #      - name: Cache
-      #        uses: Swatinem/rust-cache@v1
-      #      - name: Check formatting
-      #        run: cargo fmt --check
-      #      - name: Check if the README is up to date.
-      #        run: |
-      #          cargo install cargo-rdme
-      #          cargo rdme --check
-      #      - name: Run tests
-      #        run: cargo test
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
+      - name: Check formatting
+        run: cargo fmt --check
+      - name: Check if the README is up to date.
+        run: |
+          cargo install cargo-rdme
+          cargo rdme --check
+      - name: Run tests
+        run: cargo test --all-features
       - name: Publish leptos-struct-table-macro
         uses: katyo/publish-crates@v2
         with:

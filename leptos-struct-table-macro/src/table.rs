@@ -56,7 +56,7 @@ fn get_props_for_field(name: &syn::Ident, field: &TableDataField) -> TokenStream
     let class = field.cell_class();
 
     let precision = if let Some(p) = &field.format.precision {
-        quote! {precision=#p}
+        quote! {precision=(#p as usize)}
     } else {
         quote! {}
     };

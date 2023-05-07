@@ -57,9 +57,7 @@ fn main() {
         );
 
         view! { cx,
-            <BookTable
-                items=items
-            />
+            <BookTable items=items />
         }
     })
 }
