@@ -22,6 +22,9 @@ pub(crate) struct TableComponentDeriveInput {
     pub(crate) tag: Option<IdentString>,
 
     #[darling(default)]
+    pub(crate) head_row_renderer: Option<IdentString>,
+
+    #[darling(default)]
     pub(crate) row_renderer: Option<IdentString>,
 
     #[darling(default)]

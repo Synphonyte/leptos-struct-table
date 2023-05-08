@@ -1,3 +1,5 @@
+#![allow(unused_variables)]
+
 #[cfg(feature = "chrono")]
 mod chrono;
 #[cfg(feature = "chrono")]
@@ -16,6 +18,8 @@ pub fn DefaultTableCellRenderer<T>(
     /// The value to display.
     #[prop(into)]
     value: MaybeSignal<T>,
+    /// The index of the column. Starts at 0.
+    index: usize,
 ) -> impl IntoView
 where
     T: IntoView + Clone + 'static,
@@ -35,6 +39,8 @@ pub fn DefaultNumberTableCellRenderer<T>(
     /// The value to display.
     #[prop(into)]
     value: MaybeSignal<T>,
+    /// The index of the column. Starts at 0.
+    index: usize,
     /// The number of digits to display after the decimal point. Provided by the `#[table(format(precision=X))]` attribute of the field.
     #[prop(optional)]
     precision: Option<usize>,

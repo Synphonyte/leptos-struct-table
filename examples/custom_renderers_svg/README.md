@@ -1,4 +1,4 @@
-Example that shows how to use a REST API as a data source for a table.
+Example that shows how use custom renderers to render the table as SVG.
 
 If you don't have it installed already, install [Trunk](https://trunkrs.dev/) with:
 

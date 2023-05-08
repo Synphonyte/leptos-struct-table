@@ -7,10 +7,12 @@
       <sourceFolder url="file://$MODULE_DIR$/examples/simple/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/leptos-struct-table-macro/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/custom_renderers_svg/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/examples/rest_datasource/target" />
       <excludeFolder url="file://$MODULE_DIR$/examples/simple/target" />
       <excludeFolder url="file://$MODULE_DIR$/leptos-struct-table-macro/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/custom_renderers_svg/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

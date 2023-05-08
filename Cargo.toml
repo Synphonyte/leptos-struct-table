@@ -1,6 +1,6 @@
 [package]
 name = "leptos-struct-table"
-version = "0.1.5"
+version = "0.1.6"
 edition = "2021"
 authors = ["Marc-Stefan Cassola"]
 categories = ["gui", "web-programming"]
@@ -8,12 +8,12 @@ description = "Generate a complete batteries included leptos data table componen
 exclude = ["examples/", "tests/", "leptos-struct-table-macro"]
 keywords = ["leptos", "table", "data-sheet", "data-grid"]
 license = "MIT OR Apache-2.0"
-#readme = "README.md"
+readme = "README.md"
 repository = "https://github.com/Synphonyte/leptos-struct-table"
 
 [dependencies]
 leptos = "0.2"
-leptos-struct-table-macro = { version = "0.1", path = "leptos-struct-table-macro" }
+leptos-struct-table-macro = { version = "0.1" }
 async-trait = "0.1"
 paste = { version = "1.0", optional = true }
 chrono = { version = "0.4", optional = true, features = ["serde"] }

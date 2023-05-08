@@ -1,3 +1,5 @@
+#![allow(unused_variables)]
+
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use leptos::*;
 use paste::paste;
@@ -16,6 +18,8 @@ macro_rules! date_cell_renderer {
                 #[prop(into)] class: MaybeSignal<String>,
                 /// The value to display.
                 #[prop(into)] value: MaybeSignal<$date_type>,
+                /// The index of the column. Starts at 0.
+                index: usize,
                 /// The format string to use for formatting the date. Provided by the `#[table(format(string="..."))]` attribute of the field.
                 /// See [`chrono::format::strftime`] for more information.
                 #[prop(optional)] format_string: Option<String>,

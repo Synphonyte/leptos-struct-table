@@ -7,7 +7,7 @@
 //! - **Fully Customizable** - You can customize every aspect of the table by plugging in your own components for rendering rows, cells, headers. See [Custom Renderers](#custom-renderers) for more information.
 //! - **Headless** - No default styling is applied to the table. You can fully customize the classes that are applied to the table. See [Classes customization](#classes-customization) for more information.
 //! - **Sorting** - Optional. If turned on: Click on a column header to sort the table by that column. You can even sort by multiple columns.
-//! - **Virtualization** - (TODO) Only the visible rows are rendered. This allows for very large tables.
+//! - **Virtualization (TODO)** - Only the visible rows are rendered. This allows for very large tables.
 //!
 //! # Usage
 //!
@@ -60,6 +60,7 @@
 //!    For convenience sensible presets for major CSS frameworks are provided. See [`TableClassesProvider`] for more information.
 //! - **`tag`** - Specifies the tag that is used as the root element for the table. Defaults to `"table"`.
 //! - **`row_renderer`** - Specifies the name of the row renderer component. Used to customize the rendering of rows. Defaults to [`DefaultTableRowRenderer`].
+//! - **`head_row_renderer`** - Specifies the name of the head row renderer component/tag. Used to customize the rendering of the head rows Defaults to the tag [`tr`]. This only takes a `class` attribute.
 //! - **`head_cell_renderer`** - Specifies the name of the header cell renderer component. Used to customize the rendering of header cells. Defaults to [`DefaultTableHeaderRenderer`].
 //! - **`row_class`** - Specifies the classes that are applied to each row. Can be used in conjuction with `classes_provider` to customize the classes.
 //! - **`head_row_class`** - Specifies the classes that are applied to the header row. Can be used in conjuction with `classes_provider` to customize the classes.
@@ -185,6 +186,12 @@ pub struct TemperatureMeasurement {
 //!     }
 //! }
 //! ```
+//!
+//! For more detailed information please have a look at the `custom_renderers_svg` example for a complete customization.
+//!
+//! # Contribution
+//!
+//! All contributions are welcome. Please open an issue or a pull request if you have any ideas or problems.
 
 #![allow(non_snake_case)]
 

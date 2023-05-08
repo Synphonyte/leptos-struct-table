@@ -6,8 +6,13 @@ use quote::{format_ident, quote, ToTokens};
 use syn::__private::TokenStream2;
 use syn::{Error, Type};
 
-fn get_renderer_for_field(name: &syn::Ident, field: &TableDataField) -> TokenStream2 {
+fn get_renderer_for_field(name: &syn::Ident, field: &TableDataField, index: usize) -> TokenStream2 {
     let props = get_props_for_field(name, &field);
+
+    let props = quote! {
+        #props
+        index=#index
+    };
 
     if let Some(renderer) = &field.renderer {
         let ident = renderer.as_ident();
@@ -213,6 +218,7 @@ impl ToTokens for TableComponentDeriveInput {
             ref data,
             ref component_name,
             ref classes_provider,
+            ref head_row_renderer,
             ref row_renderer,
             ref tag,
             ref row_class,
@@ -228,6 +234,11 @@ impl ToTokens for TableComponentDeriveInput {
             .as_ref()
             .map(|r| r.as_ident().clone())
             .unwrap_or_else(|| syn::Ident::new("DefaultTableRowRenderer", row_renderer.span()));
+
+        let head_row_renderer = head_row_renderer
+            .as_ref()
+            .map(|r| r.as_ident().clone())
+            .unwrap_or_else(|| syn::Ident::new("tr", head_row_renderer.span()));
 
         let tag = tag
             .as_ref()
@@ -308,7 +319,7 @@ impl ToTokens for TableComponentDeriveInput {
                 </#head_renderer>
             });
 
-            let cell_renderer = get_renderer_for_field(name, f);
+            let cell_renderer = get_renderer_for_field(name, f, cells.len());
             cells.push(cell_renderer);
         }
 
@@ -430,9 +441,9 @@ impl ToTokens for TableComponentDeriveInput {
 
                 view! { cx,
                     <#tag class=class_provider.table(&class)>
-                        <tr class=class_provider.head_row(#head_row_class)>
+                        <#head_row_renderer class=class_provider.head_row(#head_row_class)>
                             #(#titles)*
-                        </tr>
+                        </#head_row_renderer>
 
                         <Transition fallback=move || view! {cx, <tr><td colspan="4">"Loading...!"</td></tr> }>
                             { move || {
