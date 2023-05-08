@@ -18,6 +18,7 @@ jobs:
           toolchain: nightly
           profile: minimal
           override: true
+          components: rustfmt
       - name: Cache
         uses: Swatinem/rust-cache@v1
       - name: Check formatting
