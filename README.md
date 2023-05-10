@@ -69,7 +69,7 @@ These attributes can be applied to the struct itself.
    For convenience sensible presets for major CSS frameworks are provided. See [`TableClassesProvider`] for more information.
 - **`tag`** - Specifies the tag that is used as the root element for the table. Defaults to `"table"`.
 - **`row_renderer`** - Specifies the name of the row renderer component. Used to customize the rendering of rows. Defaults to [`DefaultTableRowRenderer`].
-- **`head_row_renderer`** - Specifies the name of the head row renderer component/tag. Used to customize the rendering of the head rows Defaults to the tag [`tr`]. This only takes a `class` attribute.
+- **`head_row_renderer`** - Specifies the name of the head row renderer component/tag. Used to customize the rendering of the head rows. Defaults to the tag `tr`. This only takes a `class` attribute.
 - **`head_cell_renderer`** - Specifies the name of the header cell renderer component. Used to customize the rendering of header cells. Defaults to [`DefaultTableHeaderRenderer`].
 - **`row_class`** - Specifies the classes that are applied to each row. Can be used in conjuction with `classes_provider` to customize the classes.
 - **`head_row_class`** - Specifies the classes that are applied to the header row. Can be used in conjuction with `classes_provider` to customize the classes.
@@ -100,8 +100,8 @@ The `format` attribute can be used to customize the formatting of cells. It is a
 - **`string`** - Specifies a format string. Currently only used for `NaiveDate`, `NaiveDateTime` and `NaiveTime`. See [`chrono::format::strftime`] for more information.
 ## Classes Customization
 
-Classes can be easily customized by using the `classes_provider` attribute on the struct with.
-Specify a type that implementats the trait [`TableClassesProvider`]. Please see documentation for that trait for more information.
+Classes can be easily customized by using the `classes_provider` attribute on the struct.
+You can specify any type that implementats the trait [`TableClassesProvider`]. Please see the documentation for that trait for more information.
 You can also look at [`TailwindClassesPreset`] for an example how this can be implemented.
 
 Example:
@@ -119,14 +119,15 @@ pub struct Book {
 ## Custom Renderers
 
 Custom renderers can be used to customize almost every aspect of the table.
-They are specified by using the different `...renderer` attribute on the struct or a field.
+They are specified by using the various `...renderer` attributes on the struct or fields.
 To implement a custom renderer please have a look at the default renderers listed below.
 
 On the struct level you can use these attributes:
-- `row_renderer` - Defaults to [`DefaultTableRowRenderer`].
-- `head_cell_renderer` - Defaults to [`DefaultTableHeaderRenderer`].
+- **`row_renderer`** - Defaults to [`DefaultTableRowRenderer`].
+- **`head_row_renderer`** - Defaults to the tag `tr`. This only takes a `class` attribute.
+- **`head_cell_renderer`** - Defaults to [`DefaultTableHeaderRenderer`].
 
-On the field level you can use the `renderer` attribute.
+On the field level you can use the **`renderer`** attribute.
 
 It defaults to [`DefaultNumberTableCellRenderer`] for number types and [`DefaultTableCellRenderer`] for anything else.
 As long as Leptos supports rendering the type it will work.
