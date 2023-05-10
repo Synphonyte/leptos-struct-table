@@ -20,7 +20,7 @@ jobs:
           override: true
           components: rustfmt
       - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
       - name: Check formatting
         run: cargo fmt --check
       - name: Check if the README is up to date.
@@ -29,12 +29,7 @@ jobs:
           cargo rdme --check
       - name: Run tests
         run: cargo test --all-features
-      - name: Publish leptos-struct-table-macro
-        uses: katyo/publish-crates@v2
-        with:
-          path: leptos-struct-table-macro
-          registry-token: ${{ secrets.CRATES_TOKEN }}
-      - name: Publish leptos-struct-table
+      - name: Publish crate leptos-struct-table
         uses: katyo/publish-crates@v2
         with:
           registry-token: ${{ secrets.CRATES_TOKEN }}

@@ -11,6 +11,7 @@ macro_rules! date_cell_renderer {
     ) => {
         paste! {
             $(#[$outer])*
+            #[doc(cfg(feature = "chrono"))]
             #[component]
             pub fn [<Default $date_type TableCellRenderer>] (
                 cx: Scope,
