@@ -1,5 +1,7 @@
 //! Easily create Leptos table components from structs.
 //!
+//! ![Hero Image](https://raw.githubusercontent.com/synphonyte/leptos-struct-table/master/hero.webp)
+//!
 //! # Features
 //!
 //! - **Async data loading** - The data is loaded asynchronously. This allows for loading data from a REST API or a database etc.

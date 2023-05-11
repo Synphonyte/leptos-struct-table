@@ -8,11 +8,30 @@
       <sourceFolder url="file://$MODULE_DIR$/leptos-struct-table-macro/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples/custom_renderers_svg/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/tailwind/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/examples/rest_datasource/target" />
       <excludeFolder url="file://$MODULE_DIR$/examples/simple/target" />
       <excludeFolder url="file://$MODULE_DIR$/leptos-struct-table-macro/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/examples/custom_renderers_svg/target" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/custom_renderers_svg/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/@jridgewell/gen-mapping/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/@jridgewell/resolve-uri/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/@jridgewell/set-array/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/@jridgewell/sourcemap-codec/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/@jridgewell/trace-mapping/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/@jridgewell/trace-mapping/node_modules/@jridgewell/sourcemap-codec/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/dlv/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/jiti/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/lilconfig/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/object-hash/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/postcss-selector-parser/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/sucrase/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/ts-interface-checker/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/yaml/browser/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/yaml/dist" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
