@@ -175,11 +175,9 @@ pub struct TemperatureMeasurement {
 //! fn ImageTableCellRenderer(
 //!     cx: Scope,
 //!     #[prop(into)] class: MaybeSignal<String>,
-//!     #[prop(into)] value: MaybeSignal<T>,
-//! ) -> impl IntoView
-//! where
-//!     T: IntoView + Clone + 'static,
-//! {
+//!     #[prop(into)] value: MaybeSignal<String>,
+//!     index: usize,
+//! ) -> impl IntoView {
 //!     view! { cx,
 //!         <td class=class>
 //!             <img src=value alt="Book image" height="64"/>

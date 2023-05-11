@@ -13,7 +13,7 @@ repository = "https://github.com/Synphonyte/leptos-struct-table"
 
 [dependencies]
 leptos = "0.2"
-leptos-struct-table-macro = { version = "0.1" }
+leptos-struct-table-macro = "0.1"
 async-trait = "0.1"
 paste = { version = "1.0", optional = true }
 chrono = { version = "0.4", optional = true, features = ["serde"] }
