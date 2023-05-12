@@ -1,6 +1,8 @@
+mod bootstrap;
 mod tailwind;
 
 use crate::ColumnSort;
+pub use bootstrap::*;
 pub use tailwind::*;
 
 /// A trait for providing classes for the table.

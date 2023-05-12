@@ -9,6 +9,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples/custom_renderers_svg/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples/tailwind/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/bootstrap/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/examples/rest_datasource/target" />
       <excludeFolder url="file://$MODULE_DIR$/examples/simple/target" />
       <excludeFolder url="file://$MODULE_DIR$/leptos-struct-table-macro/target" />
@@ -32,6 +33,7 @@
       <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/yaml/browser/dist" />
       <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/node_modules/yaml/dist" />
       <excludeFolder url="file://$MODULE_DIR$/examples/tailwind/target" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/bootstrap/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
