@@ -1,4 +1,5 @@
 #![allow(unused_variables)]
+#![doc(cfg(feature = "chrono"))]
 
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use leptos::*;
@@ -11,7 +12,8 @@ macro_rules! date_cell_renderer {
     ) => {
         paste! {
             $(#[$outer])*
-            #[doc(cfg(feature = "chrono"))]
+            ///
+            /// This is only available when the **crate feature `chrono`** is enabled
             #[component]
             pub fn [<Default $date_type TableCellRenderer>] (
                 cx: Scope,

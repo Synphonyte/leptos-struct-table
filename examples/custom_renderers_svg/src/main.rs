@@ -13,6 +13,8 @@ use serde::{Deserialize, Serialize};
     row_renderer = "SvgRowRenderer",
     head_row_renderer = "g",
     head_cell_renderer = "SvgHeadCellRenderer",
+    thead_renderer = "g",
+    tbody_renderer = "g",
     tag = "g"
 )]
 pub struct Form {

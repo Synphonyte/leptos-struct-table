@@ -64,6 +64,8 @@
 //! - **`row_renderer`** - Specifies the name of the row renderer component. Used to customize the rendering of rows. Defaults to [`DefaultTableRowRenderer`].
 //! - **`head_row_renderer`** - Specifies the name of the head row renderer component/tag. Used to customize the rendering of the head rows. Defaults to the tag `tr`. This only takes a `class` attribute.
 //! - **`head_cell_renderer`** - Specifies the name of the header cell renderer component. Used to customize the rendering of header cells. Defaults to [`DefaultTableHeaderRenderer`].
+//! - **`thead_renderer`** - Specifies the name of the thead renderer component. Used to customize the rendering of the thead. Defaults to the tag `thead`. Takes no attributes.
+//! - **`tbody_renderer`** - Specifies the name of the tbody renderer component. Used to customize the rendering of the tbody. Defaults to the tag `tbody`. Takes no attributes.
 //! - **`row_class`** - Specifies the classes that are applied to each row. Can be used in conjuction with `classes_provider` to customize the classes.
 //! - **`head_row_class`** - Specifies the classes that are applied to the header row. Can be used in conjuction with `classes_provider` to customize the classes.
 //!
@@ -148,6 +150,8 @@ pub struct TemperatureMeasurement {
 //! - **`row_renderer`** - Defaults to [`DefaultTableRowRenderer`].
 //! - **`head_row_renderer`** - Defaults to the tag `tr`. This only takes a `class` attribute.
 //! - **`head_cell_renderer`** - Defaults to [`DefaultTableHeaderRenderer`].
+//! - **`thead_renderer`** -
+//! - **`tbody_renderer`** -
 //!
 //! On the field level you can use the **`renderer`** attribute.
 //!
