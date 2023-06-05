@@ -1,0 +1,22 @@
+table.table th {
+    user-select: none;
+}
+
+table.table th > span {
+    display: flex;
+    align-items: center;
+}
+
+table.table th.sort-asc > span::after, table.table th.sort-desc > span::after {
+    content: var(--sort-icon);
+    padding-left: 0.25rem;
+    opacity: 0.4;
+}
+
+table.table th.sort-asc > span::before, table.table th.sort-desc > span::before {
+    content: var(--sort-priority);
+    opacity: 0.4;
+    font-weight: 300;
+    padding-left: 0.125rem;
+    order: 9999;
+}

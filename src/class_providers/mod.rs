@@ -27,7 +27,7 @@ pub trait TableClassesProvider: Clone {
     /// The `sort` parameter contains the sort state of the column.
     /// The `template_classes` parameter contains the classes specified in the `head_class` attribute of the field.
     fn head_cell(&self, sort: ColumnSort, template_classes: &str) -> String {
-        template_classes.to_string()
+        format!("{} {}", sort.as_class(), template_classes)
     }
 
     /// Get the classes for the head cells' inner element.

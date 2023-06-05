@@ -56,8 +56,8 @@ fn main() {
         );
 
         view! { cx,
-            <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 float-left".to_string()>
-                <BookTable class="mb-[-1px]".to_string() items=items />
+            <div class="container".to_string()>
+                <BookTable class="table-hover".to_string() items=items />
             </div>
         }
     })

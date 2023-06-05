@@ -86,6 +86,7 @@
 //!    If the feature `chrono` is enabled then [`DefaultNaiveDateTableCellRenderer`], [`DefaultNaiveDateTimeTableCellRenderer`] and
 //!    [`DefaultNaiveTimeTableCellRenderer`] are used for [`chrono::NaiveDate`], [`chrono::NaiveDateTime`] and [`chrono::NaiveTime`] respectively.
 //!  - **`format`** - Quick way to customize the formatting of cells without having to create a custom renderer. See [Formatting](#formatting) below for more information.
+//! - **`getter`** - Specifies a method that returns the value of the field instead of accessing the field directly when rendering.
 //!
 //! ### Formatting
 //!
@@ -140,6 +141,73 @@ pub struct TemperatureMeasurement {
 //! }
 //! ```
 //!
+//! # Field Getters
+//!
+//! Sometimes you want to display a field that is not part of the struct but a derived value either
+//! from other fields or sth entirely different. For this you can use either the [`FieldGetter`] type
+//! or the `getter` attribute.
+//!
+//! Let's start with [`FieldGetter`] and see an example:
+//!
+//! ```
+//! # use leptos::*;
+//! # use leptos_struct_table::*;
+//! # use serde::{Deserialize, Serialize};
+//! # use async_trait::async_trait;
+//! #[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+//! #[table(classes_provider = "TailwindClassesPreset")]
+//! pub struct Book {
+//!     #[table(key)]
+//!     id: u32,
+//!     title: String,
+//!     author: String,
+//!
+//!     // this tells the macro that you're going to provide a method called `title_and_author` that returns a `String`
+//!     title_and_author: FieldGetter<String>
+//! }
+//!
+//! impl Book {
+//!     // Returns the value that is displayed in the column
+//!     pub fn title_and_author(&self) -> String {
+//!         format!("{} by {}", self.title, self.author)
+//!     }
+//! }
+//! ```
+//!
+//! To provide maximum flexibility you can use the `getter` attribute.
+//!
+//! ```
+//! # use leptos::*;
+//! # use leptos_struct_table::*;
+//! # use serde::{Deserialize, Serialize};
+//! # use async_trait::async_trait;
+//! #[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+//! #[table(classes_provider = "TailwindClassesPreset")]
+//! pub struct Book {
+//!     #[table(key)]
+//!     id: u32,
+//!
+//!     // this tells the macro that you're going to provide a method called `get_title` that returns a `String`
+//!     #[table(getter = "get_title")]
+//!     title: String,
+//! }
+//!
+//! impl Book {
+//!     pub fn get_title(&self) -> String {
+//!         format!("Title: {}", self.title)
+//!     }
+//! }
+//! ```
+//!
+//! ## When to use `FieldGetter` vs `getter` attribute
+//!
+//! A field of type `FieldGetter<T>` is a virtual field that doesn't really exist on the struct.
+//! Internally `FieldGetter` is just a new-typed `PhatomData` and thus is removed during compilation.
+//! Hence it doesn't increase memory usage. That means you should use it for purely derived data.
+//!
+//! The `getter` attribute should be used on a field that actually exists on the struct but whose
+//! value you want to modify before it's rendered.
+//!
 //! # Custom Renderers
 //!
 //! Custom renderers can be used to customize almost every aspect of the table.
@@ -150,8 +218,8 @@ pub struct TemperatureMeasurement {
 //! - **`row_renderer`** - Defaults to [`DefaultTableRowRenderer`].
 //! - **`head_row_renderer`** - Defaults to the tag `tr`. This only takes a `class` attribute.
 //! - **`head_cell_renderer`** - Defaults to [`DefaultTableHeaderRenderer`].
-//! - **`thead_renderer`** -
-//! - **`tbody_renderer`** -
+//! - **`thead_renderer`** - Defaults to the tag `thead`. Takes no attributes.
+//! - **`tbody_renderer`** - Defaults to the tag `tbody`. Takes no attributes.
 //!
 //! On the field level you can use the **`renderer`** attribute.
 //!
@@ -209,10 +277,32 @@ pub use class_providers::*;
 pub use components::*;
 pub use data_provider::*;
 pub use leptos_struct_table_macro::TableComponent;
+use serde::{Deserialize, Serialize};
+use std::marker::PhantomData;
 
+/// Type of sorting of a column
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ColumnSort {
     Ascending,
     Descending,
     None,
 }
+
+impl ColumnSort {
+    pub fn as_class(&self) -> &'static str {
+        match self {
+            ColumnSort::Ascending => "sort-asc",
+            ColumnSort::Descending => "sort-desc",
+            _ => "",
+        }
+    }
+}
+
+/// Type of struct field used to specify that the value of this field is
+/// obtained by calling a getter method on the struct.
+///
+/// Please refer to the [`getter` example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/getter) for how this is used
+#[derive(
+    Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default, Serialize, Deserialize,
+)]
+pub struct FieldGetter<T>(PhantomData<T>);

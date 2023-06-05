@@ -1,4 +1,4 @@
-use crate::{ColumnSort, TableClassesProvider};
+use crate::TableClassesProvider;
 
 #[derive(Clone, Copy)]
 pub struct BootstrapClassesPreset;
@@ -9,26 +9,12 @@ impl TableClassesProvider for BootstrapClassesPreset {
     }
 
     fn table(&self, classes: &str) -> String {
-        todo!()
+        format!("{} {}", "table table-striped", classes)
     }
 
-    fn head_row(&self, template_classes: &str) -> String {
-        todo!()
-    }
+    fn row(&self, _: usize, selected: bool, template_classes: &str) -> String {
+        let active = if selected { "table-active" } else { "" };
 
-    fn head_cell(&self, sort: ColumnSort, template_classes: &str) -> String {
-        todo!()
-    }
-
-    fn head_cell_inner(&self) -> String {
-        todo!()
-    }
-
-    fn row(&self, row_index: usize, selected: bool, template_classes: &str) -> String {
-        todo!()
-    }
-
-    fn cell(&self, template_classes: &str) -> String {
-        todo!()
+        format!("{} {}", active, template_classes)
     }
 }

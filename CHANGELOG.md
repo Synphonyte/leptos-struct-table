@@ -7,3 +7,4 @@
 - New class provider `BootstrapClassesPreset`
 - New example `bootstrap`
 - Added `thead` and `tbody` with customizable renderers
+- Added `getter` and `FieldGetter<T>` with new example
