@@ -73,6 +73,8 @@ These attributes can be applied to the struct itself.
 - **`row_renderer`** - Specifies the name of the row renderer component. Used to customize the rendering of rows. Defaults to [`DefaultTableRowRenderer`].
 - **`head_row_renderer`** - Specifies the name of the head row renderer component/tag. Used to customize the rendering of the head rows. Defaults to the tag `tr`. This only takes a `class` attribute.
 - **`head_cell_renderer`** - Specifies the name of the header cell renderer component. Used to customize the rendering of header cells. Defaults to [`DefaultTableHeaderRenderer`].
+- **`thead_renderer`** - Specifies the name of the thead renderer component. Used to customize the rendering of the thead. Defaults to the tag `thead`. Takes no attributes.
+- **`tbody_renderer`** - Specifies the name of the tbody renderer component. Used to customize the rendering of the tbody. Defaults to the tag `tbody`. Takes no attributes.
 - **`row_class`** - Specifies the classes that are applied to each row. Can be used in conjuction with `classes_provider` to customize the classes.
 - **`head_row_class`** - Specifies the classes that are applied to the header row. Can be used in conjuction with `classes_provider` to customize the classes.
 
@@ -93,6 +95,7 @@ These attributes can be applied to any field in the struct.
    If the feature `chrono` is enabled then [`DefaultNaiveDateTableCellRenderer`], [`DefaultNaiveDateTimeTableCellRenderer`] and
    [`DefaultNaiveTimeTableCellRenderer`] are used for [`chrono::NaiveDate`], [`chrono::NaiveDateTime`] and [`chrono::NaiveTime`] respectively.
  - **`format`** - Quick way to customize the formatting of cells without having to create a custom renderer. See [Formatting](#formatting) below for more information.
+- **`getter`** - Specifies a method that returns the value of the field instead of accessing the field directly when rendering.
 
 #### Formatting
 
@@ -118,6 +121,65 @@ pub struct Book {
 }
 ```
 
+## Field Getters
+
+Sometimes you want to display a field that is not part of the struct but a derived value either
+from other fields or sth entirely different. For this you can use either the [`FieldGetter`] type
+or the `getter` attribute.
+
+Let's start with [`FieldGetter`] and see an example:
+
+```rust
+#[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[table(classes_provider = "TailwindClassesPreset")]
+pub struct Book {
+    #[table(key)]
+    id: u32,
+    title: String,
+    author: String,
+
+    // this tells the macro that you're going to provide a method called `title_and_author` that returns a `String`
+    title_and_author: FieldGetter<String>
+}
+
+impl Book {
+    // Returns the value that is displayed in the column
+    pub fn title_and_author(&self) -> String {
+        format!("{} by {}", self.title, self.author)
+    }
+}
+```
+
+To provide maximum flexibility you can use the `getter` attribute.
+
+```rust
+#[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[table(classes_provider = "TailwindClassesPreset")]
+pub struct Book {
+    #[table(key)]
+    id: u32,
+
+    // this tells the macro that you're going to provide a method called `get_title` that returns a `String`
+    #[table(getter = "get_title")]
+    title: String,
+}
+
+impl Book {
+    pub fn get_title(&self) -> String {
+        format!("Title: {}", self.title)
+    }
+}
+```
+
+### When to use `FieldGetter` vs `getter` attribute
+
+A field of type `FieldGetter<T>` is a virtual field that doesn't really exist on the struct.
+Internally `FieldGetter` is just a new-typed `PhatomData` and thus is removed during compilation.
+Hence it doesn't increase memory usage. That means you should use it for purely derived data.
+
+The `getter` attribute should be used on a field that actually exists on the struct but whose
+value you want to modify before it's rendered.
+
 ## Custom Renderers
 
 Custom renderers can be used to customize almost every aspect of the table.
@@ -128,6 +190,8 @@ On the struct level you can use these attributes:
 - **`row_renderer`** - Defaults to [`DefaultTableRowRenderer`].
 - **`head_row_renderer`** - Defaults to the tag `tr`. This only takes a `class` attribute.
 - **`head_cell_renderer`** - Defaults to [`DefaultTableHeaderRenderer`].
+- **`thead_renderer`** - Defaults to the tag `thead`. Takes no attributes.
+- **`tbody_renderer`** - Defaults to the tag `tbody`. Takes no attributes.
 
 On the field level you can use the **`renderer`** attribute.
 
