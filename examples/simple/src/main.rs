@@ -58,6 +58,7 @@ fn main() {
 
         view! { cx,
             <BookTable items=items />
+            <button on:click= move |_| log::debug!("{:#?}", items.get_untracked())>"Log current state to console"</button>
         }
     })
 }

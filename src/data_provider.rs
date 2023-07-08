@@ -26,6 +26,9 @@ where
     /// range that is clamped to the length of the vector.
     async fn get_rows(&self, range: Range<usize>) -> Vec<T>;
 
+    /// Updates the value of the row at `index` to the value of `row`.
+    fn set_row(&mut self, index: usize, row: T);
+
     #[allow(unused_variables)]
     /// Set the sorting of the table. The sorting is a list of column names and the sort order sorted by priority.
     /// The first entry in the list is the most important one.
