@@ -11,6 +11,7 @@ pub struct Book {
     #[table(key)]
     pub id: u32,
     pub title: String,
+    #[table(editable)]
     pub author: String,
     pub publish_date: NaiveDate,
     #[table(skip)]

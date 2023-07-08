@@ -28,7 +28,10 @@ macro_rules! date_cell_renderer {
                 /// The format string to use for formatting the date. Provided by the `#[table(format(string="..."))]` attribute of the field.
                 /// See [`chrono::format::strftime`] for more information.
                 #[prop(optional)] format_string: Option<String>,
-                on_change: C
+                /// Called when the content of the cell has changed.
+                on_change: C,
+                /// Set this to true to be able to edit the content of the cell.
+                #[prop(optional)] editable: bool,
             ) -> impl IntoView
             where
                 C: Fn($date_type) + 'static,
@@ -53,8 +56,14 @@ macro_rules! date_cell_renderer {
                     }
                 };
 
-                view! { cx,
-                    <td class=class _ref=td_ref on:input=on_input contenteditable>{text}</td>
+                if editable {
+                    view! { cx,
+                        <td class=class _ref=td_ref on:input=on_input contenteditable>{text}</td>
+                    }
+                } else {
+                    view! { cx,
+                        <td class=class _ref=td_ref on:input=on_input>{text}</td>
+                    }
                 }
             }
         }

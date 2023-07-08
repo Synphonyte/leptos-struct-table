@@ -22,7 +22,11 @@ pub fn DefaultTableCellRenderer<T, C>(
     value: MaybeSignal<T>,
     /// The index of the column. Starts at 0.
     index: usize,
+    /// Called when the content of the cell has changed.
     on_change: C,
+    /// Set this to true to be able to edit the content of the cell.
+    #[prop(optional)]
+    editable: bool,
 ) -> impl IntoView
 where
     T: IntoView + FromStr + Clone + 'static,
@@ -39,8 +43,14 @@ where
         }
     };
 
-    view! { cx,
-        <td class=class _ref=td_ref on:input=on_input contenteditable>{value}</td>
+    if editable {
+        view! { cx,
+            <td class=class _ref=td_ref on:input=on_input contenteditable>{value}</td>
+        }
+    } else {
+        view! { cx,
+            <td class=class _ref=td_ref on:input=on_input>{value}</td>
+        }
     }
 }
 
@@ -59,7 +69,11 @@ pub fn DefaultNumberTableCellRenderer<T, C>(
     /// The number of digits to display after the decimal point. Provided by the `#[table(format(precision=X))]` attribute of the field.
     #[prop(optional)]
     precision: Option<usize>,
+    /// Called when the content of the cell has changed.
     on_change: C,
+    /// Set this to true to be able to edit the content of the cell.
+    #[prop(optional)]
+    editable: bool,
 ) -> impl IntoView
 where
     T: Display + FromStr + Clone + 'static,
