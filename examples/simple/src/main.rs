@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 #[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 #[table(sortable)]
 pub struct Book {
-    #[table(key)]
+    #[table(key, editable)]
     pub id: u32,
     pub title: String,
     #[table(editable)]
