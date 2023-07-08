@@ -36,34 +36,34 @@ macro_rules! date_cell_renderer {
             where
                 C: Fn($date_type) + 'static,
             {
-                let td_ref = create_node_ref::<Td>(cx);
-
                 let text = match format_string.clone() {
                     Some(format_string) => create_memo(cx, move |_| value().format(&format_string).to_string()),
                     None => create_memo(cx, move |_| value().to_string()),
                 };
 
-                let on_input = move |_| {
-                    if let Some(td) = td_ref.get_untracked() {
-                        let value = td.inner_text();
-                        let parse_result = match format_string {
-                            Some(ref f) => $date_type::parse_from_str(&value, &f.clone()),
-                            None => $date_type::parse_from_str(&value, $default_date_format),
-                        };
-                        if let Ok(v) = parse_result {
-                            on_change(v);
-                        }
-                    }
-                };
-
                 if editable {
-                    view! { cx,
+                    let td_ref = create_node_ref::<Td>(cx);
+
+                    let on_input = move |_| {
+                        if let Some(td) = td_ref.get_untracked() {
+                            let value = td.inner_text();
+                            let parse_result = match format_string {
+                                Some(ref f) => $date_type::parse_from_str(&value, &f.clone()),
+                                None => $date_type::parse_from_str(&value, $default_date_format),
+                            };
+                            if let Ok(v) = parse_result {
+                                on_change(v);
+                            }
+                        }
+                    };
+
+                    return view! { cx,
                         <td class=class _ref=td_ref on:input=on_input contenteditable>{text}</td>
-                    }
-                } else {
-                    view! { cx,
-                        <td class=class _ref=td_ref on:input=on_input>{text}</td>
-                    }
+                    };
+                }
+
+                view! { cx,
+                    <td class=class>{text}</td>
                 }
             }
         }

@@ -32,24 +32,24 @@ where
     C: Fn(T) + 'static,
     <T as FromStr>::Err: std::fmt::Debug,
 {
-    let td_ref = create_node_ref::<Td>(cx);
-    let on_input = move |_| {
-        if let Some(td) = td_ref.get_untracked() {
-            let value = td.inner_text();
-            if let Ok(v) = T::from_str(&value) {
-                on_change(v);
-            }
-        }
-    };
-
     if editable {
-        view! { cx,
+        let td_ref = create_node_ref::<Td>(cx);
+        let on_input = move |_| {
+            if let Some(td) = td_ref.get_untracked() {
+                let value = td.inner_text();
+                if let Ok(v) = T::from_str(&value) {
+                    on_change(v);
+                }
+            }
+        };
+
+        return view! { cx,
             <td class=class _ref=td_ref on:input=on_input contenteditable>{value}</td>
-        }
-    } else {
-        view! { cx,
-            <td class=class _ref=td_ref on:input=on_input>{value}</td>
-        }
+        };
+    }
+
+    view! { cx,
+        <td class=class>{value}</td>
     }
 }
 
@@ -77,29 +77,29 @@ where
     T: Display + FromStr + Clone + 'static,
     C: Fn(T) + 'static,
 {
-    let td_ref = create_node_ref::<Td>(cx);
-
     let text = create_memo(cx, move |_| match precision {
         Some(precision) => format!("{:.precision$}", value()),
         None => format!("{}", value()),
     });
 
-    let on_input = move |_| {
-        if let Some(td) = td_ref.get_untracked() {
-            let value = td.inner_text();
-            if let Ok(v) = T::from_str(&value) {
-                on_change(v);
-            }
-        }
-    };
-
     if editable {
-        view! { cx,
+        let td_ref = create_node_ref::<Td>(cx);
+
+        let on_input = move |_| {
+            if let Some(td) = td_ref.get_untracked() {
+                let value = td.inner_text();
+                if let Ok(v) = T::from_str(&value) {
+                    on_change(v);
+                }
+            }
+        };
+
+        return view! { cx,
             <td class=class _ref=td_ref on:input=on_input contenteditable>{text}</td>
-        }
-    } else {
-        view! { cx,
-            <td class=class _ref=td_ref on:input=on_input>{text}</td>
-        }
+        };
+    }
+
+    view! { cx,
+        <td class=class>{text}</td>
     }
 }
