@@ -31,7 +31,7 @@ macro_rules! date_cell_renderer {
                 /// Called when the content of the cell has changed.
                 on_change: C,
                 /// Set this to true to be able to edit the content of the cell.
-                #[prop(optional)] editable: bool,
+                editable: bool,
             ) -> impl IntoView
             where
                 C: Fn($date_type) + 'static,

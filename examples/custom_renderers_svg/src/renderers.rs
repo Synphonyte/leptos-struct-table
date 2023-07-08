@@ -98,11 +98,14 @@ where
 }
 
 #[component]
-pub fn SvgTextCellRenderer<T>(
+#[allow(unused_variables)]
+pub fn SvgTextCellRenderer<T, C>(
     cx: Scope,
     #[prop(into)] class: MaybeSignal<String>,
     #[prop(into)] value: MaybeSignal<T>,
     index: usize,
+    on_change: C,
+    editable: bool,
 ) -> impl IntoView
 where
     T: IntoView + Clone + 'static,
@@ -115,11 +118,14 @@ where
 }
 
 #[component]
-pub fn SvgPathCellRenderer(
+#[allow(unused_variables)]
+pub fn SvgPathCellRenderer<C>(
     cx: Scope,
     #[prop(into)] class: MaybeSignal<String>,
     #[prop(into)] value: MaybeSignal<String>,
     index: usize,
+    on_change: C,
+    editable: bool,
 ) -> impl IntoView {
     let transform = transform_from_index(index, 3);
 

@@ -25,7 +25,6 @@ pub fn DefaultTableCellRenderer<T, C>(
     /// Called when the content of the cell has changed.
     on_change: C,
     /// Set this to true to be able to edit the content of the cell.
-    #[prop(optional)]
     editable: bool,
 ) -> impl IntoView
 where
@@ -72,7 +71,6 @@ pub fn DefaultNumberTableCellRenderer<T, C>(
     /// Called when the content of the cell has changed.
     on_change: C,
     /// Set this to true to be able to edit the content of the cell.
-    #[prop(optional)]
     editable: bool,
 ) -> impl IntoView
 where
