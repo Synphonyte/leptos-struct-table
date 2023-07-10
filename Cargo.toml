@@ -18,9 +18,11 @@ async-trait = "0.1"
 paste = { version = "1.0", optional = true }
 chrono = { version = "0.4", optional = true, features = ["serde"] }
 serde = "1"
+uuid = { version = "1", optional = true, features = ["v4", "js", "serde"]}
 
 [features]
 chrono = ["dep:chrono", "dep:paste"]
+uuid = ["dep:uuid"]
 
 [package.metadata."docs.rs"]
 all-features = true

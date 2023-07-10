@@ -1,3 +1,4 @@
+use crate::uuid::Uuid;
 use async_trait::async_trait;
 use chrono::NaiveDate;
 use leptos::*;
@@ -9,7 +10,7 @@ use serde::{Deserialize, Serialize};
 #[table(sortable)]
 pub struct Book {
     #[table(key)]
-    pub id: u32,
+    pub id: Uuid,
     pub title: String,
     pub author: String,
     pub publish_date: NaiveDate,
@@ -26,28 +27,28 @@ fn main() {
             cx,
             vec![
                 Book {
-                    id: 1,
+                    id: Uuid::default(),
                     title: "The Great Gatsby".to_string(),
                     author: "F. Scott Fitzgerald".to_string(),
                     publish_date: NaiveDate::from_ymd_opt(1925, 4, 10).unwrap(),
                     hidden_field: "hidden".to_string(),
                 },
                 Book {
-                    id: 2,
+                    id: Uuid::default(),
                     title: "The Grapes of Wrath".to_string(),
                     author: "John Steinbeck".to_string(),
                     publish_date: NaiveDate::from_ymd_opt(1939, 4, 14).unwrap(),
                     hidden_field: "not visible in the table".to_string(),
                 },
                 Book {
-                    id: 3,
+                    id: Uuid::default(),
                     title: "Nineteen Eighty-Four".to_string(),
                     author: "George Orwell".to_string(),
                     publish_date: NaiveDate::from_ymd_opt(1949, 6, 8).unwrap(),
                     hidden_field: "hidden".to_string(),
                 },
                 Book {
-                    id: 4,
+                    id: Uuid::default(),
                     title: "Ulysses".to_string(),
                     author: "James Joyce".to_string(),
                     publish_date: NaiveDate::from_ymd_opt(1922, 2, 2).unwrap(),
