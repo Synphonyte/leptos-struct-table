@@ -8,9 +8,10 @@ use serde::{Deserialize, Serialize};
 #[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 #[table(sortable)]
 pub struct Book {
-    #[table(key)]
+    #[table(key, editable)]
     pub id: u32,
     pub title: String,
+    #[table(editable)]
     pub author: String,
     pub publish_date: NaiveDate,
     #[table(skip)]
@@ -58,6 +59,7 @@ fn main() {
 
         view! { cx,
             <BookTable items=items />
+            <button on:click= move |_| log::debug!("{:#?}", items.get_untracked())>"Log current state to console"</button>
         }
     })
 }
