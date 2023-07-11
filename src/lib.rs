@@ -272,6 +272,8 @@ pub struct TemperatureMeasurement {
 mod class_providers;
 mod components;
 mod data_provider;
+#[cfg(feature = "uuid")]
+pub mod uuid;
 
 pub use class_providers::*;
 pub use components::*;
