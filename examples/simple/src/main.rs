@@ -1,3 +1,6 @@
+#![deny(missing_docs)]
+//! Simple showcase example.
+
 use crate::uuid::Uuid;
 use async_trait::async_trait;
 use chrono::NaiveDate;
@@ -5,15 +8,20 @@ use leptos::*;
 use leptos_struct_table::*;
 use serde::{Deserialize, Serialize};
 
-// This generates the component BookTable
+/// This generates the component BookTable
 #[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 #[table(sortable)]
 pub struct Book {
+    /// Id of the entry.
     #[table(key)]
     pub id: Uuid,
+    /// Title of the book.
     pub title: String,
+    /// Author of the book.
     pub author: String,
+    /// Date when book has been published.
     pub publish_date: NaiveDate,
+    /// Example on hidden member.
     #[table(skip)]
     pub hidden_field: String,
 }
