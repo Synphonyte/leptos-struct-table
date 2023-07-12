@@ -58,7 +58,7 @@ macro_rules! date_cell_renderer {
                     };
 
                     return view! { cx,
-                        <td class=class node_ref=td_ref on:input=on_input contenteditable>{text}</td>
+                        <td class={ format!("{} editable", class.get()) } node_ref=td_ref on:input=on_input contenteditable>{text}</td>
                     };
                 }
 
