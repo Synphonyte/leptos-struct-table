@@ -87,6 +87,7 @@
 //!    [`DefaultNaiveTimeTableCellRenderer`] are used for [`chrono::NaiveDate`], [`chrono::NaiveDateTime`] and [`chrono::NaiveTime`] respectively.
 //!  - **`format`** - Quick way to customize the formatting of cells without having to create a custom renderer. See [Formatting](#formatting) below for more information.
 //! - **`getter`** - Specifies a method that returns the value of the field instead of accessing the field directly when rendering.
+//! - **`none_value`** - Specifies a display value for `Option` types when they are `None`. Defaults to empty string
 //!
 //! ### Formatting
 //!
