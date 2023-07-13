@@ -283,7 +283,7 @@ use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
 
 /// Type of sorting of a column
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub enum ColumnSort {
     Ascending,
     Descending,

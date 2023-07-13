@@ -46,12 +46,10 @@ impl TableClassesProvider for TailwindClassesPreset {
             } else {
                 "bg-white dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800"
             }
+        } else if selected {
+            "bg-sky-300 text-gray-700 dark:bg-sky-700 dark:text-gray-400"
         } else {
-            if selected {
-                "bg-sky-300 text-gray-700 dark:bg-sky-700 dark:text-gray-400"
-            } else {
-                "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
-            }
+            "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
         };
 
         format!(

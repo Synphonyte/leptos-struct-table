@@ -12,6 +12,8 @@
       <sourceFolder url="file://$MODULE_DIR$/examples/bootstrap/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples/getter/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples/selectable/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/server_function/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/server_function_1/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/examples/rest_datasource/target" />
       <excludeFolder url="file://$MODULE_DIR$/examples/simple/target" />
       <excludeFolder url="file://$MODULE_DIR$/leptos-struct-table-macro/target" />
@@ -38,6 +40,8 @@
       <excludeFolder url="file://$MODULE_DIR$/examples/bootstrap/target" />
       <excludeFolder url="file://$MODULE_DIR$/examples/getter/target" />
       <excludeFolder url="file://$MODULE_DIR$/examples/selectable/target" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/server_function/target" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/server_function_1/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
