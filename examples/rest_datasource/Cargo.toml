@@ -4,6 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+anyhow = "1"
 leptos = "0.3"
 leptos-struct-table = { path = "../..", features = ["chrono"] }
 chrono = { version = "0.4", features = ["serde"] }

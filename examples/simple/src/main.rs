@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use chrono::NaiveDate;
 use leptos::*;
 use leptos_struct_table::*;
@@ -8,7 +7,7 @@ use serde::{Deserialize, Serialize};
 #[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 #[table(sortable)]
 pub struct Book {
-    #[table(key, editable)]
+    #[table(key)]
     pub id: u32,
     pub title: String,
     #[table(editable)]
@@ -23,9 +22,21 @@ fn main() {
     console_error_panic_hook::set_once();
 
     mount_to_body(|cx| {
-        let items = create_rw_signal(
+        let get_current_provider_state =
+            create_action(cx, move |provider: &StoredValue<MemoryStorage<Book>>| {
+                let p = provider.get_value();
+                async move { p.get_rows(0..1000).await.unwrap() }
+            });
+        let current_provider_state = get_current_provider_state.value();
+        let log_provider_state = move || {
+            log::debug!("Provider state:\n{:#?}", current_provider_state.get());
+        };
+
+        let range_to_show = create_rw_signal(cx, 0..4);
+
+        let provider = store_value(
             cx,
-            vec![
+            MemoryStorage::new(vec![
                 Book {
                     id: 1,
                     title: "The Great Gatsby".to_string(),
@@ -54,12 +65,15 @@ fn main() {
                     publish_date: NaiveDate::from_ymd_opt(1922, 2, 2).unwrap(),
                     hidden_field: "hidden".to_string(),
                 },
-            ],
+            ]),
         );
 
         view! { cx,
-            <BookTable items=items />
-            <button on:click= move |_| log::debug!("{:#?}", items.get_untracked())>"Log current state to console"</button>
+            <BookTable data_provider=provider range=range_to_show />
+            <button on:click=move |_| {
+                get_current_provider_state.dispatch(provider);
+            }>{"Refetch data"}</button>
+            { log_provider_state }
         }
     })
 }

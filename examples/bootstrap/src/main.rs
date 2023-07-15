@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use chrono::NaiveDate;
 use leptos::*;
 use leptos_struct_table::*;
@@ -25,9 +24,9 @@ fn main() {
     console_error_panic_hook::set_once();
 
     mount_to_body(|cx| {
-        let items = create_rw_signal(
+        let provider = store_value(
             cx,
-            vec![
+            MemoryStorage::new(vec![
                 Book {
                     id: 1,
                     title: "The Great Gatsby".to_string(),
@@ -52,12 +51,12 @@ fn main() {
                     author: "James Joyce".to_string(),
                     publish_date: NaiveDate::from_ymd_opt(1922, 2, 2).unwrap(),
                 },
-            ],
+            ]),
         );
 
         view! { cx,
             <div class="container".to_string()>
-                <BookTable class="table-hover".to_string() items=items />
+                <BookTable class="table-hover".to_string() data_provider=provider />
             </div>
         }
     })
