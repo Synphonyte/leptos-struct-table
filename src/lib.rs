@@ -30,16 +30,16 @@
 //!
 //! fn main() {
 //!     mount_to_body(|cx| {
-//!         // Create a few Person items
-//!         let items = create_rw_signal( cx, vec![
+//!         // Create a provider with a few person items
+//!         let provider = store_value( cx, MemoryStorage::new(vec![
 //!             Person { id: 1, name: "John".to_string(), age: 32 },
 //!             Person { id: 2, name: "Jane".to_string(), age: 28 },
 //!             Person { id: 3, name: "Bob".to_string(), age: 45 },
-//!         ]);
+//!         ]));
 //!
 //!         // Use the generated component
 //!         view! { cx,
-//!             <PersonTable items=items />
+//!             <PersonTable data_provider=provider />
 //!         }
 //!     });
 //! }
@@ -246,11 +246,13 @@ pub struct TemperatureMeasurement {
 //!
 //! // Easy cell renderer that just displays an image from an URL.
 //! #[component]
-//! fn ImageTableCellRenderer(
+//! fn ImageTableCellRenderer<C>(
 //!     cx: Scope,
 //!     #[prop(into)] class: MaybeSignal<String>,
 //!     #[prop(into)] value: MaybeSignal<String>,
 //!     index: usize,
+//!     on_change: C,
+//!     editable: bool,
 //! ) -> impl IntoView {
 //!     view! { cx,
 //!         <td class=class>
@@ -271,13 +273,15 @@ pub struct TemperatureMeasurement {
 
 mod class_providers;
 mod components;
-mod data_provider;
+mod data_storage;
+mod sorting;
 
 pub use class_providers::*;
 pub use components::*;
-pub use data_provider::*;
+pub use data_storage::*;
 pub use leptos_struct_table_macro::TableComponent;
 use serde::{Deserialize, Serialize};
+pub use sorting::*;
 use std::marker::PhantomData;
 
 /// Type of sorting of a column

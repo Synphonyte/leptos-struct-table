@@ -12,7 +12,9 @@ readme = "README.md"
 repository = "https://github.com/Synphonyte/leptos-struct-table"
 
 [dependencies]
+anyhow = "1"
 leptos = { version = "0.3", default-features = false }
+log = "0.4"
 leptos-struct-table-macro = "0.3.1"
 async-trait = "0.1"
 paste = { version = "1.0", optional = true }
