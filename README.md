@@ -236,3 +236,10 @@ For more detailed information please have a look at the `custom_renderers_svg` e
 All contributions are welcome. Please open an issue or a pull request if you have any ideas or problems.
 
 <!-- cargo-rdme end -->
+
+## Leptos compatibility
+
+| Crate version | Compatible Leptos version |
+|---------------|---------------------------|
+| <= 0.2        | 0.3                       |
+| 0.3           | 0.4                       |
