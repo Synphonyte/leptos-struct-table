@@ -29,10 +29,19 @@ jobs:
           cargo rdme --check
       - name: Run tests
         run: cargo test --all-features
-      - name: Publish crate leptos-struct-table
-        uses: katyo/publish-crates@v2
-        with:
-          registry-token: ${{ secrets.CRATES_TOKEN }}
+      - name: Run examples
+        run: |
+          for example in "${GITHUB_WORKSPACE}"/examples/*; do
+            if [ -d "${GITHUB_WORKSPACE}"/examples/$example ]; then
+              echo "Building example: $example"
+              cd "${GITHUB_WORKSPACE}"/examples/$example
+              cargo build
+            fi
+          done
+#      - name: Publish crate leptos-struct-table
+#        uses: katyo/publish-crates@v2
+#        with:
+#          registry-token: ${{ secrets.CRATES_TOKEN }}
 
 #  coverage:
 #    name: Coverage

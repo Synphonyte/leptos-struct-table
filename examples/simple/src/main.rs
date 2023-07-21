@@ -22,6 +22,7 @@ pub struct Book {
     /// Date when book has been published.
     pub publish_date: Option<NaiveDate>,
     /// Description of the book. Optional.
+    #[table(none_value = "-")]
     pub description: Option<String>,
     /// Example on hidden member.
     #[table(skip)]
