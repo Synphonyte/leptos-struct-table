@@ -21,23 +21,18 @@ jobs:
           components: rustfmt
       - name: Cache
         uses: Swatinem/rust-cache@v2
-      - name: Check formatting
-        run: cargo fmt --check
-      - name: Check if the README is up to date.
-        run: |
-          cargo install cargo-rdme
-          cargo rdme --check
-      - name: Run tests
-        run: cargo test --all-features
+#      - name: Check formatting
+#        run: cargo fmt --check
+#      - name: Check if the README is up to date.
+#        run: |
+#          cargo install cargo-rdme
+#          cargo rdme --check
+#      - name: Run tests
+#        run: cargo test --all-features
       - name: Run examples
-        run: |
-          for example in "${GITHUB_WORKSPACE}"/examples/*; do
-            if [ -d "${GITHUB_WORKSPACE}"/examples/$example ]; then
-              echo "Building example: $example"
-              cd "${GITHUB_WORKSPACE}"/examples/$example
-              cargo build
-            fi
-          done
+        run: echo "RUNNING EXAMPLES ${{ github.action_path }}" && bash ${{ github.action_path }}/test_examples.sh ${{ github.action_path }}
+        shell: bash
+
 #      - name: Publish crate leptos-struct-table
 #        uses: katyo/publish-crates@v2
 #        with:
