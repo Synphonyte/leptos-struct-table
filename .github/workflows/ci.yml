@@ -30,7 +30,7 @@ jobs:
 #      - name: Run tests
 #        run: cargo test --all-features
       - name: Run examples
-        run: echo "RUNNING EXAMPLES ${{ github.action_path }}" && bash ${{ github.action_path }}/test_examples.sh ${{ github.action_path }}
+        run: echo "RUNNING EXAMPLES ${{ github.workspace }}" && bash ${{ github.workspace }}/test_examples.sh ${{ github.workspace }}
         shell: bash
 
 #      - name: Publish crate leptos-struct-table
