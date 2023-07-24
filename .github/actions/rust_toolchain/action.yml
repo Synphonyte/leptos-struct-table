@@ -12,5 +12,3 @@ runs:
 
     - name: Cache
       uses: Swatinem/rust-cache@v2
-      with:
-        shared-key: "same-rust-toolchain"
