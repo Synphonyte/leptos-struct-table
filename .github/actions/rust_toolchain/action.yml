@@ -1,0 +1,16 @@
+name: Rust Toolchain
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        profile: minimal
+        override: true
+        components: rustfmt
+
+    - name: Cache
+      uses: Swatinem/rust-cache@v2
+      with:
+        shared-key: "same-rust-toolchain"
