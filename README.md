@@ -38,16 +38,16 @@ pub struct Person {
 }
 
 fn main() {
-    mount_to_body(|cx| {
+    mount_to_body(|| {
         // Create a few Person items
-        let items = create_rw_signal( cx, vec![
+        let items = create_rw_signal( vec![
             Person { id: 1, name: "John".to_string(), age: 32 },
             Person { id: 2, name: "Jane".to_string(), age: 28 },
             Person { id: 3, name: "Bob".to_string(), age: 45 },
         ]);
 
         // Use the generated component
-        view! { cx,
+        view! {
             <PersonTable items=items />
         }
     });
@@ -216,12 +216,11 @@ pub struct Book {
 // Easy cell renderer that just displays an image from an URL.
 #[component]
 fn ImageTableCellRenderer(
-    cx: Scope,
     #[prop(into)] class: MaybeSignal<String>,
     #[prop(into)] value: MaybeSignal<String>,
     index: usize,
 ) -> impl IntoView {
-    view! { cx,
+    view! {
         <td class=class>
             <img src=value alt="Book image" height="64"/>
         </td>
@@ -243,3 +242,4 @@ All contributions are welcome. Please open an issue or a pull request if you hav
 |---------------|---------------------------|
 | <= 0.2        | 0.3                       |
 | 0.3           | 0.4                       |
+| >= 0.3.3      | 0.5                       |

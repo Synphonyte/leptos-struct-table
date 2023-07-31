@@ -55,19 +55,16 @@ impl TableDataProvider<Book> for BookDataProvider {
 }
 
 #[component]
-pub fn App(cx: Scope) -> impl IntoView {
-    provide_meta_context(cx);
+pub fn App() -> impl IntoView {
+    provide_meta_context();
 
-    let items = create_rw_signal(
-        cx,
-        BookDataProvider {
-            sorting: VecDeque::from([(BookColumnName::Id, ColumnSort::Descending)]),
-        },
-    );
+    let items = create_rw_signal(BookDataProvider {
+        sorting: VecDeque::from([(BookColumnName::Id, ColumnSort::Descending)]),
+    });
 
-    // let current_sorting = create_rw_signal(cx, vec![]);
+    // let current_sorting = create_rw_signal( vec![]);
 
-    let sorting = create_memo(cx, move |_| {
+    let sorting = create_memo(move |_| {
         log!("Sorting: {:?}", items.get());
         items
             .get()
@@ -77,22 +74,22 @@ pub fn App(cx: Scope) -> impl IntoView {
             .collect::<Vec<_>>()
     });
 
-    let sort_option_view = create_memo(cx, move |_| {
+    let sort_option_view = create_memo(move |_| {
         if sorting().is_empty() {
             log!("Empty");
-            view! {cx,
+            view! {
                 <div>
                     "-- No option selected --"
                 </div>
             }
-            .into_view(cx)
+            .into_view()
         } else {
-            view! {cx,
+            view! {
                 <For
                     each=sorting
                     key=|(i, s)| format!("{}-{}", i, s)
-                    view=move |cx, (i, s)| {
-                        view! {cx,
+                    view=move | (i, s)| {
+                        view! {
                             <div>
                                 {i}" - "{s}
                             </div>
@@ -100,11 +97,11 @@ pub fn App(cx: Scope) -> impl IntoView {
                     }
                 />
             }
-            .into_view(cx)
+            .into_view()
         }
     });
 
-    view! { cx,
+    view! {
         <div>
             <h5>"Highest Priority"</h5>
                 {sort_option_view}

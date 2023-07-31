@@ -34,9 +34,9 @@ impl core::ops::Deref for Uuid {
 }
 
 impl IntoView for Uuid {
-    fn into_view(self, cx: Scope) -> View {
+    fn into_view(self) -> View {
         view! {
-            cx,
+
             <>{format!("{:?}", self.0)}</>
         }
         .into()

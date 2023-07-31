@@ -30,9 +30,9 @@ fn main() {
     _ = console_log::init_with_level(log::Level::Debug);
     console_error_panic_hook::set_once();
 
-    mount_to_body(|cx| {
+    mount_to_body(|| {
         let items = create_rw_signal(
-            cx,
+
             vec![
                 Form {
                     id: 1,
@@ -52,7 +52,7 @@ fn main() {
             ],
         );
 
-        view! { cx,
+        view! {
             <svg style="font-family: sans-serif;">
                 <FormTable items=items/>
             </svg>

@@ -59,10 +59,10 @@ fn main() {
     _ = console_log::init_with_level(log::Level::Debug);
     console_error_panic_hook::set_once();
 
-    mount_to_body(|cx| {
-        let items = create_rw_signal(cx, BookDataProvider);
+    mount_to_body(|| {
+        let items = create_rw_signal(BookDataProvider);
 
-        view! { cx,
+        view! {
             <BookTable
                 items=items
             />
