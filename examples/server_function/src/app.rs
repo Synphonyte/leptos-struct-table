@@ -1,6 +1,5 @@
 use crate::server::*;
 use async_trait::async_trait;
-use cfg_if::cfg_if;
 use leptos::*;
 use leptos_meta::*;
 use leptos_struct_table::*;
@@ -41,7 +40,7 @@ impl TableDataProvider<Book> for BookDataProvider {
 
         let res = match get_books(self.sorting.clone()).await {
             Ok(books) => books,
-            Err(err) => {
+            Err(_) => {
                 return vec![];
             }
         };

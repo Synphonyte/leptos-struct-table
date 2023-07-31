@@ -61,7 +61,7 @@ fn main() {
 
         let selected_key = create_rw_signal(None);
 
-        create_effect(move || log!("{:?}", selected_key.get()));
+        create_effect(move |_| log!("{:?}", selected_key.get()));
 
         view! {
             <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 float-left".to_string()>
