@@ -1,6 +1,6 @@
 [package]
 name = "leptos-struct-table"
-version = "0.3.3"
+version = "0.4.0"
 edition = "2021"
 authors = ["Marc-Stefan Cassola"]
 categories = ["gui", "web-programming"]
@@ -13,7 +13,7 @@ repository = "https://github.com/Synphonyte/leptos-struct-table"
 
 [dependencies]
 leptos = { git = "https://github.com/leptos-rs/leptos", branch = "effect-cleanups", features = ["nightly"]}
-leptos-struct-table-macro = "0.4"
+leptos-struct-table-macro = "0.5"
 async-trait = "0.1"
 paste = { version = "1.0", optional = true }
 chrono = { version = "0.4", optional = true, features = ["serde"] }

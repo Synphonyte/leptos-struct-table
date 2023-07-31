@@ -27,6 +27,7 @@ jobs:
     name: Test Examples
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         example: [bootstrap, custom_renderers_svg, getter, rest_datasource, selectable, server_function, simple, tailwind]
     steps:
