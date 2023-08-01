@@ -13,7 +13,7 @@ cfg-if = "1"
 chrono = { version = "0.4", features = ["serde"] }
 console_error_panic_hook = "0.1"
 console_log = "1"
-leptos = { git = "https://github.com/leptos-rs/leptos", branch = "effect-cleanups", features = ["nightly", "serde"]}
+leptos = { git = "https://github.com/leptos-rs/leptos", branch = "effect-cleanups", features = ["nightly", "csr", "serde"]}
 leptos_axum = { git = "https://github.com/leptos-rs/leptos", branch = "effect-cleanups", optional = true }
 leptos_meta = { git = "https://github.com/leptos-rs/leptos", branch = "effect-cleanups", features = ["nightly"] }
 leptos_router = { git = "https://github.com/leptos-rs/leptos", branch = "effect-cleanups", features = ["nightly"] }
