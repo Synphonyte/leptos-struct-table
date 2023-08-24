@@ -270,12 +270,14 @@ pub struct TemperatureMeasurement {
 #![feature(doc_cfg)]
 
 mod class_providers;
+mod column_enum;
 mod components;
 mod data_provider;
 #[cfg(feature = "uuid")]
 pub mod uuid;
 
 pub use class_providers::*;
+pub use column_enum::*;
 pub use components::*;
 pub use data_provider::*;
 pub use leptos_struct_table_macro::TableComponent;
