@@ -12,7 +12,7 @@ readme = "README.md"
 repository = "https://github.com/Synphonyte/leptos-struct-table"
 
 [dependencies]
-leptos = { git = "https://github.com/leptos-rs/leptos", branch = "main", commit = "fb48f7f", features = ["nightly"] }
+leptos = { version = "0.5.0-rc1", features = ["nightly"] }
 leptos-struct-table-macro = { git = "https://github.com/Synphonyte/leptos-struct-table-macro", branch = "main" }
 async-trait = "0.1"
 paste = { version = "1.0", optional = true }
