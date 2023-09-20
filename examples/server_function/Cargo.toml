@@ -13,10 +13,10 @@ cfg-if = "1"
 chrono = { version = "0.4", features = ["serde"] }
 console_error_panic_hook = "0.1"
 console_log = "1"
-leptos = { version = "0.5.0-rc1", features = ["nightly", "csr", "serde"]}
-leptos_axum = { version = "0.5.0-rc1", optional = true }
-leptos_meta = { version = "0.5.0-rc1", features = ["nightly"] }
-leptos_router = { version = "0.5.0-rc1", features = ["nightly"] }
+leptos = { version = "0.5.0-rc2", features = ["nightly", "csr", "serde"]}
+leptos_axum = { version = "0.5.0-rc2", optional = true }
+leptos_meta = { version = "0.5.0-rc2", features = ["nightly"] }
+leptos_router = { version = "0.5.0-rc2", features = ["nightly"] }
 leptos-struct-table = { path = "../..", features = ["chrono"] }
 log = "0.4"
 reqwasm = "0.5"
