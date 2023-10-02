@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0
+
+- Updated to leptos 0.5
+
+## 0.3.0
+
+- Updated to leptos 0.4
+
 ## 0.2.0
 
 - Updated to leptos 0.3

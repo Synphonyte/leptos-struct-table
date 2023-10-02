@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-leptos = { version = "0.5.0-rc2", features = ["nightly", "csr"]}
+leptos = { version = "0.5", features = ["nightly", "csr"]}
 leptos-struct-table = { path = "../..", features = ["chrono"] }
 chrono = { version = "0.4", features=["serde"] }
 console_error_panic_hook = "0.1"
