@@ -2,6 +2,7 @@ mod tailwind;
 
 use async_trait::async_trait;
 use chrono::NaiveDate;
+use leptos::logging::log;
 use leptos::*;
 use leptos_struct_table::*;
 use serde::{Deserialize, Serialize};
