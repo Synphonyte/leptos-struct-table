@@ -273,6 +273,7 @@ mod class_providers;
 mod column_enum;
 mod components;
 mod data_provider;
+mod events;
 #[cfg(feature = "uuid")]
 pub mod uuid;
 
@@ -280,6 +281,7 @@ pub use class_providers::*;
 pub use column_enum::*;
 pub use components::*;
 pub use data_provider::*;
+pub use events::*;
 pub use leptos_struct_table_macro::TableComponent;
 use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
