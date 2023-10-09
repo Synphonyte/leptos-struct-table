@@ -19,6 +19,7 @@ Easily create Leptos table components from structs.
 - **Headless** - No default styling is applied to the table. You can fully customize the classes that are applied to the table. See [Classes customization](#classes-customization) for more information.
 - **Sorting** - Optional. If turned on: Click on a column header to sort the table by that column. You can even sort by multiple columns.
 - **Virtualization (TODO)** - Only the visible rows are rendered. This allows for very large tables.
+- **Editable** - Optional. You can provide custom renderers for editable cells. See [Editable Cells](#editable-cells) for more information.
 
 ## Usage
 
@@ -215,11 +216,15 @@ pub struct Book {
 
 // Easy cell renderer that just displays an image from an URL.
 #[component]
-fn ImageTableCellRenderer(
+fn ImageTableCellRenderer<F>(
     #[prop(into)] class: MaybeSignal<String>,
     #[prop(into)] value: MaybeSignal<String>,
+    on_change: F,
     index: usize,
-) -> impl IntoView {
+) -> impl IntoView
+where
+    F: Fn(String) + 'static,
+{
     view! {
         <td class=class>
             <img src=value alt="Book image" height="64"/>
@@ -229,6 +234,59 @@ fn ImageTableCellRenderer(
 ```
 
 For more detailed information please have a look at the `custom_renderers_svg` example for a complete customization.
+
+
+#### Editable Cells
+
+You might have noticed the type parameter `F` in the custom cell renderer above. This can be used
+to emit an event when the cell is changed. In the simplest case you can use a cell renderer that
+uses an `<input>`.
+
+```rust
+#[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+pub struct Book {
+    #[table(key)]
+    id: u32,
+    #[table(renderer = "InputCellRenderer")]
+    title: String,
+}
+
+// Easy input cell renderer that emits `on_change` when the input is changed.
+#[component]
+fn InputCellRenderer<F>(
+    #[prop(into)] class: MaybeSignal<String>,
+    #[prop(into)] value: MaybeSignal<String>,
+    on_change: F,
+    index: usize,
+) -> impl IntoView
+where
+    F: Fn(String) + 'static,
+{
+    view! {
+        <td class=class>
+            <input type="text" value=value on:change=move |evt| { on_change(event_target_value(&evt)); } />
+        </td>
+    }
+}
+```
+
+Then in the table component you can listen to the `on_change` event:
+
+```rust
+
+#[component]
+pub fn App() -> impl IntoView {
+    let on_change = move |evt: TableChangeEvent<Book, BookColumnName, BookColumnValue>| {
+        // Do something
+    };
+
+    view! {
+        <BookTable items=items on_change=on_change />
+    }
+}
+```
+
+Please have a look at the `editable` example for fully working example.
 
 ## Contribution
 

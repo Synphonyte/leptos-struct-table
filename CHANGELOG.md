@@ -1,14 +1,18 @@
 # Changelog
 
-## 0.4.0
+## [Unreleased]
+
+- Added `on_change` events to support editable data
+
+## [0.4.0] - 2023-10-02
 
 - Updated to leptos 0.5
 
-## 0.3.0
+## [0.3.0]
 
 - Updated to leptos 0.4
 
-## 0.2.0
+## [0.2.0]
 
 - Updated to leptos 0.3
 - Deactivated `default-features` of leptos
