@@ -109,12 +109,14 @@ pub struct ArchiveOrgApiResponseInner {
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct BookDataProvider {
+    reload_count: usize,
     sorting: VecDeque<(BookColumnName, ColumnSort)>,
 }
 
 impl Default for BookDataProvider {
     fn default() -> Self {
         Self {
+            reload_count: 0,
             sorting: VecDeque::new(),
         }
     }
@@ -162,6 +164,10 @@ impl BookDataProvider {
             page + 1,
         )
     }
+
+    pub fn reload(&mut self) {
+        self.reload_count += 1;
+    }
 }
 
 #[async_trait(?Send)]
@@ -190,8 +196,7 @@ pub fn App() -> impl IntoView {
     let items = create_rw_signal(BookDataProvider::default());
 
     let refresh = move |_| {
-        log::debug!("refresh");
-        items.update(|_| {});
+        items.update(|items| items.reload());
     };
 
     view! {

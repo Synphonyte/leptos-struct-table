@@ -2,7 +2,18 @@
 
 ## [Unreleased]
 
-- Added `on_change` events to support editable data
+### Breaking Changes 🛠️
+
+- Added `on_change` events to support editable data (see new editable example)
+
+### Fixes 🐛
+
+- Fixed selection with `key`s that are not `Copy`
+
+### Other Changes
+
+- Modified REST example to include sorting
+
 
 ## [0.4.0] - 2023-10-02
 
