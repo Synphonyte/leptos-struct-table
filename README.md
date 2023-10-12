@@ -4,6 +4,7 @@
 [![Docs](https://docs.rs/leptos-struct-table/badge.svg)](https://docs.rs/leptos-struct-table/)
 [![MIT/Apache 2.0](https://img.shields.io/badge/license-MIT%2FApache-blue.svg)](https://github.com/synphonyte/leptos-struct-table#license)
 [![Build Status](https://github.com/synphonyte/leptos-struct-table/actions/workflows/ci.yml/badge.svg)](https://github.com/synphonyte/leptos-struct-table/actions/workflows/ci.yml)
+[![built with Codeium](https://codeium.com/badges/main)](https://codeium.com)
 
 <!-- cargo-rdme start -->
 
