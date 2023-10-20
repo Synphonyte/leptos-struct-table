@@ -1,10 +1,8 @@
 use async_trait::async_trait;
-use chrono::{DateTime, NaiveDate, TimeZone};
 use leptos::*;
 use leptos_struct_table::*;
 use reqwasm::http::Request;
 use serde::{Deserialize, Serialize};
-use std::cell::RefCell;
 use std::collections::VecDeque;
 use std::fmt::Display;
 use std::ops::Range;
@@ -16,6 +14,7 @@ pub struct Link {
 }
 
 #[component]
+#[allow(unused_variables)]
 pub fn ObjectLinkTableCellRenderer<F>(
     #[prop(into)] class: MaybeSignal<String>,
     #[prop(into)] value: MaybeSignal<Link>,
@@ -155,8 +154,6 @@ impl BookDataProvider {
 
         let len = ((range.end - range.start) / Self::ITEM_COUNT + 2) * Self::ITEM_COUNT;
         let page = range.start / len;
-
-        let start = page * len;
 
         format!(
             "https://archive.org/advancedsearch.php?q=creator%3A%28Lewis%29&fl%5B%5D=creator&fl%5B%5D=identifier&fl%5B%5D=publicdate&fl%5B%5D=title{sort}&rows={}&page={}&output=json&callback=", 

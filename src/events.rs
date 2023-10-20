@@ -1,5 +1,3 @@
-use std::marker::PhantomData;
-
 /// The event provided to the `on_change` prop of the table component
 pub struct TableChangeEvent<Row, Col, T> {
     /// The index of the table row that contains the cell that was changed. Starts at 0.

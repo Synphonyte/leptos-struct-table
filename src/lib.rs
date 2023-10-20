@@ -322,7 +322,7 @@ pub struct TemperatureMeasurement {
 //!
 //! #[component]
 //! pub fn App() -> impl IntoView {
-//! #    items = create_rw_signal(vec![Book::default(), Book::default()]);
+//! #    let items = create_rw_signal(vec![Book::default(), Book::default()]);
 //!     let on_change = move |evt: TableChangeEvent<Book, BookColumnName, BookColumnValue>| {
 //!         // Do something
 //!     };
