@@ -24,7 +24,16 @@ where
     /// The parameter `range` is only determined by visibility and may be out of bounds. It is the
     /// responsibility of the implementation to handle this case. Use [get_vec_range_clamped] to get a
     /// range that is clamped to the length of the vector.
-    async fn get_rows(&self, range: Range<usize>) -> Vec<Row>;
+    ///
+    /// It returns a `Vec` of all rows loaded and the range that these rows cover. Depending on
+    /// the data source you might not be able to load exactly the requested range; that's why
+    /// the range is returned.
+    async fn get_rows(&self, range: Range<usize>) -> (Vec<Row>, Range<usize>);
+
+    /// The total number of rows in the table. Returns `None` if unknown (which is the default).
+    async fn row_count(&self) -> Option<usize> {
+        None
+    }
 
     /// Set the sorting of the table. The sorting is a list of column names and the sort order sorted by priority.
     /// The first entry in the list is the most important one.
@@ -39,7 +48,10 @@ where
 }
 
 /// Return `vec[range.start..range.end]` where `range` is clamped to the length of `vec`.
-pub fn get_vec_range_clamped<T: Clone>(vec: &Vec<T>, range: Range<usize>) -> Vec<T> {
+pub fn get_vec_range_clamped<T: Clone>(
+    vec: &Vec<T>,
+    range: Range<usize>,
+) -> (Vec<T>, Range<usize>) {
     if vec.is_empty() {
         return vec![];
     }
@@ -47,5 +59,7 @@ pub fn get_vec_range_clamped<T: Clone>(vec: &Vec<T>, range: Range<usize>) -> Vec
     let start = range.start.min(vec.len() - 1);
     let end = range.end.min(vec.len());
 
-    vec[start..end].to_vec()
+    let return_range = start..end;
+
+    (vec[return_range].to_vec(), return_range)
 }
