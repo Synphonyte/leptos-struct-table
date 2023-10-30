@@ -35,7 +35,7 @@ pub trait TableDataProvider<Row> {
     /// it is assumed that the data source is done and there are no more rows to load.
     ///
     /// In the case of an error the returned error `String` is going to be displayed in a
-    /// table row in place of the failed rows.
+    /// in place of the failed rows.
     async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Row>, Range<usize>), String>;
 
     /// The total number of rows in the table. Returns `None` if unknown (which is the default).

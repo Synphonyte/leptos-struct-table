@@ -6,7 +6,7 @@ use std::marker::PhantomData;
 #[derive(Copy, Clone)]
 pub struct TableData<Provider, Row>
 where
-    Provider: TableDataProvider<Row> + 'static,
+    Provider: TableDataProvider<Row>,
     Row: Debug + PartialEq,
 {
     pub update_count: RwSignal<u16>,
@@ -27,12 +27,12 @@ where
 
 impl<Provider, Row> From<Provider> for TableData<Provider, Row>
 where
-    Provider: TableDataProvider<Row> + 'static,
+    Provider: TableDataProvider<Row>,
     Row: Debug + PartialEq,
 {
     fn from(provider: Provider) -> Self {
         Self {
-            update_count: create_rw_signal(0),
+            update_count: Default::default(),
             provider: StoredValue::new(provider),
             _marker: PhantomData,
         }
