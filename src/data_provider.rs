@@ -28,7 +28,10 @@ where
     /// It returns a `Vec` of all rows loaded and the range that these rows cover. Depending on
     /// the data source you might not be able to load exactly the requested range; that's why
     /// the range is returned.
-    async fn get_rows(&self, range: Range<usize>) -> (Vec<Row>, Range<usize>);
+    ///
+    /// In the case of an error the `String` is going to be displayed in a table row in place
+    /// of the failed data.
+    async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Row>, Range<usize>), String>;
 
     /// The total number of rows in the table. Returns `None` if unknown (which is the default).
     async fn row_count(&self) -> Option<usize> {
