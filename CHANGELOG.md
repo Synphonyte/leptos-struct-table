@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.8.0] - 2023-11-02
+
+### New Feature 🎉
+
+- Support for generic structs
+
 ## [0.5.0] - 2023-10-20
 
 ### Breaking Changes 🛠️
