@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        example: [bootstrap, custom_renderers_svg, getter, rest_datasource, selectable, simple, tailwind]
+        example: [bootstrap, custom_renderers_svg, getter, rest_datasource, selectable, simple, tailwind, generic]
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/rust_toolchain/
