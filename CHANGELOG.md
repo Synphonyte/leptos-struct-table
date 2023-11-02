@@ -22,6 +22,10 @@
 
 - Support for generic structs
 
+### Fix 🐛
+
+- Fixed `#[table(skip_sort)]` on fields
+
 ## [0.5.0] - 2023-10-20
 
 ### Breaking Changes 🛠️
