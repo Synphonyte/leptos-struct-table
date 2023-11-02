@@ -16,6 +16,12 @@
 - The trait `TableDataProvider` has been extended to accomodate all the new functionaliy. 
   Please check it's documentation for more details.
 
+## [0.6.0] - 2023-11-02
+
+### New Feature 🎉
+
+- Support for generic structs
+
 ## [0.5.0] - 2023-10-20
 
 ### Breaking Changes 🛠️
