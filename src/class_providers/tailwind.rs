@@ -8,13 +8,6 @@ impl TableClassesProvider for TailwindClassesPreset {
         Self
     }
 
-    fn table(&self, classes: &str) -> String {
-        format!(
-            "{} {}",
-            "text-sm text-left text-gray-500 dark:text-gray-400", classes
-        )
-    }
-
     fn head_row(&self, template_classes: &str) -> String {
         format!(
             "{} {}",

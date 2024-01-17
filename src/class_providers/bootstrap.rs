@@ -8,10 +8,6 @@ impl TableClassesProvider for BootstrapClassesPreset {
         Self
     }
 
-    fn table(&self, classes: &str) -> String {
-        format!("{} {}", "table table-striped", classes)
-    }
-
     fn row(&self, _: usize, selected: bool, template_classes: &str) -> String {
         let active = if selected { "table-active" } else { "" };
 

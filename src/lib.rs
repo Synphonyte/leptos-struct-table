@@ -343,21 +343,21 @@ pub struct TemperatureMeasurement {
 #![feature(doc_cfg)]
 
 mod class_providers;
-mod column_enum;
 mod components;
 mod data;
 mod data_provider;
 mod events;
+mod row_renderer;
 #[cfg(feature = "uuid")]
 pub mod uuid;
 
 pub use class_providers::*;
-pub use column_enum::*;
 pub use components::*;
 pub use data::*;
 pub use data_provider::*;
 pub use events::*;
-pub use leptos_struct_table_macro::TableComponent;
+pub use leptos_struct_table_macro::TableRow;
+pub use row_renderer::*;
 use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
 

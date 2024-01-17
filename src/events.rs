@@ -1,39 +1,46 @@
+use leptos::ev::MouseEvent;
+
 /// The event provided to the `on_change` prop of the table component
-pub struct TableChangeEvent<Row, Col, T> {
+pub struct TableChangeEvent<Row> {
     /// The index of the table row that contains the cell that was changed. Starts at 0.
     pub row_index: usize,
     /// The index of the table column that contains the cell that was changed. Starts at 0.
     pub col_index: usize,
-    /// The old value of the row that was changed. This is the struct for which the table component is generated.
-    pub old_row: Row,
-    /// The column enum variant of the column that was changed.
-    pub column: Col,
-    /// The new value of the row that was changed. This will be of a column value enum type that is
-    /// generated with the table component.
-    pub new_value: T,
+    /// The the row that was changed. This is the struct for which the table component is generated.
+    pub changed_row: Row,
+}
+
+/// Event emitted when a table head cell is clicked.
+#[derive(Debug)]
+pub struct TableHeadEvent {
+    /// The index of the column. Starts at 0 for the first column.
+    /// The order of the columns is the same as the order of the fields in the struct.
+    pub index: usize,
+    /// The mouse event that triggered the event.
+    pub mouse_event: MouseEvent,
 }
 
 /// New type wrapper of a closure that takes a `TableChangeEvent`. This allows the `on_change` prop
 /// to be optional while being able to take a simple closure.
-pub struct ChangeEventHandler<Row, Col, T>(Option<Box<dyn Fn(TableChangeEvent<Row, Col, T>)>>);
+pub struct ChangeEventHandler<Row>(Option<Box<dyn Fn(TableChangeEvent<Row>)>>);
 
-impl<Row, Col, T> Default for ChangeEventHandler<Row, Col, T> {
+impl<Row> Default for ChangeEventHandler<Row> {
     fn default() -> Self {
         Self(None)
     }
 }
 
-impl<F, Row, Col, T> From<F> for ChangeEventHandler<Row, Col, T>
+impl<F, Row> From<F> for ChangeEventHandler<Row>
 where
-    F: Fn(TableChangeEvent<Row, Col, T>) + 'static,
+    F: Fn(TableChangeEvent<Row>) + 'static,
 {
     fn from(f: F) -> Self {
         Self(Some(Box::new(f)))
     }
 }
 
-impl<Row, Col, T> ChangeEventHandler<Row, Col, T> {
-    pub fn call(&self, event: TableChangeEvent<Row, Col, T>) {
+impl<Row> ChangeEventHandler<Row> {
+    pub fn call(&self, event: TableChangeEvent<Row>) {
         if let Some(f) = &self.0 {
             f(event);
         }

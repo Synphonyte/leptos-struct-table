@@ -9,7 +9,7 @@ use leptos_struct_table::*;
 use serde::{Deserialize, Serialize};
 
 /// This generates the component BookTable
-#[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(TableRow, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
 #[table(sortable)]
 pub struct Book {
     /// Id of the entry.
@@ -34,7 +34,7 @@ fn main() {
     console_error_panic_hook::set_once();
 
     mount_to_body(|| {
-        let items = create_rw_signal(vec![
+        let rows = vec![
             Book {
                 id: Uuid::default(),
                 title: "The Great Gatsby".to_string(),
@@ -69,10 +69,12 @@ fn main() {
                 description: None,
                 hidden_field: "hidden".to_string(),
             },
-        ]);
+        ];
 
         view! {
-            <BookTable items=items />
+            <table>
+                <TableContent rows=rows />
+            </table>
         }
     })
 }
