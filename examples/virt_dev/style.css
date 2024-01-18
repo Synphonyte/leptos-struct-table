@@ -1,0 +1,26 @@
+table {
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+tbody {
+    display: block;
+    overflow: auto;
+    width: 500px;
+    height: 300px;
+}
+
+thead > tr {
+    display: block;
+}
+
+tr {
+    width: 100%;
+}
+
+td {
+    height: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

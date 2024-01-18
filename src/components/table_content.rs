@@ -1,7 +1,8 @@
 use crate::row_renderer::RowRenderer;
 use crate::{
-    ChangeEventHandler, ColumnSort, DefaultTableHeadRenderer, DefaultTableRowRenderer,
-    TableClassesProvider, TableDataProvider, TableHeadEvent,
+    ChangeEventHandler, ColumnSort, DefaultTableBodyRenderer, DefaultTableHeadRenderer,
+    DefaultTableHeadRowRenderer, DefaultTableRowRenderer, TableClassesProvider, TableDataProvider,
+    TableHeadEvent,
 };
 use leptos::*;
 use std::collections::VecDeque;
@@ -65,29 +66,21 @@ where
 }
 
 #[derive(Clone)]
-pub struct HeadRendererFn(Rc<dyn Fn(View) -> View>);
+pub struct WrapperRendererFn(Rc<dyn Fn(View, Signal<String>) -> View>);
 
-impl<F, Ret> From<F> for HeadRendererFn
+impl<F, Ret> From<F> for WrapperRendererFn
 where
-    F: Fn(View) -> Ret + 'static,
+    F: Fn(View, Signal<String>) -> Ret + 'static,
     Ret: IntoView,
 {
     fn from(f: F) -> Self {
-        Self(Rc::new(move |view| f(view).into_view()))
+        Self(Rc::new(move |view, class| f(view, class).into_view()))
     }
 }
 
-impl Default for HeadRendererFn {
-    fn default() -> Self {
-        Self(Rc::new(move |view| {
-            DefaultTableHeadRenderer(view).into_view()
-        }))
-    }
-}
-
-impl HeadRendererFn {
-    pub fn run(&self, view: View) -> View {
-        (self.0)(view)
+impl WrapperRendererFn {
+    pub fn run(&self, view: View, class: Signal<String>) -> View {
+        (self.0)(view, class)
     }
 }
 
@@ -97,8 +90,14 @@ pub fn TableContent<Row, DataP, Key, ClsP>(
     #[prop(optional, into)] on_change: ChangeEventHandler<Row>,
     #[prop(default = create_rw_signal(None), into)] selected_key: RwSignal<Option<Key>>,
     #[prop(optional, into)] row_renderer: RowRendererFn<Row, Key>,
+    #[prop(default = DefaultTableHeadRenderer.into(), into)] thead_renderer: WrapperRendererFn,
+    #[prop(default = DefaultTableHeadRowRenderer.into(), into)]
+    thead_row_renderer: WrapperRendererFn,
+    #[prop(default = DefaultTableBodyRenderer.into(), into)] tbody_renderer: WrapperRendererFn,
     #[prop(optional, into)] row_class: MaybeSignal<String>,
-    #[prop(optional, into)] head_renderer: HeadRendererFn,
+    #[prop(optional, into)] thead_class: MaybeSignal<String>,
+    #[prop(optional, into)] thead_row_class: MaybeSignal<String>,
+    #[prop(optional, into)] tbody_class: MaybeSignal<String>,
     #[prop(optional, into)] sorting: RwSignal<VecDeque<(usize, ColumnSort)>>,
 ) -> impl IntoView
 where
@@ -109,7 +108,13 @@ where
 {
     let on_change = store_value(on_change);
     let rows = store_value(rows);
+
+    let class_provider = ClsP::new();
+
     let row_class = Signal::derive(move || row_class.get());
+    let thead_class = Signal::derive(move || class_provider.thead(&thead_class.get()));
+    let thead_row_class = Signal::derive(move || class_provider.thead_row(&thead_row_class.get()));
+    let tbody_class = Signal::derive(move || class_provider.tbody(&tbody_class.get()));
 
     let on_head_click = move |event: TableHeadEvent| {
         sorting.update(move |sorting| update_sorting_from_event(sorting, event));
@@ -119,85 +124,111 @@ where
         });
     };
 
-    let is_selected = move |key| create_selector(selected_key).selected(key);
+    let is_selected = create_selector(selected_key);
 
     let (items, set_items) = create_signal(Ok(vec![]));
 
     // TODO : this is only to test. Replace with virtualization...
-    spawn_local(async move {
-        let rows = rows.get_value();
-        set_items.set(
-            rows.get_rows(0..100)
-                .await
-                .map(|(rows, _)| rows.into_iter().enumerate().collect()),
-        );
-    });
+    let _ = watch(
+        move || sorting.get(),
+        move |_, _, _| {
+            spawn_local(async move {
+                let rows = rows.get_value();
+                set_items.set(
+                    rows.get_rows(0..100)
+                        .await
+                        .map(|(rows, _)| rows.into_iter().enumerate().collect()),
+                );
+            })
+        },
+        true,
+    );
 
-    let class_provider = ClsP::new();
+    let thead_content = Row::render_head_row(sorting.into(), on_head_click).into_view();
+
+    let tbody_content = view! {
+        {move || {
+            let items = items.get();
+            items
+                .map_err(|e| ServerFnError::ServerError(e))
+                .map({
+                    let row_renderer = row_renderer.clone();
+                    let is_selected = is_selected.clone();
+                    move |items| {
+                        view! {
+                            <For
+                                each=move || items.clone()
+                                key=|(_, item)| item.key()
+                                children={
+                                    let row_renderer = row_renderer.clone();
+                                    let is_selected = is_selected.clone();
+                                    move |(i, item)| {
+                                        let class_signal = Signal::derive({
+                                            let key = item.key();
+                                            let is_selected = is_selected.clone();
+                                            move || {
+                                                class_provider
+                                                    .clone()
+                                                    .row(
+                                                        i,
+                                                        is_selected.selected(Some(key.clone())),
+                                                        &row_class.get(),
+                                                    )
+                                            }
+                                        });
+                                        let selected_signal = create_rw_signal(
+                                            is_selected.selected(Some(item.key())),
+                                        );
+                                        let _ = create_effect({
+                                            let key = item.key();
+                                            let is_selected = is_selected.clone();
+                                            move |_| {
+                                                let key = key.clone();
+                                                let is_selected = is_selected.clone();
+                                                let selected = is_selected.selected(Some(key.clone()));
+                                                queue_microtask(move || { selected_signal.set(selected) })
+                                            }
+                                        });
+                                        let _ = watch(
+                                            move || selected_signal.get(),
+                                            {
+                                                let key = item.key();
+                                                move |selected, prev_selected, _| {
+                                                    if *selected
+                                                        && !prev_selected.map(|s| *s).unwrap_or_default()
+                                                    {
+                                                        selected_key.set(Some(key.clone()));
+                                                    }
+                                                }
+                                            },
+                                            false,
+                                        );
+                                        row_renderer.run(class_signal, item, i, selected_signal)
+                                    }
+                                }
+                            />
+                        }
+                    }
+                })
+        }}
+    }.into_view();
 
     // TODO : error handling
     view! {
-        {Row::render_head_row(sorting.into(), on_head_click)}
+        {thead_renderer.run(
+            thead_row_renderer.run(
+                thead_content,
+                thead_row_class,
+            ).into_view(),
+            thead_class,
+        )}
+
         <ErrorBoundary fallback=move |err| {
-            view! {
-                <p>{
-                    move || err.get().iter().map(|err| format!("{err:?}")).collect_view()
-                }</p>
-            }
+            view! { <p>{move || err.get().iter().map(|err| format!("{err:?}")).collect_view()}</p> }
         }>
-            {
-                move || {
-                let items = items.get();
-                items.map_err(|e| ServerFnError::ServerError(e)).map({
-                    let row_renderer = row_renderer.clone();
 
-                    move |items| view! {
-                        <For
-                            each=move || items.clone()
-                            key=|(_, item)| item.key()
-                            children={
-                                let row_renderer = row_renderer.clone();
-                                move |(i, item)| {
-                                    let is_sel = is_selected.clone();
+            {tbody_renderer.run(tbody_content, tbody_class)}
 
-                                    let class_signal = Signal::derive({
-                                        let key = item.key();
-                                        move || class_provider.clone().row(i, is_sel(Some(key.clone())), &row_class.get())
-                                    });
-
-                                    let is_sel = is_selected.clone();
-
-                                    let selected_signal = create_rw_signal(is_sel(Some(item.key())));
-
-                                    create_effect({
-                                        let key = item.key();
-
-                                        move |_| {
-                                            selected_signal.set(is_sel(Some(key.clone())))
-                                        }
-                                    });
-
-                                    let _ = watch(
-                                        move || selected_signal.get(),
-                                        {
-                                            let key = item.key();
-
-                                            move |selected, prev_selected, _| {
-                                                if *selected && !prev_selected.map(|s| *s).unwrap_or_default() {
-                                                    selected_key.set(Some(key.clone()));
-                                                }
-                                            }
-                                        },
-                                        false
-                                    );
-
-                                    row_renderer.run(class_signal, item, i, selected_signal)
-                                }
-                            }
-                        />
-                    }
-                })
-            }}
         </ErrorBoundary>
     }
 }

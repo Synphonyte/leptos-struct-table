@@ -1,7 +1,8 @@
 use leptos::ev::MouseEvent;
 
 /// The event provided to the `on_change` prop of the table component
-pub struct TableChangeEvent<Row> {
+#[derive(Debug, Clone)]
+pub struct TableChangeEvent<Row: Clone> {
     /// The index of the table row that contains the cell that was changed. Starts at 0.
     pub row_index: usize,
     /// The index of the table column that contains the cell that was changed. Starts at 0.
@@ -22,9 +23,9 @@ pub struct TableHeadEvent {
 
 /// New type wrapper of a closure that takes a `TableChangeEvent`. This allows the `on_change` prop
 /// to be optional while being able to take a simple closure.
-pub struct ChangeEventHandler<Row>(Option<Box<dyn Fn(TableChangeEvent<Row>)>>);
+pub struct ChangeEventHandler<Row: Clone>(Option<Box<dyn Fn(TableChangeEvent<Row>)>>);
 
-impl<Row> Default for ChangeEventHandler<Row> {
+impl<Row: Clone> Default for ChangeEventHandler<Row> {
     fn default() -> Self {
         Self(None)
     }
@@ -33,13 +34,14 @@ impl<Row> Default for ChangeEventHandler<Row> {
 impl<F, Row> From<F> for ChangeEventHandler<Row>
 where
     F: Fn(TableChangeEvent<Row>) + 'static,
+    Row: Clone,
 {
     fn from(f: F) -> Self {
         Self(Some(Box::new(f)))
     }
 }
 
-impl<Row> ChangeEventHandler<Row> {
+impl<Row: Clone> ChangeEventHandler<Row> {
     pub fn call(&self, event: TableChangeEvent<Row>) {
         if let Some(f) = &self.0 {
             f(event);

@@ -1,17 +1,18 @@
+use crate::wrapper_render_fn;
 use crate::{ColumnSort, TableHeadEvent};
 use leptos::*;
 
-/// Default thead renderer. Uses the `<thead>` element. Please note that this
-/// is **NOT** a `#[component]`.
-pub fn DefaultTableHeadRenderer(head_row_content: View) -> impl IntoView {
-    view! {
-        <thead>
-            <tr>
-                {head_row_content}
-            </tr>
-        </thead>
-    }
-}
+wrapper_render_fn!(
+    DefaultTableHeadRenderer,
+    thead,
+    /// thead
+);
+
+wrapper_render_fn!(
+    DefaultTableHeadRowRenderer,
+    tr,
+    /// thead row
+);
 
 /// The default table header renderer. Renders roughly
 /// ```html

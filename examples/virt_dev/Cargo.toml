@@ -1,0 +1,22 @@
+[package]
+name = "virt_dev"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+leptos = { version = "0.5", features = ["nightly", "csr"] }
+leptos-struct-table = { path = "../..", features = ["chrono", "uuid"] }
+leptos-use = "0.9"
+chrono = { version = "0.4", features = ["serde"] }
+console_error_panic_hook = "0.1"
+console_log = "1"
+log = "0.4"
+serde = "1"
+async-trait = "0.1"
+csv = "1.3"
+gloo-timers = "0.3.0"
+
+[dev-dependencies]
+wasm-bindgen = "0.2"
+wasm-bindgen-test = "0.3.0"
+web-sys = "0.3"
