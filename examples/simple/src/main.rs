@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 
 /// This generates the component BookTable
 #[derive(TableRow, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-#[table(sortable)]
+#[table(sortable, impl_vec_data_provider)]
 pub struct Book {
     /// Id of the entry.
     #[table(key)]
@@ -73,7 +73,7 @@ fn main() {
 
         view! {
             <table>
-                <TableContent rows=rows />
+                <TableContent rows=rows/>
             </table>
         }
     })

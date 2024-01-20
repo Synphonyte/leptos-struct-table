@@ -3,15 +3,15 @@ use crate::{ColumnSort, TableHeadEvent};
 use leptos::*;
 
 wrapper_render_fn!(
+    /// thead
     DefaultTableHeadRenderer,
     thead,
-    /// thead
 );
 
 wrapper_render_fn!(
+    /// thead row
     DefaultTableHeadRowRenderer,
     tr,
-    /// thead row
 );
 
 /// The default table header renderer. Renders roughly

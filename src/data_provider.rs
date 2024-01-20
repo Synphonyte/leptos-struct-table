@@ -12,6 +12,9 @@ use std::ops::Range;
 /// Please note that because of the use of [`async-trait`](https://docs.rs/async-trait/latest/async_trait/) this documentation is a bit cluttered.
 #[async_trait(?Send)]
 pub trait TableDataProvider<Row> {
+    /// Load data in chunks of multiples of this size.
+    const PREFERRED_CHUNK_SIZE: usize = 20;
+
     /// Get all data rows for the table specified by the range. This method is called when the table is rendered.
     /// The range is determined by the visible rows and used to virtualize the table.
     /// The parameter `range` is only determined by visibility and may be out of bounds. It is the

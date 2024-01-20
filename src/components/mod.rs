@@ -1,4 +1,5 @@
 mod cell;
+mod renderer_fn;
 mod row;
 mod table_content;
 mod tbody;
@@ -13,9 +14,9 @@ pub use thead::*;
 #[macro_export]
 macro_rules! wrapper_render_fn {
     (
+        #[$doc_name:meta]
         $name:ident,
         $tag:ident,
-        #[$doc_name:meta]
     ) => {
         /// Default
         #[$doc_name]

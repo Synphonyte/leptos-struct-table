@@ -1,7 +1,7 @@
 use async_trait::async_trait;
+use gloo_net::http::Request;
 use leptos::*;
 use leptos_struct_table::*;
-use reqwasm::http::Request;
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::fmt::Display;
@@ -16,7 +16,7 @@ pub struct Link {
 #[component]
 #[allow(unused_variables)]
 pub fn ObjectLinkTableCellRenderer<F>(
-    #[prop(into)] class: MaybeSignal<String>,
+    class: String,
     #[prop(into)] value: MaybeSignal<Link>,
     on_change: F,
     index: usize,
@@ -28,7 +28,11 @@ where
         "https://archive.org/advancedsearch.php?q=identifier%3D{}&output=json&callback=",
         value.get_untracked().href,
     );
-    view! { <td key=index class=class><a href=link>{value.get_untracked().text}</a></td> }
+    view! {
+        <td key=index class=class>
+            <a href=link>{value.get_untracked().text}</a>
+        </td>
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Ord, PartialOrd, Eq)]
@@ -63,8 +67,8 @@ impl IntoView for Authors {
     }
 }
 
-#[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-#[table(sortable)]
+#[derive(TableRow, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+// #[table(sortable)]
 pub struct Book {
     #[serde(rename = "identifier")]
     #[table(key)]
@@ -96,20 +100,31 @@ impl Book {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 struct ArchiveOrgApiResponse {
     pub response: ArchiveOrgApiResponseInner,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct ArchiveOrgApiResponseInner {
     pub docs: Vec<Book>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct ArchiveOrgCountRespone {
+    pub response: ArchiveOrgCountResponseInner,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ArchiveOrgCountResponseInner {
+    pub num_found: usize,
 }
 
 #[derive(Clone, PartialEq, Debug)]
 pub struct BookDataProvider {
     reload_count: usize,
-    sorting: VecDeque<(BookColumnName, ColumnSort)>,
+    sorting: VecDeque<(usize, ColumnSort)>,
 }
 
 impl Default for BookDataProvider {
@@ -124,17 +139,17 @@ impl Default for BookDataProvider {
 impl BookDataProvider {
     const ITEM_COUNT: usize = 20;
 
-    fn url_sort_param_for_column(&self, column: BookColumnName) -> &'static str {
+    fn url_sort_param_for_column(&self, column: usize) -> &'static str {
         match column {
-            BookColumnName::Id => "identifierSorter",
-            BookColumnName::Title => "titleSorter",
-            BookColumnName::Author => "creatorSorter",
-            BookColumnName::PublishDate => "publicdate",
+            0 => "identifierSorter",
+            1 => "titleSorter",
+            2 => "creatorSorter",
+            3 => "publicdate",
             _ => "",
         }
     }
 
-    fn url_sort_param_for_sort_pair(&self, pair: &(BookColumnName, ColumnSort)) -> String {
+    fn url_sort_param_for_sort_pair(&self, pair: &(usize, ColumnSort)) -> String {
         let col = self.url_sort_param_for_column(pair.0);
 
         let dir = match pair.1 {
@@ -146,7 +161,7 @@ impl BookDataProvider {
         format!("&sort%5B%5D={}+{}", col, dir)
     }
 
-    fn get_url(&self, range: Range<usize>) -> String {
+    fn get_url_and_start_index(&self, range: Range<usize>) -> (String, usize) {
         let mut sort = String::new();
         for pair in &self.sorting {
             sort.push_str(&self.url_sort_param_for_sort_pair(pair));
@@ -155,10 +170,13 @@ impl BookDataProvider {
         let len = ((range.end - range.start) / Self::ITEM_COUNT + 2) * Self::ITEM_COUNT;
         let page = range.start / len;
 
-        format!(
-            "https://archive.org/advancedsearch.php?q=creator%3A%28Lewis%29&fl%5B%5D=creator&fl%5B%5D=identifier&fl%5B%5D=publicdate&fl%5B%5D=title{sort}&rows={}&page={}&output=json&callback=", 
-            len,
-            page + 1,
+        (
+            format!(
+                "https://archive.org/advancedsearch.php?q=creator%3A%28Lewis%29&fl%5B%5D=creator&fl%5B%5D=identifier&fl%5B%5D=publicdate&fl%5B%5D=title{sort}&rows={}&page={}&output=json&callback=",
+                len,
+                page + 1,
+            ),
+            page * len
         )
     }
 
@@ -169,36 +187,56 @@ impl BookDataProvider {
 
 #[async_trait(?Send)]
 impl TableDataProvider<Book> for BookDataProvider {
-    type ColumnName = BookColumnName;
+    async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Book>, Range<usize>), String> {
+        let (url, start_index) = self.get_url_and_start_index(range);
 
-    async fn get_rows(&self, range: Range<usize>) -> Vec<Book> {
-        let resp: ArchiveOrgApiResponse = Request::get(&self.get_url(range))
+        let resp: ArchiveOrgApiResponse = Request::get(&url)
             .send()
             .await
-            .unwrap()
+            .map_err(|e| e.to_string())?
             .json()
             .await
-            .unwrap();
+            .map_err(|e| e.to_string())?;
 
-        resp.response.docs
+        let result = resp.response.docs;
+
+        let end_index = start_index + result.len();
+
+        Ok((result, start_index..end_index))
     }
 
-    fn set_sorting(&mut self, sorting: &VecDeque<(Self::ColumnName, ColumnSort)>) {
+    async fn row_count(&self) -> Option<usize> {
+        let resp: Option<ArchiveOrgCountRespone> = Request::get("https://archive.org/advancedsearch.php?q=creator%3A(Lewis)&fl[]=creator&fl[]=identifier&fl[]=publicdate&rows=0&page=0&output=json&callback=")
+            .send()
+            .await
+            .map_err(|err| logging::error!("Failed to load count: {:?}", err))
+            .ok()?
+            .json()
+            .await
+            .map_err(|err| logging::error!("Failed to parse count response: {:?}", err))
+            .ok();
+        logging::log!("resp: {:?}", &resp);
+        resp.map(|r| r.response.num_found)
+    }
+
+    fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
         self.sorting = sorting.clone();
     }
 }
 
 #[component]
 pub fn App() -> impl IntoView {
-    let items = create_rw_signal(BookDataProvider::default());
+    let rows = BookDataProvider::default();
 
     let refresh = move |_| {
-        items.update(|items| items.reload());
+        // TODO: actually reload
     };
 
     view! {
         <button on:click=refresh>"Refresh"</button>
-        <BookTable items=items />
+        <table>
+            <TableContent rows=rows/>
+        </table>
     }
 }
 
@@ -207,8 +245,6 @@ fn main() {
     console_error_panic_hook::set_once();
 
     mount_to_body(|| {
-        view! {
-            <App />
-        }
+        view! { <App/> }
     })
 }

@@ -1,13 +1,17 @@
-use crate::{ColumnSort, TableClassesProvider, TableHeadEvent};
+use crate::{
+    ChangeEventHandler, ColumnSort, TableChangeEvent, TableClassesProvider, TableHeadEvent,
+};
 use leptos::*;
 use std::collections::VecDeque;
 
-pub trait RowRenderer<Key> {
+pub trait RowRenderer: Clone {
     type ClassesProvider: TableClassesProvider + Copy;
 
-    fn key(&self) -> Key;
+    const COLUMN_COUNT: usize;
 
-    fn render_row(&self) -> impl IntoView;
+    fn key(&self) -> String;
+
+    fn render_row(&self, index: usize, on_change: ChangeEventHandler<Self>) -> impl IntoView;
 
     fn render_head_row<F>(
         sorting: Signal<VecDeque<(usize, ColumnSort)>>,

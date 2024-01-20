@@ -347,6 +347,7 @@ mod components;
 mod data;
 mod data_provider;
 mod events;
+mod loaded_rows;
 mod row_renderer;
 #[cfg(feature = "uuid")]
 pub mod uuid;

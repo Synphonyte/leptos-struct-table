@@ -1,4 +1,5 @@
 use leptos::ev::MouseEvent;
+use std::rc::Rc;
 
 /// The event provided to the `on_change` prop of the table component
 #[derive(Debug, Clone)]
@@ -23,11 +24,12 @@ pub struct TableHeadEvent {
 
 /// New type wrapper of a closure that takes a `TableChangeEvent`. This allows the `on_change` prop
 /// to be optional while being able to take a simple closure.
-pub struct ChangeEventHandler<Row: Clone>(Option<Box<dyn Fn(TableChangeEvent<Row>)>>);
+#[derive(Clone)]
+pub struct ChangeEventHandler<Row: Clone>(Rc<dyn Fn(TableChangeEvent<Row>)>);
 
 impl<Row: Clone> Default for ChangeEventHandler<Row> {
     fn default() -> Self {
-        Self(None)
+        Self(Rc::new(|_| {}))
     }
 }
 
@@ -37,14 +39,12 @@ where
     Row: Clone,
 {
     fn from(f: F) -> Self {
-        Self(Some(Box::new(f)))
+        Self(Rc::new(f))
     }
 }
 
 impl<Row: Clone> ChangeEventHandler<Row> {
-    pub fn call(&self, event: TableChangeEvent<Row>) {
-        if let Some(f) = &self.0 {
-            f(event);
-        }
+    pub fn run(&self, event: TableChangeEvent<Row>) {
+        (self.0)(event)
     }
 }
