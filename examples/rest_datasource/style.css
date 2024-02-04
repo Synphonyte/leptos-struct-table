@@ -1,24 +1,67 @@
+body {
+    font-family: sans-serif;
+}
+
 .table-container {
+    margin-top: 20px;
     overflow: auto;
     max-height: calc(100vh - 200px);
 }
 
 table {
-    position: relative;
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+tr:nth-child(2n+1) {
+    background: rgba(255, 255, 255, 0.7);
 }
 
 th {
     background: white;
     position: sticky;
     top: 0;
+    width: 20%;
+    padding: 5px 0;
+    border-bottom: 1px solid silver;
+}
+
+th:first-child {
+    width: 40%;
+}
+
+td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 20%;
+    padding: 4px 5px;
+}
+
+td:first-child {
+    width: 40%;
 }
 
 .loading-skeleton {
+    display: inline-block;
     animation: skeleton-loading 1s linear infinite alternate;
-    height: 1rem;
+    height: 0.75rem;
     border-radius: 0.25rem;
-    width: 25vw;
-    margin: 3px 5px 3px 0;
+    width: 80%;
+    /*margin: 0.25rem 0;*/
+}
+
+tr:nth-child(4n) .loading-skeleton {
+    width: 60%;
+}
+
+tr:nth-child(4n+1) .loading-skeleton {
+    width: 90%;
+}
+
+tr:nth-child(4n+2) .loading-skeleton {
+    width: 40%;
 }
 
 @keyframes skeleton-loading {
@@ -26,6 +69,6 @@ th {
         background-color: hsl(200, 20%, 80%);
     }
     100% {
-        background-color: hsl(200, 20%, 95%);
+        background-color: hsl(200, 20%, 90%);
     }
 }

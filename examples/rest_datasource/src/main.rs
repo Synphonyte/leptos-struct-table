@@ -231,14 +231,14 @@ pub fn App() -> impl IntoView {
 
     let reload_controller = ReloadController::default();
 
-    let refresh = move |_| {
+    let reload = move |_| {
         reload_controller.reload();
     };
 
     let container = create_node_ref::<Div>();
 
     view! {
-        <button on:click=refresh>"Refresh"</button>
+        <button on:click=reload>"Reload"</button>
         <div class="table-container" node_ref=container>
             <table>
                 <TableContent

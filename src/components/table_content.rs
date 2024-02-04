@@ -94,6 +94,17 @@ where
 
     let loaded_rows = create_rw_signal(LoadedRows::<Row>::new());
 
+    let first_selected_index = create_rw_signal(None::<usize>);
+
+    let clear = move || {
+        selection.clear();
+        first_selected_index.set(None);
+
+        loaded_rows.update(|loaded_rows| {
+            loaded_rows.clear();
+        });
+    };
+
     let on_head_click = {
         let rows = Rc::clone(&rows);
 
@@ -102,23 +113,16 @@ where
 
             rows.borrow_mut().set_sorting(&sorting());
 
-            loaded_rows.update(|loaded_rows| {
-                loaded_rows.clear();
-            });
-
-            selection.clear();
+            clear();
         }
     };
 
+    let (do_reload, set_reload) = create_signal(false);
     create_effect(move |_| {
         // triggered when `ReloadController::reload()` is called
         reload_controller.get();
-
-        loaded_rows.update(|loaded_rows| {
-            loaded_rows.clear();
-        });
-
-        selection.clear();
+        clear();
+        set_reload.set(true);
     });
 
     let selected_indices = match selection {
@@ -131,7 +135,6 @@ where
         }),
         Selection::Multiple(selected_indices) => selected_indices.into(),
     };
-    let (first_selected_index, set_first_selected_index) = create_signal(None::<usize>);
 
     let UseScrollReturn { y, set_y, .. } = use_scroll_with_options(
         scroll_container,
@@ -158,7 +161,7 @@ where
         }
     });
 
-    let (average_row_height, set_average_row_height) = create_signal(22.0);
+    let (average_row_height, set_average_row_height) = create_signal(20.0);
 
     let first_visible_row_index =
         create_memo(move |_| (y.get() / average_row_height.get()).floor() as usize);
@@ -204,6 +207,11 @@ where
             return;
         }
 
+        // with this a reload triggers this effect
+        if do_reload.get() {
+            set_reload.set_untracked(false);
+        }
+
         let start = first_visible_row_index.saturating_sub(visible_row_count * 2);
 
         let start = (start / DataP::PREFERRED_CHUNK_SIZE) * DataP::PREFERRED_CHUNK_SIZE;
@@ -214,7 +222,7 @@ where
             end = end.min(count);
         }
 
-        end = end.min(start + 100);
+        end = end.min(start + 300);
 
         loaded_rows.update_untracked(|loaded_rows| {
             if end > loaded_rows.len() {
@@ -298,49 +306,7 @@ where
                                             )
                                     });
 
-                                    let on_select = move |evt: web_sys::MouseEvent| match selection {
-                                        Selection::None => {}
-                                        Selection::Single(selected_index) => {
-                                            selected_index.set(Some(i));
-                                        }
-                                        Selection::Multiple(selected_indices) => {
-                                            selected_indices.update(|selected_indices| {
-                                                let (meta_pressed, shift_pressed) = get_keyboard_modifiers(&evt);
-
-                                                if meta_pressed {
-                                                    if selected_indices.contains(&i) {
-                                                        selected_indices.remove(&i);
-                                                    } else {
-                                                        selected_indices.insert(i);
-                                                    }
-                                                    match selected_indices.len() {
-                                                        0 => set_first_selected_index.set(None),
-                                                        1 => {
-                                                            set_first_selected_index.set(Some(i));
-                                                        }
-                                                        _ => {
-                                                            // do nothing
-                                                        }
-                                                    }
-                                                } else if shift_pressed {
-                                                    if let Some(first_selected_index) = first_selected_index.get() {
-                                                        let min = first_selected_index.min(i);
-                                                        let max = first_selected_index.max(i);
-                                                        for i in min..=max {
-                                                            selected_indices.insert(i);
-                                                        }
-                                                    } else {
-                                                        selected_indices.insert(i);
-                                                        set_first_selected_index.set(Some(i));
-                                                    }
-                                                } else {
-                                                    selected_indices.clear();
-                                                    selected_indices.insert(i);
-                                                    set_first_selected_index.set(Some(i));
-                                                }
-                                            });
-                                        }
-                                    };
+                                    let on_select = move |evt: web_sys::MouseEvent| update_selection(evt, selection, first_selected_index, i);
 
                                     row_renderer.run(class_signal, row, i, selected_signal, on_select.into(), on_change.get_value())
                                 }
@@ -489,4 +455,55 @@ fn get_keyboard_modifiers(evt: &web_sys::MouseEvent) -> (bool, bool) {
     let meta_pressed = evt.meta_key() || evt.ctrl_key();
     let shift_pressed = evt.shift_key();
     (meta_pressed, shift_pressed)
+}
+
+fn update_selection(
+    evt: web_sys::MouseEvent,
+    selection: Selection,
+    first_selected_index: RwSignal<Option<usize>>,
+    i: usize,
+) {
+    match selection {
+        Selection::None => {}
+        Selection::Single(selected_index) => {
+            selected_index.set(Some(i));
+        }
+        Selection::Multiple(selected_indices) => {
+            selected_indices.update(|selected_indices| {
+                let (meta_pressed, shift_pressed) = get_keyboard_modifiers(&evt);
+
+                if meta_pressed {
+                    if selected_indices.contains(&i) {
+                        selected_indices.remove(&i);
+                    } else {
+                        selected_indices.insert(i);
+                    }
+                    match selected_indices.len() {
+                        0 => first_selected_index.set(None),
+                        1 => {
+                            first_selected_index.set(Some(i));
+                        }
+                        _ => {
+                            // do nothing
+                        }
+                    }
+                } else if shift_pressed {
+                    if let Some(first_selected_index) = first_selected_index.get() {
+                        let min = first_selected_index.min(i);
+                        let max = first_selected_index.max(i);
+                        for i in min..=max {
+                            selected_indices.insert(i);
+                        }
+                    } else {
+                        selected_indices.insert(i);
+                        first_selected_index.set(Some(i));
+                    }
+                } else {
+                    selected_indices.clear();
+                    selected_indices.insert(i);
+                    first_selected_index.set(Some(i));
+                }
+            });
+        }
+    }
 }

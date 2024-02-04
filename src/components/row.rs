@@ -48,6 +48,7 @@ pub fn DefaultLoadingRowRenderer(
                 (0..col_count).map(|_| view! {
                     <td>
                         <div class=inner_class></div>
+                        " "
                     </td>
                 }).collect_view()
             }
