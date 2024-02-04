@@ -5,4 +5,6 @@ wrapper_render_fn!(
     /// tbody
     DefaultTableBodyRenderer,
     tbody,
+    ///
+    /// This render function has to render exactly one root element.
 );

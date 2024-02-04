@@ -13,7 +13,6 @@ use serde::{Deserialize, Serialize};
 #[table(sortable, impl_vec_data_provider)]
 pub struct Book {
     /// Id of the entry.
-    #[table(key)]
     pub id: Uuid,
     /// Title of the book.
     pub title: String,

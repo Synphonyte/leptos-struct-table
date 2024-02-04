@@ -1,0 +1,31 @@
+.table-container {
+    overflow: auto;
+    max-height: calc(100vh - 200px);
+}
+
+table {
+    position: relative;
+}
+
+th {
+    background: white;
+    position: sticky;
+    top: 0;
+}
+
+.loading-skeleton {
+    animation: skeleton-loading 1s linear infinite alternate;
+    height: 1rem;
+    border-radius: 0.25rem;
+    width: 25vw;
+    margin: 3px 5px 3px 0;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-color: hsl(200, 20%, 80%);
+    }
+    100% {
+        background-color: hsl(200, 20%, 95%);
+    }
+}

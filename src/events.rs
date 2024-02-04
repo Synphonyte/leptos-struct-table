@@ -48,3 +48,27 @@ impl<Row: Clone> ChangeEventHandler<Row> {
         (self.0)(event)
     }
 }
+
+#[derive(Clone)]
+pub struct EventHandler(Rc<dyn Fn(web_sys::MouseEvent)>);
+
+impl Default for EventHandler {
+    fn default() -> Self {
+        Self(Rc::new(|_| {}))
+    }
+}
+
+impl<F> From<F> for EventHandler
+where
+    F: Fn(web_sys::MouseEvent) + 'static,
+{
+    fn from(f: F) -> Self {
+        Self(Rc::new(f))
+    }
+}
+
+impl EventHandler {
+    pub fn run(&self, event: web_sys::MouseEvent) {
+        (self.0)(event);
+    }
+}

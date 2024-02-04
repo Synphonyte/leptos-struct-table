@@ -1,5 +1,5 @@
 use crate::row_renderer::RowRenderer;
-use crate::{ChangeEventHandler, TableChangeEvent};
+use crate::{ChangeEventHandler, EventHandler};
 use leptos::*;
 
 /// The default table row renderer. Uses the `<tr>` element. Please note that this
@@ -13,17 +13,17 @@ pub fn DefaultTableRowRenderer<Row>(
     // The index of the row. Starts at 0 for the first body row.
     index: usize,
     // The selected state of the row. True, when the row is selected.
-    selected: RwSignal<bool>,
+    selected: Signal<bool>,
+    // Event handler callback when this row is selected
+    on_select: EventHandler,
     // Event handler callback for changes
     on_change: ChangeEventHandler<Row>,
 ) -> impl IntoView
 where
     Row: RowRenderer + Clone + 'static,
 {
-    let key = row.key();
-
     view! {
-        <tr class=class on:click=move |mouse_event| selected.set(true)>
+        <tr class=class on:click=move |mouse_event| on_select.run(mouse_event)>
             {row.render_row(index, on_change)}
         </tr>
     }
@@ -37,9 +37,13 @@ pub fn DefaultErrorRowRenderer(err: String) -> impl IntoView {
     view! { <div>{err}</div> }
 }
 
-pub fn DefaultLoadingRowRenderer(col_count: usize, inner_class: Signal<String>) -> impl IntoView {
+pub fn DefaultLoadingRowRenderer(
+    col_count: usize,
+    class: Signal<String>,
+    inner_class: Signal<String>,
+) -> impl IntoView {
     view! {
-        <tr>
+        <tr class=class>
             {
                 (0..col_count).map(|_| view! {
                     <td>

@@ -17,10 +17,12 @@ macro_rules! wrapper_render_fn {
         #[$doc_name:meta]
         $name:ident,
         $tag:ident,
+        $(#[$additional_doc:meta])*
     ) => {
         /// Default
         #[$doc_name]
         /// renderer. Please note that this is **NOT** a `#[component]`.
+        $(#[$additional_doc])*
         pub fn $name(content: View, class: Signal<String>) -> impl IntoView {
             view! {
                 <$tag class=class>

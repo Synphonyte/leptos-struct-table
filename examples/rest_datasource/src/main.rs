@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use gloo_net::http::Request;
+use leptos::html::Div;
 use leptos::*;
 use leptos_struct_table::*;
 use serde::{Deserialize, Serialize};
@@ -71,7 +72,7 @@ impl IntoView for Authors {
 // #[table(sortable)]
 pub struct Book {
     #[serde(rename = "identifier")]
-    #[table(key)]
+    #[table(skip)]
     pub id: String,
 
     pub title: String,
@@ -215,7 +216,7 @@ impl TableDataProvider<Book> for BookDataProvider {
             .await
             .map_err(|err| logging::error!("Failed to parse count response: {:?}", err))
             .ok();
-        logging::log!("resp: {:?}", &resp);
+
         resp.map(|r| r.response.num_found)
     }
 
@@ -228,15 +229,26 @@ impl TableDataProvider<Book> for BookDataProvider {
 pub fn App() -> impl IntoView {
     let rows = BookDataProvider::default();
 
+    let reload_controller = ReloadController::default();
+
     let refresh = move |_| {
-        // TODO: actually reload
+        reload_controller.reload();
     };
+
+    let container = create_node_ref::<Div>();
 
     view! {
         <button on:click=refresh>"Refresh"</button>
-        <table>
-            <TableContent rows=rows/>
-        </table>
+        <div class="table-container" node_ref=container>
+            <table>
+                <TableContent
+                    rows=rows
+                    scroll_container=container
+                    loading_row_inner_class="loading-skeleton"
+                    reload_controller=reload_controller
+                />
+            </table>
+        </div>
     }
 }
 

@@ -15,11 +15,11 @@ Easily create Leptos table components from structs.
 ## Features
 
 - **Async data loading** - The data is loaded asynchronously. This allows for loading data from a REST API or a database etc.
-- **Selectable** - Optional. If turned on: Click on a row to select it. You can select multiple rows (TODO).
+- **Selectable** - Optional. You can enable single or multi-select.
 - **Fully Customizable** - You can customize every aspect of the table by plugging in your own components for rendering rows, cells, headers. See [Custom Renderers](#custom-renderers) for more information.
 - **Headless** - No default styling is applied to the table. You can fully customize the classes that are applied to the table. See [Classes customization](#classes-customization) for more information.
 - **Sorting** - Optional. If turned on: Click on a column header to sort the table by that column. You can even sort by multiple columns.
-- **Virtualization (TODO)** - Only the visible rows are rendered. This allows for very large tables.
+- **Virtualization** - Only the visible rows are rendered. This allows for very large tables.
 - **Editable** - Optional. You can provide custom renderers for editable cells. See [Editable Cells](#editable-cells) for more information.
 
 ## Usage
