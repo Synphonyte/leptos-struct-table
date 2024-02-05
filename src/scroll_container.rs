@@ -10,7 +10,8 @@ pub struct ScrollContainer(Signal<Option<web_sys::Element>>);
 impl Default for ScrollContainer {
     fn default() -> Self {
         Self(Signal::derive(move || {
-            use_window()
+            use_document()
+                .body()
                 .as_ref()
                 .map(|w| w.unchecked_ref::<web_sys::Element>().clone())
         }))
