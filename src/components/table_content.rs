@@ -43,7 +43,7 @@ renderer_fn!(
 );
 
 renderer_fn!(
-    ErrorRowRendererFn(err: String)
+    ErrorRowRendererFn(err: String, col_count: usize)
     default DefaultErrorRowRenderer
 );
 
@@ -366,7 +366,7 @@ where
 
                                     row_renderer.run(class_signal, row, i, selected_signal, on_select.into(), on_change.get_value())
                                 }
-                                RowState::Error(err) => error_row_renderer.run(err),
+                                RowState::Error(err) => error_row_renderer.run(err, Row::COLUMN_COUNT),
                                 RowState::Loading | RowState::Placeholder => {
                                     loading_row_renderer.run(
                                         Row::COLUMN_COUNT,

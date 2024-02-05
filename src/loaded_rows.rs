@@ -19,6 +19,8 @@ impl<T: Clone> std::fmt::Debug for RowState<T> {
     }
 }
 
+/// This is basically a cache for rows and used by [`TableContent`] internally to track
+/// which rows are already loaded, which are still loading and which are missing.
 pub struct LoadedRows<T: Clone> {
     rows: Vec<RowState<T>>,
 }
@@ -73,7 +75,7 @@ impl<T: Clone> LoadedRows<T> {
 
     #[inline]
     pub fn missing_range(&self, range: Range<usize>) -> Option<Range<usize>> {
-        let do_load_predicate = |row| matches!(row, &RowState::Placeholder | &RowState::Error(_));
+        let do_load_predicate = |row| matches!(row, &RowState::Placeholder);
 
         let slice = &self.rows[range.clone()];
 

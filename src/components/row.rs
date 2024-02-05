@@ -33,8 +33,8 @@ pub fn DefaultRowPlaceholderRenderer(height: Signal<f64>) -> impl IntoView {
     view! { <div style:height=move || format!("{}px", height.get())></div> }
 }
 
-pub fn DefaultErrorRowRenderer(err: String) -> impl IntoView {
-    view! { <div>{err}</div> }
+pub fn DefaultErrorRowRenderer(err: String, col_count: usize) -> impl IntoView {
+    view! { <tr><td colspan=col_count>{err}</td></tr> }
 }
 
 pub fn DefaultLoadingRowRenderer(

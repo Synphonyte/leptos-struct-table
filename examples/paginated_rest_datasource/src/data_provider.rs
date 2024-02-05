@@ -69,9 +69,10 @@ impl PaginatedTableDataProvider<Book> for BookDataProvider {
             .await
             .map_err(|e| e.to_string())?;
 
-        let result = resp.response.docs;
-
-        Ok(result)
+        match resp {
+            ArchiveOrgApiResponse::Err { error } => Err(error),
+            ArchiveOrgApiResponse::Ok { response } => Ok(response.docs),
+        }
     }
 
     async fn row_count(&self) -> Option<usize> {

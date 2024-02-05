@@ -76,8 +76,14 @@ impl Book {
 }
 
 #[derive(Deserialize, Debug)]
-pub(crate) struct ArchiveOrgApiResponse {
-    pub response: ArchiveOrgApiResponseInner,
+#[serde(untagged)]
+pub(crate) enum ArchiveOrgApiResponse {
+    Ok {
+        response: ArchiveOrgApiResponseInner,
+    },
+    Err {
+        error: String,
+    },
 }
 
 #[derive(Deserialize, Debug)]
