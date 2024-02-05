@@ -2,7 +2,6 @@
 //! Simple showcase example.
 
 use crate::uuid::Uuid;
-use async_trait::async_trait;
 use chrono::NaiveDate;
 use leptos::*;
 use leptos_struct_table::*;

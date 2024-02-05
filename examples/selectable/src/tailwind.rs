@@ -8,14 +8,7 @@ impl TableClassesProvider for TailwindClassesPreset {
         Self
     }
 
-    fn table(&self, classes: &str) -> String {
-        format!(
-            "{} {}",
-            "text-sm text-left text-gray-500 dark:text-gray-400", classes
-        )
-    }
-
-    fn head_row(&self, template_classes: &str) -> String {
+    fn thead_row(&self, template_classes: &str) -> String {
         format!(
             "{} {}",
             "text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-300",
@@ -23,7 +16,7 @@ impl TableClassesProvider for TailwindClassesPreset {
         )
     }
 
-    fn head_cell(&self, sort: ColumnSort, template_classes: &str) -> String {
+    fn thead_cell(&self, sort: ColumnSort, template_classes: &str) -> String {
         let sort_class = match sort {
             ColumnSort::None => "",
             _ => "text-black dark:text-white",
@@ -35,7 +28,7 @@ impl TableClassesProvider for TailwindClassesPreset {
         )
     }
 
-    fn head_cell_inner(&self) -> String {
+    fn thead_cell_inner(&self) -> String {
         "flex items-center after:content-[--sort-icon] after:pl-1 after:opacity-40 before:content-[--sort-priority] before:order-last before:pl-0.5 before:font-light before:opacity-40".to_string()
     }
 
@@ -46,12 +39,10 @@ impl TableClassesProvider for TailwindClassesPreset {
             } else {
                 "bg-white dark:bg-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800"
             }
+        } else if selected {
+            "bg-sky-300 text-gray-700 dark:bg-sky-700 dark:text-gray-400"
         } else {
-            if selected {
-                "bg-sky-300 text-gray-700 dark:bg-sky-700 dark:text-gray-400"
-            } else {
-                "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
-            }
+            "bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700"
         };
 
         format!(

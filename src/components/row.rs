@@ -1,5 +1,5 @@
 use crate::row_renderer::RowRenderer;
-use crate::{ChangeEventHandler, EventHandler};
+use crate::{ChangeEvent, EventHandler};
 use leptos::*;
 
 /// The default table row renderer. Uses the `<tr>` element. Please note that this
@@ -15,9 +15,9 @@ pub fn DefaultTableRowRenderer<Row>(
     // The selected state of the row. True, when the row is selected.
     selected: Signal<bool>,
     // Event handler callback when this row is selected
-    on_select: EventHandler,
+    on_select: EventHandler<web_sys::MouseEvent>,
     // Event handler callback for changes
-    on_change: ChangeEventHandler<Row>,
+    on_change: EventHandler<ChangeEvent<Row>>,
 ) -> impl IntoView
 where
     Row: RowRenderer + Clone + 'static,
