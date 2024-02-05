@@ -3,17 +3,24 @@ use async_trait::async_trait;
 use std::collections::VecDeque;
 use std::ops::Range;
 
-/// The trait that provides data for the generated table component.
-/// Anything that is passed to the `items` prop must implement this trait.
+/// The trait that provides data for the `<TableContent>` component.
+/// Anything that is passed to the `rows` prop must implement this trait.
 ///
-/// This is automatically implemented for `Vec<Row>`.
+/// If you add `#[table(impl_vec_data_provider)]` to your row struct,
+/// this is automatically implemented for `Vec<Row>`.
 /// This way a simple list of items can be passed to the table.
 ///
-/// Please note that because of the use of [`async-trait`](https://docs.rs/async-trait/latest/async_trait/) this documentation is a bit cluttered.
+/// This is also automatically implemented for any struct that implements [`PaginatedTableDataProvider`]
+/// which is a more convenient way of connecting to a paginated data source.
+///
+/// Please note that because of the use of [`async-trait`](https://docs.rs/async-trait/latest/async_trait/)
+/// this documentation looks a bit cluttered.
 #[async_trait(?Send)]
 pub trait TableDataProvider<Row> {
-    /// Load data in chunks of multiples of this size.
-    const PREFERRED_CHUNK_SIZE: usize = 20;
+    /// If Some(...), data will be loaded in chunks of this size. This is useful for paginated data sources.
+    /// If you have such a paginated data source, you probably want to implement `PaginatedTableDataProvider`
+    /// instead of this trait.
+    const CHUNK_SIZE: Option<usize> = None;
 
     /// Get all data rows for the table specified by the range. This method is called when the table is rendered.
     /// The range is determined by the visible rows and used to virtualize the table.
@@ -23,10 +30,12 @@ pub trait TableDataProvider<Row> {
     ///
     /// It returns a `Vec` of all rows loaded and the range that these rows cover. Depending on
     /// the data source you might not be able to load exactly the requested range; that's why
-    /// the actual loaded range is returned in addition to the rows.
+    /// the actual loaded range is returned in addition to the rows. You should always return
+    /// at least the range that is requested or more. If you return less rows than requested,
+    /// it is assumed that the data source is done and there are no more rows to load.
     ///
-    /// In the case of an error the `String` is going to be displayed in a table row in place
-    /// of the failed data.
+    /// In the case of an error the returned error `String` is going to be displayed in a
+    /// table row in place of the failed rows.
     async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Row>, Range<usize>), String>;
 
     /// The total number of rows in the table. Returns `None` if unknown (which is the default).
@@ -43,6 +52,70 @@ pub trait TableDataProvider<Row> {
     #[allow(unused_variables)]
     fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
         // by default do nothing
+    }
+}
+
+/// A paginated data source. This is meant to provide a more convenient way
+/// of connecting to a paginated data source instead of implementing [`TableDataProvider`] directly.
+///
+/// If you implement this for your struct, [`TableDataProvider`] is automatically implemented for you.
+#[async_trait(?Send)]
+pub trait PaginatedTableDataProvider<Row> {
+    /// How many rows per page
+    const PAGE_ROW_COUNT: usize;
+
+    /// Get all data rows for the table specified by the page index (starts a 0).
+    ///
+    /// If you return less than `PAGE_ROW_COUNT` rows, it is assumed that the end of the
+    /// data has been reached.
+    async fn get_page(&self, page_index: usize) -> Result<Vec<Row>, String>;
+
+    /// The total number of rows in the table. Returns `None` if unknown (which is the default).
+    ///
+    /// By default this is computed from the [`page_count`] method. But if your data source
+    /// tells you the number of rows instead of the number of pages you should override this method.
+    async fn row_count(&self) -> Option<usize> {
+        self.page_count().await.map(|pc| pc * Self::PAGE_ROW_COUNT)
+    }
+
+    /// The total number of pages in the data source. Returns `None` if unknown (which is the default).
+    ///
+    /// If your data source gives you the number of rows instead of the number of pages
+    /// you should implement [`row_count`] instead of this method.
+    async fn page_count(&self) -> Option<usize> {
+        None
+    }
+
+    /// Same as [`TableDataProvider::set_sorting`]
+    #[allow(unused_variables)]
+    fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
+        // by default do nothing
+    }
+}
+
+#[async_trait(?Send)]
+impl<Row, D> TableDataProvider<Row> for D
+where
+    D: PaginatedTableDataProvider<Row>,
+{
+    const CHUNK_SIZE: Option<usize> = Some(D::PAGE_ROW_COUNT);
+
+    async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Row>, Range<usize>), String> {
+        let Range { start, end } = range;
+        debug_assert_eq!(end - start, D::PAGE_ROW_COUNT);
+
+        self.get_page(start / D::PAGE_ROW_COUNT).await.map(|rows| {
+            let len = rows.len();
+            (rows, start..start + len)
+        })
+    }
+
+    async fn row_count(&self) -> Option<usize> {
+        PaginatedTableDataProvider::<Row>::row_count(self).await
+    }
+
+    fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
+        PaginatedTableDataProvider::<Row>::set_sorting(self, sorting)
     }
 }
 

@@ -1,5 +1,5 @@
 [package]
-name = "rest_datasource"
+name = "paginated_rest_datasource"
 version = "0.1.0"
 edition = "2021"
 

@@ -6,7 +6,6 @@ use leptos_struct_table::*;
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::fmt::Display;
-use std::ops::Range;
 
 #[derive(PartialEq, PartialOrd, Clone, Debug, Default)]
 pub struct Link {
@@ -122,24 +121,19 @@ pub struct ArchiveOrgCountResponseInner {
     pub num_found: usize,
 }
 
-#[derive(Clone, PartialEq, Debug)]
 pub struct BookDataProvider {
-    reload_count: usize,
     sorting: VecDeque<(usize, ColumnSort)>,
 }
 
 impl Default for BookDataProvider {
     fn default() -> Self {
         Self {
-            reload_count: 0,
             sorting: VecDeque::new(),
         }
     }
 }
 
 impl BookDataProvider {
-    const ITEM_COUNT: usize = 20;
-
     fn url_sort_param_for_column(&self, column: usize) -> &'static str {
         match column {
             0 => "identifierSorter",
@@ -162,34 +156,26 @@ impl BookDataProvider {
         format!("&sort%5B%5D={}+{}", col, dir)
     }
 
-    fn get_url_and_start_index(&self, range: Range<usize>) -> (String, usize) {
+    fn get_url(&self, page_index: usize) -> String {
         let mut sort = String::new();
         for pair in &self.sorting {
             sort.push_str(&self.url_sort_param_for_sort_pair(pair));
         }
 
-        let len = ((range.end - range.start) / Self::ITEM_COUNT + 2) * Self::ITEM_COUNT;
-        let page = range.start / len;
-
-        (
-            format!(
+        format!(
                 "https://archive.org/advancedsearch.php?q=creator%3A%28Lewis%29&fl%5B%5D=creator&fl%5B%5D=identifier&fl%5B%5D=publicdate&fl%5B%5D=title{sort}&rows={}&page={}&output=json&callback=",
-                len,
-                page + 1,
-            ),
-            page * len
-        )
-    }
-
-    pub fn reload(&mut self) {
-        self.reload_count += 1;
+                Self::PAGE_ROW_COUNT,
+                page_index + 1,
+            )
     }
 }
 
 #[async_trait(?Send)]
-impl TableDataProvider<Book> for BookDataProvider {
-    async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Book>, Range<usize>), String> {
-        let (url, start_index) = self.get_url_and_start_index(range);
+impl PaginatedTableDataProvider<Book> for BookDataProvider {
+    const PAGE_ROW_COUNT: usize = 50;
+
+    async fn get_page(&self, page_index: usize) -> Result<Vec<Book>, String> {
+        let url = self.get_url(page_index);
 
         let resp: ArchiveOrgApiResponse = Request::get(&url)
             .send()
@@ -201,9 +187,7 @@ impl TableDataProvider<Book> for BookDataProvider {
 
         let result = resp.response.docs;
 
-        let end_index = start_index + result.len();
-
-        Ok((result, start_index..end_index))
+        Ok(result)
     }
 
     async fn row_count(&self) -> Option<usize> {
@@ -217,7 +201,8 @@ impl TableDataProvider<Book> for BookDataProvider {
             .map_err(|err| logging::error!("Failed to parse count response: {:?}", err))
             .ok();
 
-        resp.map(|r| r.response.num_found)
+        // This API only allows to display up to 10000 results
+        resp.map(|r| r.response.num_found.min(10000))
     }
 
     fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {

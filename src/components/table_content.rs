@@ -212,17 +212,24 @@ where
             set_reload.set_untracked(false);
         }
 
-        let start = first_visible_row_index.saturating_sub(visible_row_count * 2);
+        let mut start = first_visible_row_index.saturating_sub(visible_row_count * 2);
 
-        let start = (start / DataP::PREFERRED_CHUNK_SIZE) * DataP::PREFERRED_CHUNK_SIZE;
-        let mut end = ((start + visible_row_count * 5) / DataP::PREFERRED_CHUNK_SIZE + 1)
-            * DataP::PREFERRED_CHUNK_SIZE;
+        let mut end = start + visible_row_count * 5;
 
         if let Some(count) = row_count.get() {
             end = end.min(count);
         }
 
         end = end.min(start + 300);
+
+        if let Some(chunk_size) = DataP::CHUNK_SIZE {
+            start /= chunk_size;
+            start *= chunk_size;
+
+            end /= chunk_size;
+            end += 1;
+            end *= chunk_size;
+        }
 
         loaded_rows.update_untracked(|loaded_rows| {
             if end > loaded_rows.len() {
@@ -238,18 +245,33 @@ where
 
         if let Some(missing_range) = missing_range {
             loaded_rows.update(|loaded_rows| loaded_rows.write_loading(missing_range.clone()));
-            let compute_average_row_height = compute_average_row_height.clone();
-            spawn_local({
-                let rows = Rc::clone(&rows);
 
-                async move {
-                    let result = rows.borrow().get_rows(missing_range.clone()).await;
-                    loaded_rows
-                        .update(|loaded_rows| loaded_rows.write_loaded(result, missing_range));
-
-                    compute_average_row_height();
+            let mut loading_ranges = vec![];
+            if let Some(chunk_size) = DataP::CHUNK_SIZE {
+                let mut current_range = missing_range.start..missing_range.start + chunk_size;
+                while current_range.end <= missing_range.end {
+                    loading_ranges.push(current_range.clone());
+                    current_range = current_range.end..current_range.end + chunk_size;
                 }
-            });
+            } else {
+                loading_ranges.push(missing_range);
+            }
+
+            // TODO : implement max concurrent requests
+            for missing_range in loading_ranges {
+                let compute_average_row_height = compute_average_row_height.clone();
+                spawn_local({
+                    let rows = Rc::clone(&rows);
+
+                    async move {
+                        let result = rows.borrow().get_rows(missing_range.clone()).await;
+                        loaded_rows
+                            .update(|loaded_rows| loaded_rows.write_loaded(result, missing_range));
+
+                        compute_average_row_height();
+                    }
+                });
+            }
         }
     });
 

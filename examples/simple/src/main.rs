@@ -6,10 +6,9 @@ use async_trait::async_trait;
 use chrono::NaiveDate;
 use leptos::*;
 use leptos_struct_table::*;
-use serde::{Deserialize, Serialize};
 
 /// This generates the component BookTable
-#[derive(TableRow, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(TableRow, Clone)]
 #[table(sortable, impl_vec_data_provider)]
 pub struct Book {
     /// Id of the entry.

@@ -49,7 +49,7 @@ td:first-child {
     height: 0.75rem;
     border-radius: 0.25rem;
     width: 80%;
-    /*margin: 0.25rem 0;*/
+    vertical-align: middle;
 }
 
 tr:nth-child(4n) .loading-skeleton {
@@ -66,9 +66,9 @@ tr:nth-child(4n+2) .loading-skeleton {
 
 @keyframes skeleton-loading {
     0% {
-        background-color: hsl(200, 20%, 80%);
+        background-color: rgba(0, 0, 0, 0.15);
     }
     100% {
-        background-color: hsl(200, 20%, 90%);
+        background-color: rgba(0, 0, 0, 0.05);
     }
 }

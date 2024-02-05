@@ -1,4 +1,4 @@
-Example that shows how to use a REST API as a data source for a table.
+Example that shows how to use a paginated REST API as a data source for a table.
 
 If you don't have it installed already, install [Trunk](https://trunkrs.dev/) 
 as well as the nightly toolchain for Rust and the wasm32-unknown-unknown target:
