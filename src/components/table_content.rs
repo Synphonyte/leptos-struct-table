@@ -96,6 +96,7 @@ where
 
     let first_selected_index = create_rw_signal(None::<usize>);
 
+    let (do_reload, set_reload) = create_signal(false);
     let clear = move || {
         selection.clear();
         first_selected_index.set(None);
@@ -103,6 +104,8 @@ where
         loaded_rows.update(|loaded_rows| {
             loaded_rows.clear();
         });
+
+        set_reload.set(true);
     };
 
     let on_head_click = {
@@ -117,12 +120,10 @@ where
         }
     };
 
-    let (do_reload, set_reload) = create_signal(false);
     create_effect(move |_| {
         // triggered when `ReloadController::reload()` is called
         reload_controller.get();
         clear();
-        set_reload.set(true);
     });
 
     let selected_indices = match selection {
