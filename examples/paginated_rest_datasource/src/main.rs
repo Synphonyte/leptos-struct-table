@@ -1,11 +1,11 @@
 use async_trait::async_trait;
+use gloo_net::http::Request;
+use leptos::html::Div;
 use leptos::*;
 use leptos_struct_table::*;
-use reqwasm::http::Request;
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 use std::fmt::Display;
-use std::ops::Range;
 
 #[derive(PartialEq, PartialOrd, Clone, Debug, Default)]
 pub struct Link {
@@ -16,7 +16,7 @@ pub struct Link {
 #[component]
 #[allow(unused_variables)]
 pub fn ObjectLinkTableCellRenderer<F>(
-    #[prop(into)] class: MaybeSignal<String>,
+    class: String,
     #[prop(into)] value: MaybeSignal<Link>,
     on_change: F,
     index: usize,
@@ -28,7 +28,11 @@ where
         "https://archive.org/advancedsearch.php?q=identifier%3D{}&output=json&callback=",
         value.get_untracked().href,
     );
-    view! { <td key=index class=class><a href=link>{value.get_untracked().text}</a></td> }
+    view! {
+        <td key=index class=class>
+            <a href=link>{value.get_untracked().text}</a>
+        </td>
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Ord, PartialOrd, Eq)]
@@ -63,11 +67,11 @@ impl IntoView for Authors {
     }
 }
 
-#[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-#[table(sortable)]
+#[derive(TableRow, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+// #[table(sortable)]
 pub struct Book {
     #[serde(rename = "identifier")]
-    #[table(key)]
+    #[table(skip)]
     pub id: String,
 
     pub title: String,
@@ -96,45 +100,51 @@ impl Book {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 struct ArchiveOrgApiResponse {
     pub response: ArchiveOrgApiResponseInner,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct ArchiveOrgApiResponseInner {
     pub docs: Vec<Book>,
 }
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Deserialize, Debug)]
+pub struct ArchiveOrgCountRespone {
+    pub response: ArchiveOrgCountResponseInner,
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ArchiveOrgCountResponseInner {
+    pub num_found: usize,
+}
+
 pub struct BookDataProvider {
-    reload_count: usize,
-    sorting: VecDeque<(BookColumnName, ColumnSort)>,
+    sorting: VecDeque<(usize, ColumnSort)>,
 }
 
 impl Default for BookDataProvider {
     fn default() -> Self {
         Self {
-            reload_count: 0,
             sorting: VecDeque::new(),
         }
     }
 }
 
 impl BookDataProvider {
-    const ITEM_COUNT: usize = 20;
-
-    fn url_sort_param_for_column(&self, column: BookColumnName) -> &'static str {
+    fn url_sort_param_for_column(&self, column: usize) -> &'static str {
         match column {
-            BookColumnName::Id => "identifierSorter",
-            BookColumnName::Title => "titleSorter",
-            BookColumnName::Author => "creatorSorter",
-            BookColumnName::PublishDate => "publicdate",
+            0 => "identifierSorter",
+            1 => "titleSorter",
+            2 => "creatorSorter",
+            3 => "publicdate",
             _ => "",
         }
     }
 
-    fn url_sort_param_for_sort_pair(&self, pair: &(BookColumnName, ColumnSort)) -> String {
+    fn url_sort_param_for_sort_pair(&self, pair: &(usize, ColumnSort)) -> String {
         let col = self.url_sort_param_for_column(pair.0);
 
         let dir = match pair.1 {
@@ -146,59 +156,84 @@ impl BookDataProvider {
         format!("&sort%5B%5D={}+{}", col, dir)
     }
 
-    fn get_url(&self, range: Range<usize>) -> String {
+    fn get_url(&self, page_index: usize) -> String {
         let mut sort = String::new();
         for pair in &self.sorting {
             sort.push_str(&self.url_sort_param_for_sort_pair(pair));
         }
 
-        let len = ((range.end - range.start) / Self::ITEM_COUNT + 2) * Self::ITEM_COUNT;
-        let page = range.start / len;
-
         format!(
-            "https://archive.org/advancedsearch.php?q=creator%3A%28Lewis%29&fl%5B%5D=creator&fl%5B%5D=identifier&fl%5B%5D=publicdate&fl%5B%5D=title{sort}&rows={}&page={}&output=json&callback=", 
-            len,
-            page + 1,
-        )
-    }
-
-    pub fn reload(&mut self) {
-        self.reload_count += 1;
+                "https://archive.org/advancedsearch.php?q=creator%3A%28Lewis%29&fl%5B%5D=creator&fl%5B%5D=identifier&fl%5B%5D=publicdate&fl%5B%5D=title{sort}&rows={}&page={}&output=json&callback=",
+                Self::PAGE_ROW_COUNT,
+                page_index + 1,
+            )
     }
 }
 
 #[async_trait(?Send)]
-impl TableDataProvider<Book> for BookDataProvider {
-    type ColumnName = BookColumnName;
+impl PaginatedTableDataProvider<Book> for BookDataProvider {
+    const PAGE_ROW_COUNT: usize = 50;
 
-    async fn get_rows(&self, range: Range<usize>) -> Vec<Book> {
-        let resp: ArchiveOrgApiResponse = Request::get(&self.get_url(range))
+    async fn get_page(&self, page_index: usize) -> Result<Vec<Book>, String> {
+        let url = self.get_url(page_index);
+
+        let resp: ArchiveOrgApiResponse = Request::get(&url)
             .send()
             .await
-            .unwrap()
+            .map_err(|e| e.to_string())?
             .json()
             .await
-            .unwrap();
+            .map_err(|e| e.to_string())?;
 
-        resp.response.docs
+        let result = resp.response.docs;
+
+        Ok(result)
     }
 
-    fn set_sorting(&mut self, sorting: &VecDeque<(Self::ColumnName, ColumnSort)>) {
+    async fn row_count(&self) -> Option<usize> {
+        let resp: Option<ArchiveOrgCountRespone> = Request::get("https://archive.org/advancedsearch.php?q=creator%3A(Lewis)&fl[]=creator&fl[]=identifier&fl[]=publicdate&rows=0&page=0&output=json&callback=")
+            .send()
+            .await
+            .map_err(|err| logging::error!("Failed to load count: {:?}", err))
+            .ok()?
+            .json()
+            .await
+            .map_err(|err| logging::error!("Failed to parse count response: {:?}", err))
+            .ok();
+
+        // This API only allows to display up to 10000 results
+        resp.map(|r| r.response.num_found.min(10000))
+    }
+
+    fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
         self.sorting = sorting.clone();
     }
 }
 
 #[component]
 pub fn App() -> impl IntoView {
-    let items = create_rw_signal(BookDataProvider::default());
+    let rows = BookDataProvider::default();
 
-    let refresh = move |_| {
-        items.update(|items| items.reload());
+    let reload_controller = ReloadController::default();
+
+    let reload = move |_| {
+        reload_controller.reload();
     };
 
+    let container = create_node_ref::<Div>();
+
     view! {
-        <button on:click=refresh>"Refresh"</button>
-        <BookTable items=items />
+        <button on:click=reload>"Reload"</button>
+        <div class="table-container" node_ref=container>
+            <table>
+                <TableContent
+                    rows=rows
+                    scroll_container=container
+                    loading_row_inner_class="loading-skeleton"
+                    reload_controller=reload_controller
+                />
+            </table>
+        </div>
     }
 }
 
@@ -207,8 +242,6 @@ fn main() {
     console_error_panic_hook::set_once();
 
     mount_to_body(|| {
-        view! {
-            <App />
-        }
+        view! { <App/> }
     })
 }

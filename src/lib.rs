@@ -323,7 +323,7 @@ pub struct TemperatureMeasurement {
 //! #[component]
 //! pub fn App() -> impl IntoView {
 //! #    let items = create_rw_signal(vec![Book::default(), Book::default()]);
-//!     let on_change = move |evt: TableChangeEvent<Book, BookColumnName, BookColumnValue>| {
+//!     let on_change = move |evt: ChangeEvent<Book, BookColumnName, BookColumnValue>| {
 //!         // Do something
 //!     };
 //!
@@ -343,19 +343,28 @@ pub struct TemperatureMeasurement {
 #![feature(doc_cfg)]
 
 mod class_providers;
-mod column_enum;
 mod components;
+mod data;
 mod data_provider;
 mod events;
+mod loaded_rows;
+mod reload_controller;
+mod row_renderer;
+mod scroll_container;
+mod selection;
 #[cfg(feature = "uuid")]
 pub mod uuid;
 
 pub use class_providers::*;
-pub use column_enum::*;
 pub use components::*;
+pub use data::*;
 pub use data_provider::*;
 pub use events::*;
-pub use leptos_struct_table_macro::TableComponent;
+pub use leptos_struct_table_macro::TableRow;
+pub use reload_controller::*;
+pub use row_renderer::*;
+pub use scroll_container::*;
+pub use selection::*;
 use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
 

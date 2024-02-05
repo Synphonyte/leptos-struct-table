@@ -4,14 +4,16 @@ use async_trait::async_trait;
 use chrono::NaiveDate;
 use leptos::*;
 use leptos_struct_table::*;
-use serde::{Deserialize, Serialize};
 use tailwind::TailwindClassesPreset;
 
 // This generates the component BookTable
-#[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-#[table(sortable, classes_provider = "TailwindClassesPreset")]
+#[derive(TableRow, Clone)]
+#[table(
+    sortable,
+    classes_provider = "TailwindClassesPreset",
+    impl_vec_data_provider
+)]
 pub struct Book {
-    #[table(key)]
     pub id: u32,
     pub title: String,
     pub author: String,
@@ -27,7 +29,7 @@ fn main() {
     console_error_panic_hook::set_once();
 
     mount_to_body(|| {
-        let items = create_rw_signal(vec![
+        let rows = vec![
             Book {
                 id: 1,
                 title: "The Great Gatsby".to_string(),
@@ -52,11 +54,13 @@ fn main() {
                 author: "James Joyce".to_string(),
                 publish_date: NaiveDate::from_ymd_opt(1922, 2, 2).unwrap(),
             },
-        ]);
+        ];
 
         view! {
             <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 float-left".to_string()>
-                <BookTable class="mb-[-1px]".to_string() items=items />
+                <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
+                    <TableContent rows=rows />
+                </table>
             </div>
         }
     })

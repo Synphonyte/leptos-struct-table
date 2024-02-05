@@ -2,18 +2,15 @@
 //! Simple showcase example.
 
 use crate::uuid::Uuid;
-use async_trait::async_trait;
 use chrono::NaiveDate;
 use leptos::*;
 use leptos_struct_table::*;
-use serde::{Deserialize, Serialize};
 
 /// This generates the component BookTable
-#[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-#[table(sortable)]
+#[derive(TableRow, Clone)]
+#[table(sortable, impl_vec_data_provider)]
 pub struct Book {
     /// Id of the entry.
-    #[table(key)]
     pub id: Uuid,
     /// Title of the book.
     pub title: String,
@@ -34,7 +31,7 @@ fn main() {
     console_error_panic_hook::set_once();
 
     mount_to_body(|| {
-        let items = create_rw_signal(vec![
+        let rows = vec![
             Book {
                 id: Uuid::default(),
                 title: "The Great Gatsby".to_string(),
@@ -69,10 +66,12 @@ fn main() {
                 description: None,
                 hidden_field: "hidden".to_string(),
             },
-        ]);
+        ];
 
         view! {
-            <BookTable items=items />
+            <table>
+                <TableContent rows=rows/>
+            </table>
         }
     })
 }

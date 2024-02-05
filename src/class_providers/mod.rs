@@ -6,47 +6,73 @@ pub use bootstrap::*;
 pub use tailwind::*;
 
 /// A trait for providing classes for the table.
-pub trait TableClassesProvider: Clone {
+pub trait TableClassesProvider {
     /// Create a new instance of the class provider.
     fn new() -> Self;
 
-    /// Get the classes for the root table element.
-    /// The `classes` parameter contains the classes specified in the `classes` prop of the generated component.
-    fn table(&self, classes: &str) -> String {
-        classes.to_string()
+    /// Get the class attribute for the thead.
+    /// The `prop_class` parameter contains the classes specified in the
+    /// `thead_class` prop of the [`TableContent`] component.
+    fn thead(&self, prop_class: &str) -> String {
+        prop_class.to_string()
     }
 
-    /// Get the classes for the head row.
-    /// The `template_classes` parameter contains the classes specified in the `head_row_class` attribute of the struct.
-    fn head_row(&self, template_classes: &str) -> String {
-        template_classes.to_string()
+    /// Get the classes for the thead row.
+    /// The `prop_class` parameter contains the classes specified in the
+    /// `thead_row_class` prop of the [`TableContent`] component.
+    fn thead_row(&self, prop_class: &str) -> String {
+        prop_class.to_string()
     }
 
-    #[allow(unused_variables)]
-    /// Get the classes for the head cells.
+    /// Get the classes for the thead cells.
     /// The `sort` parameter contains the sort state of the column.
-    /// The `template_classes` parameter contains the classes specified in the `head_class` attribute of the field.
-    fn head_cell(&self, sort: ColumnSort, template_classes: &str) -> String {
-        format!("{} {}", sort.as_class(), template_classes)
+    /// The `macro_class` parameter contains the classes specified in the `head_class` macro attribute of the field.
+    fn thead_cell(&self, sort: ColumnSort, macro_class: &str) -> String {
+        format!("{} {}", sort.as_class(), macro_class)
     }
 
-    /// Get the classes for the head cells' inner element.
-    fn head_cell_inner(&self) -> String {
+    /// Get the classes for the thead cells' inner element.
+    fn thead_cell_inner(&self) -> String {
         "".to_string()
+    }
+
+    /// Get the classes for the tbody.
+    /// The `prop_class` parameter contains the classes specified in the
+    /// `tbody_class` prop of the [`TableContent`] component.
+    fn tbody(&self, prop_class: &str) -> String {
+        prop_class.to_string()
     }
 
     #[allow(unused_variables)]
     /// Get the classes for the body rows.
     /// The `row_index` parameter contains the index of the row. The first row has index 0.
     /// The `selected` parameter indicates whether the row is selected.
-    /// The `template_classes` parameter contains the classes specified in the `row_class` attribute of the struct.
-    fn row(&self, row_index: usize, selected: bool, template_classes: &str) -> String {
-        template_classes.to_string() + if selected { " selected" } else { "" }
+    /// The `prop_class` parameter contains the classes specified in the `row_class`
+    /// prop of the [`TableContent`] component.
+    fn row(&self, row_index: usize, selected: bool, prop_class: &str) -> String {
+        prop_class.to_string() + if selected { " selected" } else { "" }
+    }
+
+    /// Get the classes for the elements inside of the cells of rows that are currently
+    /// being loaded. Usually this will be some loading indicator like a sceleton bar.
+    /// The `prop_class` parameter contains the classes specified in the
+    /// `loading_row_inner_class` prop of the [`TableContent`] component.
+    fn loading_row_inner(&self, prop_class: &str) -> String {
+        prop_class.to_string()
     }
 
     /// Get the classes for the body cells.
-    /// The `template_classes` parameter contains the classes specified in the `class` attribute of the field.
-    fn cell(&self, template_classes: &str) -> String {
-        template_classes.to_string()
+    /// The `macro_class` parameter contains the classes specified in the `class` macro attribute of the field.
+    fn cell(&self, macro_class: &str) -> String {
+        macro_class.to_string()
+    }
+}
+
+#[derive(Copy, Clone)]
+pub struct DummyTableClassesProvider;
+
+impl TableClassesProvider for DummyTableClassesProvider {
+    fn new() -> Self {
+        Self
     }
 }

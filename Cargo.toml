@@ -12,14 +12,16 @@ readme = "README.md"
 repository = "https://github.com/Synphonyte/leptos-struct-table"
 
 [dependencies]
-leptos = { version = "0.5", features = ["nightly"] }
-leptos-struct-table-macro = "0.8"
+leptos = { version = "0.6", features = ["nightly"] }
+leptos-struct-table-macro = { path = "../leptos-struct-table-macro" }
+leptos-use = "0.10"
 async-trait = "0.1"
 paste = { version = "1.0", optional = true }
 chrono = { version = "0.4", optional = true, features = ["serde"] }
 serde = "1"
 uuid = { version = "1", optional = true, features = ["v4", "js", "serde"] }
 thiserror = "1"
+web-sys = "0.3.67"
 
 [features]
 chrono = ["dep:chrono", "dep:paste"]
