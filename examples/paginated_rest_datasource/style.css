@@ -1,11 +1,30 @@
-body {
+body, html {
     font-family: sans-serif;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: stretch;
+    flex-direction: column;
+}
+
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 1rem;
+    background: white;
+    border-bottom: 1px solid silver;
 }
 
 .table-container {
-    margin-top: 20px;
+    flex: 1;
     overflow: auto;
-    max-height: calc(100vh - 200px);
 }
 
 table {

@@ -3,10 +3,10 @@ use crate::loaded_rows::{LoadedRows, RowState};
 use crate::row_renderer::RowRenderer;
 use crate::selection::Selection;
 use crate::{
-    ChangeEventHandler, ColumnSort, DefaultErrorRowRenderer, DefaultLoadingRowRenderer,
+    ChangeEvent, ColumnSort, DefaultErrorRowRenderer, DefaultLoadingRowRenderer,
     DefaultRowPlaceholderRenderer, DefaultTableBodyRenderer, DefaultTableHeadRenderer,
     DefaultTableHeadRowRenderer, DefaultTableRowRenderer, EventHandler, ReloadController,
-    ScrollContainer, TableClassesProvider, TableDataProvider, TableHeadEvent,
+    ScrollContainer, SelectionChangeEvent, TableClassesProvider, TableDataProvider, TableHeadEvent,
 };
 use leptos::wasm_bindgen::JsCast;
 use leptos::*;
@@ -26,8 +26,8 @@ renderer_fn!(
         row: Row,
         index: usize,
         selected: Signal<bool>,
-        on_select: EventHandler,
-        on_change: ChangeEventHandler<Row>
+        on_select: EventHandler<web_sys::MouseEvent>,
+        on_change: EventHandler<ChangeEvent<Row>>
     )
     default DefaultTableRowRenderer
     where Row: RowRenderer + Clone + 'static
@@ -52,12 +52,14 @@ renderer_fn!(
     default DefaultLoadingRowRenderer
 );
 
+/// Render the content of a table. This is the main component of this crate.
 #[component]
 pub fn TableContent<Row, DataP, ClsP>(
     rows: DataP,
     #[prop(optional, into)] scroll_container: ScrollContainer,
-    #[prop(optional, into)] on_change: ChangeEventHandler<Row>,
+    #[prop(optional, into)] on_change: EventHandler<ChangeEvent<Row>>,
     #[prop(optional, into)] selection: Selection,
+    #[prop(optional, into)] on_selection_change: EventHandler<SelectionChangeEvent<Row>>,
     #[prop(default = DefaultTableHeadRenderer.into(), into)] thead_renderer: WrapperRendererFn,
     #[prop(default = DefaultTableBodyRenderer.into(), into)] tbody_renderer: WrapperRendererFn,
     #[prop(default = DefaultTableHeadRowRenderer.into(), into)]
@@ -74,7 +76,21 @@ pub fn TableContent<Row, DataP, ClsP>(
     #[prop(default = create_rw_signal(VecDeque::new()), into)] sorting: RwSignal<
         VecDeque<(usize, ColumnSort)>,
     >,
-    #[prop(optional)] reload_controller: ReloadController,
+
+    /// This is called once the number of rows is known.
+    /// It will only be executed if [`TableDataProvider::row_count`] returns `Some(...)`.
+    ///
+    /// See the [paginated_rest_datasource example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/paginated_rest_datasource/src/main.rs)
+    /// for how to use.
+    #[prop(optional, into)]
+    on_row_count: EventHandler<usize>,
+
+    /// Allows to manually trigger a reload.
+    ///
+    /// See the [paginated_rest_datasource example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/paginated_rest_datasource/src/main.rs)
+    /// for how to use.
+    #[prop(optional)]
+    reload_controller: ReloadController,
 ) -> impl IntoView
 where
     Row: RowRenderer<ClassesProvider = ClsP> + Clone + 'static,
@@ -154,10 +170,11 @@ where
         async move {
             let row_count = rows.borrow().row_count().await;
 
-            set_row_count(row_count);
+            set_row_count.set(row_count);
 
             if let Some(row_count) = row_count {
                 loaded_rows.update(|loaded_rows| loaded_rows.resize(row_count));
+                on_row_count.run(row_count);
             }
         }
     });
@@ -285,6 +302,7 @@ where
             let row_renderer = row_renderer.clone();
             let loading_row_renderer = loading_row_renderer.clone();
             let error_row_renderer = error_row_renderer.clone();
+            let on_selection_change = on_selection_change.clone();
 
             view! {
                 <For
@@ -312,6 +330,7 @@ where
                         let row_renderer = row_renderer.clone();
                         let loading_row_renderer = loading_row_renderer.clone();
                         let error_row_renderer = error_row_renderer.clone();
+                        let on_selection_change = on_selection_change.clone();
 
                         move |(i, row)| {
                             match row {
@@ -329,7 +348,21 @@ where
                                             )
                                     });
 
-                                    let on_select = move |evt: web_sys::MouseEvent| update_selection(evt, selection, first_selected_index, i);
+                                    let on_select = {
+                                        let on_selection_change = on_selection_change.clone();
+                                        let row = row.clone();
+
+                                        move |evt: web_sys::MouseEvent| {
+                                            update_selection(evt, selection, first_selected_index, i);
+
+                                            let selection_change_event = SelectionChangeEvent {
+                                                row: row.clone(),
+                                                row_index:i,
+                                                selected: selected_signal.get_untracked(),
+                                            };
+                                            on_selection_change.run(selection_change_event);
+                                        }
+                                    };
 
                                     row_renderer.run(class_signal, row, i, selected_signal, on_select.into(), on_change.get_value())
                                 }

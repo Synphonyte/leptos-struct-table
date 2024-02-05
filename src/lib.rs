@@ -344,7 +344,6 @@ pub struct TemperatureMeasurement {
 
 mod class_providers;
 mod components;
-mod data;
 mod data_provider;
 mod events;
 mod loaded_rows;
@@ -357,7 +356,6 @@ pub mod uuid;
 
 pub use class_providers::*;
 pub use components::*;
-pub use data::*;
 pub use data_provider::*;
 pub use events::*;
 pub use leptos_struct_table_macro::TableRow;
