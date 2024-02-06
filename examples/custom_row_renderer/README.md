@@ -1,4 +1,4 @@
-A simple table example with just local data stored as `Vec<Book>` demonstrating a custom row value renderer and skipping header titles.
+A simple table example with just local data stored as `Vec<Book>` demonstrating a custom row renderer and skipping header titles.
 
 If you don't have it installed already, install [Trunk](https://trunkrs.dev/) 
 as well as the nightly toolchain for Rust and the wasm32-unknown-unknown target:
