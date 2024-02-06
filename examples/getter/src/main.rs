@@ -1,14 +1,11 @@
-use async_trait::async_trait;
 use chrono::NaiveDate;
 use leptos::*;
 use leptos_struct_table::*;
-use serde::{Deserialize, Serialize};
 
 // This generates the component BookTable
-#[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-#[table(sortable)]
+#[derive(TableRow, Clone)]
+#[table(sortable, impl_vec_data_provider)]
 pub struct Book {
-    #[table(key)]
     pub id: u32,
     pub title: String,
 
@@ -36,7 +33,7 @@ impl Book {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(Clone)]
 pub struct Author {
     pub first_name: String,
     pub last_name: String,
@@ -47,7 +44,7 @@ fn main() {
     console_error_panic_hook::set_once();
 
     mount_to_body(|| {
-        let items = create_rw_signal(vec![
+        let rows = vec![
             Book {
                 id: 1,
                 title: "The Great Gatsby".to_string(),
@@ -88,10 +85,12 @@ fn main() {
                 publish_date: NaiveDate::from_ymd_opt(1922, 2, 2).unwrap(),
                 author_name: Default::default(),
             },
-        ]);
+        ];
 
         view! {
-            <BookTable items=items />
+            <table>
+                <TableContent rows />
+            </table>
         }
     })
 }
