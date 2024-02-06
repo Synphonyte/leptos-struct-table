@@ -1,7 +1,6 @@
 mod tailwind;
 
 use chrono::NaiveDate;
-use leptos::logging::log;
 use leptos::*;
 use leptos_struct_table::*;
 use tailwind::TailwindClassesPreset;
@@ -56,20 +55,37 @@ fn main() {
             },
         ];
 
-        let selected_key = create_rw_signal(None);
-
-        create_effect(move |_| log!("{:?}", selected_key.get()));
+        let selected_index = create_rw_signal(None);
+        let (selected_row, set_selected_row) = create_signal(None);
 
         view! {
-            <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 float-left".to_string()>
+            <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 float-left">
                 <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
                     <TableContent
                         rows=rows
-                        selection=Selection::Single(selected_key)
+                        selection=Selection::Single(selected_index)
                         row_class="select-none"
+                        on_selection_change={move |evt: SelectionChangeEvent<Book>| {
+                            set_selected_row.update(|selected_row| {
+                                *selected_row = Some(evt.row);
+                            })
+                        }}
                     />
                 </table>
             </div>
+
+            { move || selected_row.get().map(|selected_row| {
+                view! {
+                    <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 float-left px-5 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-400">
+                        <pre>
+                            "          Id:  " {selected_row.id} "\n"
+                            "       Title:  " {selected_row.title} "\n"
+                            "      Author:  " {selected_row.author} "\n"
+                            "Publish Date:  " {selected_row.publish_date.to_string()}
+                        </pre>
+                    </div>
+                }
+            }) }
         }
     })
 }
