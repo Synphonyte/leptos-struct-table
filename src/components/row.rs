@@ -29,18 +29,27 @@ where
     }
 }
 
+/// The default row placeholder renderer which is just a div that is set to the
+/// appropriate height. This is used in place of rows that are not shown
+/// before and after the currently visible rows.
 pub fn DefaultRowPlaceholderRenderer(height: Signal<f64>) -> impl IntoView {
     view! { <div style:height=move || format!("{}px", height.get())></div> }
 }
 
-pub fn DefaultErrorRowRenderer(err: String, col_count: usize) -> impl IntoView {
+/// The default error row renderer which just displays the error message when
+/// a row fails to load, i.e. when [`TableDataProvider::get_rows`] returns an `Err(..)`.
+#[allow(unused_variables)]
+pub fn DefaultErrorRowRenderer(err: String, index: usize, col_count: usize) -> impl IntoView {
     view! { <tr><td colspan=col_count>{err}</td></tr> }
 }
 
+/// The default loading row renderer which just displays a loading indicator.
+#[allow(unused_variables)]
 pub fn DefaultLoadingRowRenderer(
-    col_count: usize,
     class: Signal<String>,
     inner_class: Signal<String>,
+    index: usize,
+    col_count: usize,
 ) -> impl IntoView {
     view! {
         <tr class=class>

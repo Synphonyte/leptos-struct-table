@@ -23,6 +23,7 @@ macro_rules! wrapper_render_fn {
         #[$doc_name]
         /// renderer. Please note that this is **NOT** a `#[component]`.
         $(#[$additional_doc])*
+        #[allow(non_snake_case)]
         pub fn $name(content: View, class: Signal<String>) -> impl IntoView {
             view! {
                 <$tag class=class>

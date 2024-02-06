@@ -4,27 +4,32 @@ mod tailwind;
 use crate::renderer::*;
 use async_trait::async_trait;
 use chrono::NaiveDate;
-use leptos::logging::log;
 use leptos::*;
 use leptos_struct_table::*;
-use serde::{Deserialize, Serialize};
+use std::ops::Range;
 use tailwind::TailwindClassesPreset;
 
 // This generates the component BookTable
-#[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(TableRow, Clone, Debug)]
 #[table(classes_provider = "TailwindClassesPreset")]
 pub struct Book {
-    #[table(key)]
     pub id: u32,
     #[table(renderer = "InputCellRenderer")]
     pub title: String,
     #[table(renderer = "InputCellRenderer")]
     pub author: String,
-    #[table(
-        cell_class = "text-red-600 dark:text-red-400",
-        head_class = "text-red-700 dark:text-red-300"
-    )]
     pub publish_date: NaiveDate,
+}
+
+#[async_trait(?Send)]
+impl TableDataProvider<Book> for RwSignal<Vec<Book>> {
+    async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Book>, Range<usize>), String> {
+        Ok((self.get_untracked()[range.clone()].to_vec(), range))
+    }
+
+    async fn row_count(&self) -> Option<usize> {
+        Some(self.get_untracked().len())
+    }
 }
 
 fn main() {
@@ -32,7 +37,7 @@ fn main() {
     console_error_panic_hook::set_once();
 
     mount_to_body(|| {
-        let items = create_rw_signal(vec![
+        let rows = create_rw_signal(vec![
             Book {
                 id: 1,
                 title: "The Great Gatsby".to_string(),
@@ -59,28 +64,20 @@ fn main() {
             },
         ]);
 
-        let on_change = move |evt: TableChangeEvent<Book, BookColumnName, BookColumnValue>| {
-            items.update(|items| {
-                items[evt.row_index] = match evt.new_value {
-                    BookColumnValue::Author(author) => Book {
-                        author,
-                        ..evt.old_row
-                    },
-                    BookColumnValue::Title(title) => Book {
-                        title,
-                        ..evt.old_row
-                    },
-                    _ => unreachable!(),
-                };
+        let on_change = move |evt: ChangeEvent<Book>| {
+            rows.update(|rows| {
+                rows[evt.row_index] = evt.changed_row;
             });
         };
 
         view! {
             <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 w-[50%]".to_string()>
-                <BookTable class="mb-[-1px]".to_string() items=items on_change=on_change/>
+                <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
+                    <TableContent rows on_change/>
+                </table>
             </div>
 
-            <pre>{move || format!("{:#?}", items())}</pre>
+            <pre>{move || format!("{:#?}", rows())}</pre>
         }
     })
 }

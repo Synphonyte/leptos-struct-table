@@ -43,12 +43,12 @@ renderer_fn!(
 );
 
 renderer_fn!(
-    ErrorRowRendererFn(err: String, col_count: usize)
+    ErrorRowRendererFn(err: String, index: usize, col_count: usize)
     default DefaultErrorRowRenderer
 );
 
 renderer_fn!(
-    LoadingRowRendererFn(col_count: usize, class: Signal<String>, inner_class: Signal<String>)
+    LoadingRowRendererFn(class: Signal<String>, inner_class: Signal<String>, index: usize, col_count: usize)
     default DefaultLoadingRowRenderer
 );
 
@@ -366,16 +366,17 @@ where
 
                                     row_renderer.run(class_signal, row, i, selected_signal, on_select.into(), on_change.get_value())
                                 }
-                                RowState::Error(err) => error_row_renderer.run(err, Row::COLUMN_COUNT),
+                                RowState::Error(err) => error_row_renderer.run(err, i, Row::COLUMN_COUNT),
                                 RowState::Loading | RowState::Placeholder => {
                                     loading_row_renderer.run(
-                                        Row::COLUMN_COUNT,
                                         Signal::derive(
                                             move || class_provider.row(i, false, &row_class.get())
                                         ),
                                         Signal::derive(
                                             move || class_provider.loading_row_inner(&loading_row_inner_class.get())
                                         ),
+                                        i,
+                                        Row::COLUMN_COUNT,
                                     )
                                 }
                             }
