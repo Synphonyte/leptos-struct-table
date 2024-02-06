@@ -16,6 +16,7 @@
       <sourceFolder url="file://$MODULE_DIR$/examples/editable/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples/virt_dev/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples/paginated_rest_datasource/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/generic/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/examples/simple/target" />
       <excludeFolder url="file://$MODULE_DIR$/leptos-struct-table-macro/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
@@ -46,6 +47,7 @@
       <excludeFolder url="file://$MODULE_DIR$/examples/editable/target" />
       <excludeFolder url="file://$MODULE_DIR$/examples/virt_dev/target" />
       <excludeFolder url="file://$MODULE_DIR$/examples/paginated_rest_datasource/target" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/generic/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

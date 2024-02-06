@@ -1,24 +1,21 @@
 //! Generic showcase example.
 
 use crate::uuid::Uuid;
-use async_trait::async_trait;
 use chrono::NaiveDate;
 use leptos::*;
 use leptos_struct_table::*;
-use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use std::fmt::Debug;
 
 /// This generates the component BookTable
-#[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#[derive(TableRow, Clone)]
+#[table(impl_vec_data_provider)]
 pub struct Book<T>
 where
-    // necessary trait bounds. `IntoView` is only necessary because we require it in our custom renderer below
-    // otherwise you could remove it here.
+    // necessary trait bounds. `IntoView` is only necessary because we require it in
+    // our custom renderer below, otherwise you could remove it here.
     // If you also make the table sortable then you might have to add `PartialOrd` as well.
-    T: PartialEq + Debug + Clone + Serialize + DeserializeOwned + IntoView + 'static,
+    T: IntoView + Clone + 'static,
 {
     /// Id of the entry.
-    #[table(key)]
     pub id: Uuid,
     /// Title of the book.
     pub title: String,
@@ -30,17 +27,20 @@ where
     #[table(none_value = "-")]
     pub description: Option<String>,
 
-    /// Generic field. You have to specify a custom renderer for a generic field
-    /// and provide this serde bound attribute.
+    /// Generic field. You have to specify a custom renderer for a generic field.
+    ///
+    /// In case you need serde you also have to add
+    /// ```
+    /// #[serde(bound(deserialize = "T: DeserializeOwned"))]
+    /// ```
     #[table(renderer = "CustomDataRenderer")]
-    #[serde(bound(deserialize = "T: DeserializeOwned"))]
     pub custom_data: T,
 }
 
 #[component]
 #[allow(unused_variables)]
 pub fn CustomDataRenderer<T, F>(
-    #[prop(into)] class: MaybeSignal<String>,
+    class: String,
     #[prop(into)] value: MaybeSignal<T>,
     on_change: F,
     index: usize,
@@ -59,7 +59,7 @@ fn main() {
     console_error_panic_hook::set_once();
 
     mount_to_body(|| {
-        let items = create_rw_signal(vec![
+        let rows = vec![
             Book {
                 id: Uuid::default(),
                 title: "The Great Gatsby".to_string(),
@@ -94,10 +94,12 @@ fn main() {
                 description: None,
                 custom_data: "still a string".to_string(),
             },
-        ]);
+        ];
 
         view! {
-            <BookTable items=items />
+            <table>
+                <TableContent rows />
+            </table>
         }
     })
 }
