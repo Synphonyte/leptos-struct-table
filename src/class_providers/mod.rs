@@ -61,6 +61,7 @@ pub trait TableClassesProvider {
         prop_class.to_string()
     }
 
+    #[allow(unused_variables)]
     /// Get the classes for the elements inside of the cells of rows that are currently
     /// being loaded. Usually this will be some loading indicator like a sceleton bar.
     /// The `prop_class` parameter contains the classes specified in the

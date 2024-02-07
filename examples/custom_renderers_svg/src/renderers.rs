@@ -20,7 +20,7 @@ pub fn SvgRowRenderer<Row>(
     on_change: EventHandler<ChangeEvent<Row>>,
 ) -> impl IntoView
 where
-    Row: RowRenderer + Clone + 'static,
+    Row: TableRow + Clone + 'static,
 {
     let transform = format!("translate(0, {})", (index + 1) * ROW_HEIGHT);
 

@@ -13,4 +13,6 @@ impl TableClassesProvider for BootstrapClassesPreset {
 
         format!("{} {}", active, template_classes)
     }
+
+    // TODO : skeleton loading
 }

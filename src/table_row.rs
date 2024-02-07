@@ -2,7 +2,12 @@ use crate::{ChangeEvent, ColumnSort, EventHandler, TableClassesProvider, TableHe
 use leptos::*;
 use std::collections::VecDeque;
 
-pub trait RowRenderer: Clone {
+/// This trait has to implemented in order for [`TableContent`] to be able to render rows and the head row of the table.
+/// Usually this is done by `#[derive(TableRow, Clone)]`.
+///
+/// Please see the [simple example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs)
+/// for how to use.
+pub trait TableRow: Clone {
     type ClassesProvider: TableClassesProvider + Copy;
 
     /// How many columns this row has (i.e. the number of fields in the struct)

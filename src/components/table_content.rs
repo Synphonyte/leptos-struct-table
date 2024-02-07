@@ -1,7 +1,7 @@
 use crate::components::renderer_fn::renderer_fn;
 use crate::loaded_rows::{LoadedRows, RowState};
-use crate::row_renderer::RowRenderer;
 use crate::selection::Selection;
+use crate::table_row::TableRow;
 use crate::{
     ChangeEvent, ColumnSort, DefaultErrorRowRenderer, DefaultLoadingRowRenderer,
     DefaultRowPlaceholderRenderer, DefaultTableBodyRenderer, DefaultTableHeadRenderer,
@@ -31,7 +31,7 @@ renderer_fn!(
         on_change: EventHandler<ChangeEvent<Row>>
     )
     default DefaultTableRowRenderer
-    where Row: RowRenderer + Clone + 'static
+    where Row: TableRow + Clone + 'static
 );
 
 renderer_fn!(
@@ -56,28 +56,101 @@ renderer_fn!(
 /// Render the content of a table. This is the main component of this crate.
 #[component]
 pub fn TableContent<Row, DataP, ClsP>(
+    /// The data to be rendered in this table.
+    /// This must implement [`TableDataProvider`] or [`PaginatedTableDataProvider`].
     rows: DataP,
-    #[prop(optional, into)] scroll_container: ScrollContainer,
-    #[prop(optional, into)] on_change: EventHandler<ChangeEvent<Row>>,
-    #[prop(optional, into)] selection: Selection,
-    #[prop(optional, into)] on_selection_change: EventHandler<SelectionChangeEvent<Row>>,
-    #[prop(default = DefaultTableHeadRenderer.into(), into)] thead_renderer: WrapperRendererFn,
-    #[prop(default = DefaultTableBodyRenderer.into(), into)] tbody_renderer: WrapperRendererFn,
+
+    /// The container element which has scrolling capabilities. By default this is the `body` element.
+    #[prop(optional, into)]
+    scroll_container: ScrollContainer,
+
+    /// Event handler for when a row is edited.
+    /// Check out the [editable example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/editable/src/main.rs).
+    #[prop(optional, into)]
+    on_change: EventHandler<ChangeEvent<Row>>,
+
+    /// Selection mode together with the `RwSignal` to hold the selection. Available modes are
+    /// - `None` - No selection (default)
+    /// - `Single` - Single selection
+    /// - `Multiple` - Multiple selection
+    ///
+    /// Please see [`Selection`] for more information and check out the
+    /// [selectable example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/selectable/src/main.rs).
+    #[prop(optional, into)]
+    selection: Selection,
+
+    /// Event handler callback for when the selection changes.
+    /// See the [selectable example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/selectable/src/main.rs) for details.
+    #[prop(optional, into)]
+    on_selection_change: EventHandler<SelectionChangeEvent<Row>>,
+
+    /// Renderer function for the table head. Defaults to [`DefaultTableHeadRenderer`]. For a full example see the
+    /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
+    #[prop(default = DefaultTableHeadRenderer.into(), into)]
+    thead_renderer: WrapperRendererFn,
+
+    /// Renderer function for the table body. Defaults to [`DefaultTableBodyRenderer`]. For a full example see the
+    /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
+    #[prop(default = DefaultTableBodyRenderer.into(), into)]
+    tbody_renderer: WrapperRendererFn,
+
+    /// Renderer function for the table head row. Defaults to [`DefaultTableHeadRowRenderer`]. For a full example see the
+    /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
     #[prop(default = DefaultTableHeadRowRenderer.into(), into)]
     thead_row_renderer: WrapperRendererFn,
-    #[prop(optional, into)] row_renderer: RowRendererFn<Row>,
-    #[prop(optional, into)] loading_row_renderer: LoadingRowRendererFn,
-    #[prop(optional, into)] error_row_renderer: ErrorRowRendererFn,
-    #[prop(optional, into)] row_placeholder_renderer_fn: RowPlaceholderRendererFn,
-    #[prop(optional, into)] row_class: MaybeSignal<String>,
-    #[prop(optional, into)] thead_class: MaybeSignal<String>,
-    #[prop(optional, into)] thead_row_class: MaybeSignal<String>,
-    #[prop(optional, into)] tbody_class: MaybeSignal<String>,
-    #[prop(optional, into)] loading_cell_class: MaybeSignal<String>,
-    #[prop(optional, into)] loading_cell_inner_class: MaybeSignal<String>,
-    #[prop(default = create_rw_signal(VecDeque::new()), into)] sorting: RwSignal<
-        VecDeque<(usize, ColumnSort)>,
-    >,
+
+    /// The row renderer. Defaults to [`DefaultTableRowRenderer`]. For a full example see the
+    /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
+    #[prop(optional, into)]
+    row_renderer: RowRendererFn<Row>,
+
+    /// The row renderer for when that row is currently being loaded.
+    /// Defaults to [`DefaultLoadingRowRenderer`]. For a full example see the
+    /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
+    #[prop(optional, into)]
+    loading_row_renderer: LoadingRowRendererFn,
+
+    /// The row renderer for when that row failed to load.
+    /// Defaults to [`DefaultErrorRowRenderer`]. For a full example see the
+    /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
+    #[prop(optional, into)]
+    error_row_renderer: ErrorRowRendererFn,
+
+    /// The row placeholder renderer. Defaults to [`DefaultRowPlaceholderRenderer`].
+    /// This is used in place of rows that are not shown
+    /// before and after the currently visible rows.
+    #[prop(optional, into)]
+    row_placeholder_renderer_fn: RowPlaceholderRendererFn,
+
+    /// Additional classes to add to rows
+    #[prop(optional, into)]
+    row_class: MaybeSignal<String>,
+
+    /// Additional classes to add to the thead
+    #[prop(optional, into)]
+    thead_class: MaybeSignal<String>,
+
+    /// Additional classes to add to the row inside the thead
+    #[prop(optional, into)]
+    thead_row_class: MaybeSignal<String>,
+
+    /// Additional classes to add to the tbody
+    #[prop(optional, into)]
+    tbody_class: MaybeSignal<String>,
+
+    /// Additional classes to add to the cell inside a row that is being loaded
+    #[prop(optional, into)]
+    loading_cell_class: MaybeSignal<String>,
+
+    /// Additional classes to add to the inner element inside a cell that is inside a row that is being loaded
+    #[prop(optional, into)]
+    loading_cell_inner_class: MaybeSignal<String>,
+
+    /// The sorting to apply to the table.
+    /// For this to work you have add `#[table(sortable)]` to your struct.
+    /// Please see the [simple example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs).
+    #[prop(default = create_rw_signal(VecDeque::new()), into)]
+    sorting: RwSignal<VecDeque<(usize, ColumnSort)>>,
 
     /// This is called once the number of rows is known.
     /// It will only be executed if [`TableDataProvider::row_count`] returns `Some(...)`.
@@ -96,16 +169,16 @@ pub fn TableContent<Row, DataP, ClsP>(
 
     /// The display strategy to use when rendering the table.
     /// Can be one of
-    ///  - `Virtualization`
-    ///  - `InfiniteScroll`
-    ///  - `Pagination`  
+    /// - `Virtualization`
+    /// - `InfiniteScroll`
+    /// - `Pagination`  
     ///
     /// Please check [`DisplayStrategy`] to see explanations of all available options.
     #[prop(optional)]
     display_strategy: DisplayStrategy,
 ) -> impl IntoView
 where
-    Row: RowRenderer<ClassesProvider = ClsP> + Clone + 'static,
+    Row: TableRow<ClassesProvider = ClsP> + Clone + 'static,
     DataP: TableDataProvider<Row> + 'static,
     ClsP: TableClassesProvider + Copy + 'static,
 {
@@ -487,7 +560,7 @@ fn compute_average_row_height_from_loaded<Row, ClsP>(
     placeholder_height_before: Signal<f64>,
     loaded_rows: RwSignal<LoadedRows<Row>>,
 ) where
-    Row: RowRenderer<ClassesProvider = ClsP> + Clone + 'static,
+    Row: TableRow<ClassesProvider = ClsP> + Clone + 'static,
 {
     if let Some(el) = tbody_el.get_untracked() {
         let el: &web_sys::Element = &el;

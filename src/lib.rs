@@ -4,26 +4,26 @@
 //!
 //! # Features
 //!
-//! - **Async data loading** - The data is loaded asynchronously. This allows for loading data from a REST API or a database etc.
-//! - **Selectable** - Optional. If turned on: Click on a row to select it. You can select multiple rows (TODO).
-//! - **Fully Customizable** - You can customize every aspect of the table by plugging in your own components for rendering rows, cells, headers. See [Custom Renderers](#custom-renderers) for more information.
+//! - **Easy to use** - yet powerful.
+//! - **Async data loading** - The data is loaded asynchronously. This allows to load data from a REST API or a database etc.
+//! - **Selection** - Can be turned off or single/multi select
+//! - **Customization** - You can customize every aspect of the table by plugging in your own components for rendering rows, cells, headers. See [Custom Renderers](#custom-renderers) for more information.
 //! - **Headless** - No default styling is applied to the table. You can fully customize the classes that are applied to the table. See [Classes customization](#classes-customization) for more information.
 //! - **Sorting** - Optional. If turned on: Click on a column header to sort the table by that column. You can even sort by multiple columns.
-//! - **Virtualization (TODO)** - Only the visible rows are rendered. This allows for very large tables.
-//! - **Editable** - Optional. You can provide custom renderers for editable cells. See [Editable Cells](#editable-cells) for more information.
+//! - **Virtualization** - Only the visible rows are rendered. This allows for very large tables.
+//! - **Pagination** - Instead of virtualization you can paginate the table.
+//! - **Caching** - Only visible rows are loaded and cached.
+//! - **Editing** - Optional. You can provide custom renderers for editable cells. See [Editable Cells](#editable-cells) for more information.
 //!
 //! # Usage
 //!
 //! ```
 //! use leptos::*;
 //! use leptos_struct_table::*;
-//! use serde::{Deserialize, Serialize};
-//! use async_trait::async_trait;
 //!
-//! // This generates the component PersonTable
-//! #[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+//! #[derive(TableRow, Clone)]
+//! #[table(impl_vec_data_provider)]
 //! pub struct Person {
-//!     #[table(key)]
 //!     id: u32,
 //!     name: String,
 //!     age: u32,
@@ -31,16 +31,16 @@
 //!
 //! fn main() {
 //!     mount_to_body(|| {
-//!         // Create a few Person items
-//!         let items = create_rw_signal( vec![
+//!         let rows = vec![
 //!             Person { id: 1, name: "John".to_string(), age: 32 },
 //!             Person { id: 2, name: "Jane".to_string(), age: 28 },
 //!             Person { id: 3, name: "Bob".to_string(), age: 45 },
-//!         ]);
+//!         ];
 //!
-//!         // Use the generated component
 //!         view! {
-//!             <PersonTable items=items />
+//!             <table>
+//!                 <TableContent rows />
+//!             </table>
 //!         }
 //!     });
 //! }
@@ -54,21 +54,13 @@
 //!
 //! These attributes can be applied to the struct itself.
 //!
-//! - **`sortable`** - Specifies that the table should be sortable. This makes the header clickable to toggle sorting.
-//! - **`selection_mode`** - Specifies the selection mode. Can be one of `none`, `single`, (TODO: `multiple`). Defaults to `none`.
-//!    If given `single` then the generated component has a `selected_key: RwSignal<Option<K>>` property that can be used to get/set the selected key (of type K, the field specified by `#[table(key)]` - see below).
-//!    Clicking on a row will set the selected key to the key of that row.
-//! - **`component_name`** - Specifies the name of the generated component. Defaults to `StructNameTable`.
-//! - **`classes_provider`** - Specifies the name of the class provider. Used to customize the classes that are applied to the table.
-//!    For convenience sensible presets for major CSS frameworks are provided. See [`TableClassesProvider`] for more information.
-//! - **`tag`** - Specifies the tag that is used as the root element for the table. Defaults to `"table"`.
-//! - **`row_renderer`** - Specifies the name of the row renderer component. Used to customize the rendering of rows. Defaults to [`DefaultTableRowRenderer`].
-//! - **`head_row_renderer`** - Specifies the name of the head row renderer component/tag. Used to customize the rendering of the head rows. Defaults to the tag `tr`. This only takes a `class` attribute.
-//! - **`head_cell_renderer`** - Specifies the name of the header cell renderer component. Used to customize the rendering of header cells. Defaults to [`DefaultTableHeaderRenderer`].
-//! - **`thead_renderer`** - Specifies the name of the thead renderer component. Used to customize the rendering of the thead. Defaults to the tag `thead`. Takes no attributes.
-//! - **`tbody_renderer`** - Specifies the name of the tbody renderer component. Used to customize the rendering of the tbody. Defaults to the tag `tbody`. Takes no attributes.
-//! - **`row_class`** - Specifies the classes that are applied to each row. Can be used in conjuction with `classes_provider` to customize the classes.
-//! - **`head_row_class`** - Specifies the classes that are applied to the header row. Can be used in conjuction with `classes_provider` to customize the classes.
+//! - **`sortable`** - Specifies that the table should be sortable. This makes the header titles clickable to control sorting. See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) for more information.
+//! - **`classes_provider`** - Specifies the name of the class provider. Used to quickly customize all of the classes that are applied to the table.
+//!    For convenience sensible presets for major CSS frameworks are provided. See [`TableClassesProvider`] and [tailwind example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/tailwind/src/main.rs) for more information.
+//! - **`head_cell_renderer`** - Specifies the name of the header cell renderer component. Used to customize the rendering of header cells. Defaults to [`DefaultTableHeaderRenderer`]. See the [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs) for more information.
+//! - **`impl_vec_data_provider`** - If given, then [`TableDataProvider`] is automatically implemented for `Vec<ThisStruct>` to allow
+//!    for easy local data use. See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) for more information.
+//! - **`row_type`** - Specifies the type of the rows in the table. Defaults to the struct that this is applied to.
 //!
 //! ## Field attributes
 //!
@@ -349,9 +341,9 @@ mod display_strategy;
 mod events;
 mod loaded_rows;
 mod reload_controller;
-mod row_renderer;
 mod scroll_container;
 mod selection;
+mod table_row;
 #[cfg(feature = "uuid")]
 pub mod uuid;
 
@@ -362,11 +354,11 @@ pub use display_strategy::*;
 pub use events::*;
 pub use leptos_struct_table_macro::TableRow;
 pub use reload_controller::*;
-pub use row_renderer::*;
 pub use scroll_container::*;
 pub use selection::*;
 use serde::{Deserialize, Serialize};
 use std::marker::PhantomData;
+pub use table_row::*;
 
 /// Type of sorting of a column
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]

@@ -23,6 +23,7 @@ pub enum DisplayStrategy {
     ///
     /// > Please note that this will work wether your data source implements
     /// > [`PaginatedTableDataProvider`] or [`TableDataProvider`] directly.
+    /// > Also `row_count` can be different from `PaginatedTableDataProvider::PAGE_ROW_COUNT`.
     Pagination {
         row_count: usize,
         controller: PaginationController,

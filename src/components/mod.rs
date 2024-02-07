@@ -22,6 +22,11 @@ macro_rules! wrapper_render_fn {
         /// Default
         #[$doc_name]
         /// renderer. Please note that this is **NOT** a `#[component]`.
+        ///
+        /// # Arguments
+        ///
+        /// * `content` - The content of the renderer. It's like the children of this view.
+        /// * `class` - The class attribute that is passed to the root element
         $(#[$additional_doc])*
         #[allow(non_snake_case)]
         pub fn $name(content: View, class: Signal<String>) -> impl IntoView {

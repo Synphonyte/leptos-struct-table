@@ -59,6 +59,11 @@ pub trait TableDataProvider<Row> {
 /// of connecting to a paginated data source instead of implementing [`TableDataProvider`] directly.
 ///
 /// If you implement this for your struct, [`TableDataProvider`] is automatically implemented for you.
+///
+/// > Please note that this is independent from using [`DisplayStrategy::Pagination`] with [`TableContent`].
+/// > You do not have implement this trait if you're using pagination and you vice versa if you're not using pagination
+/// > you can still implement this trait. And in case if you use this trait together with pagination the
+/// > display row count can be different from the `PAGE_ROW_COUNT`.
 #[async_trait(?Send)]
 pub trait PaginatedTableDataProvider<Row> {
     /// How many rows per page

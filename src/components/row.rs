@@ -1,4 +1,4 @@
-use crate::row_renderer::RowRenderer;
+use crate::table_row::TableRow;
 use crate::{ChangeEvent, EventHandler};
 use leptos::*;
 
@@ -20,7 +20,7 @@ pub fn DefaultTableRowRenderer<Row>(
     on_change: EventHandler<ChangeEvent<Row>>,
 ) -> impl IntoView
 where
-    Row: RowRenderer + Clone + 'static,
+    Row: TableRow + Clone + 'static,
 {
     view! {
         <tr class=class on:click=move |mouse_event| on_select.run(mouse_event)>
