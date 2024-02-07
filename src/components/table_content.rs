@@ -5,8 +5,9 @@ use crate::selection::Selection;
 use crate::{
     ChangeEvent, ColumnSort, DefaultErrorRowRenderer, DefaultLoadingRowRenderer,
     DefaultRowPlaceholderRenderer, DefaultTableBodyRenderer, DefaultTableHeadRenderer,
-    DefaultTableHeadRowRenderer, DefaultTableRowRenderer, EventHandler, ReloadController,
-    ScrollContainer, SelectionChangeEvent, TableClassesProvider, TableDataProvider, TableHeadEvent,
+    DefaultTableHeadRowRenderer, DefaultTableRowRenderer, DisplayStrategy, EventHandler,
+    ReloadController, ScrollContainer, SelectionChangeEvent, TableClassesProvider,
+    TableDataProvider, TableHeadEvent,
 };
 use leptos::wasm_bindgen::JsCast;
 use leptos::*;
@@ -91,6 +92,16 @@ pub fn TableContent<Row, DataP, ClsP>(
     /// for how to use.
     #[prop(optional)]
     reload_controller: ReloadController,
+
+    /// The display strategy to use when rendering the table.
+    /// Can be one of
+    ///  - `Virtualization`
+    ///  - `InfiniteScroll`
+    ///  - `Pagination`  
+    ///
+    /// Please check [`DisplayStrategy`] to see explanations of all available options.
+    #[prop(optional)]
+    display_strategy: DisplayStrategy,
 ) -> impl IntoView
 where
     Row: RowRenderer<ClassesProvider = ClsP> + Clone + 'static,
@@ -164,41 +175,78 @@ where
     );
 
     let (row_count, set_row_count) = create_signal(None::<usize>);
-    spawn_local({
-        let rows = Rc::clone(&rows);
 
-        async move {
-            let row_count = rows.borrow().row_count().await;
+    let set_known_row_count = move |row_count: usize| {
+        set_row_count.set(Some(row_count));
+        loaded_rows.update(|loaded_rows| loaded_rows.resize(row_count));
+        on_row_count.run(row_count);
+        display_strategy.set_row_count(row_count);
+    };
 
-            set_row_count.set(row_count);
+    if matches!(
+        display_strategy,
+        DisplayStrategy::Virtualization | DisplayStrategy::Pagination { .. }
+    ) {
+        spawn_local({
+            let rows = Rc::clone(&rows);
+            let set_known_row_count = set_known_row_count.clone();
 
-            if let Some(row_count) = row_count {
-                loaded_rows.update(|loaded_rows| loaded_rows.resize(row_count));
-                on_row_count.run(row_count);
+            async move {
+                let row_count = rows.borrow().row_count().await;
+
+                if let Some(row_count) = row_count {
+                    set_known_row_count(row_count);
+                }
             }
-        }
-    });
+        });
+    }
 
     let (average_row_height, set_average_row_height) = create_signal(20.0);
 
-    let first_visible_row_index =
-        create_memo(move |_| (y.get() / average_row_height.get()).floor() as usize);
-    let visible_row_count =
-        create_memo(move |_| ((height.get() / average_row_height.get()).ceil() as usize).max(20));
+    let first_visible_row_index = if let DisplayStrategy::Pagination {
+        controller,
+        row_count,
+    } = display_strategy
+    {
+        create_memo(move |_| controller.current_page.get() * row_count)
+    } else {
+        create_memo(move |_| (y.get() / average_row_height.get()).floor() as usize)
+    };
+    let visible_row_count = match display_strategy {
+        DisplayStrategy::Pagination { row_count, .. } => Signal::derive(move || row_count),
+
+        DisplayStrategy::Virtualization | DisplayStrategy::InfiniteScroll => {
+            create_memo(move |_| {
+                ((height.get() / average_row_height.get()).ceil() as usize).max(20)
+            })
+            .into()
+        }
+    };
 
     let (display_range, set_display_range) = create_signal(0..0);
 
     let placeholder_height_before =
-        create_memo(move |_| display_range.get().start as f64 * average_row_height.get());
-    let placeholder_height_after = create_memo(move |_| {
-        let row_count_after = if let Some(row_count) = row_count.get() {
-            (row_count - display_range.get().end) as f64
+        if matches!(display_strategy, DisplayStrategy::Pagination { .. }) {
+            Signal::derive(move || 0.0)
         } else {
-            0.0
+            create_memo(move |_| display_range.get().start as f64 * average_row_height.get()).into()
         };
 
-        row_count_after * average_row_height.get()
-    });
+    let placeholder_height_after = if matches!(display_strategy, DisplayStrategy::Pagination { .. })
+    {
+        Signal::derive(move || 0.0)
+    } else {
+        create_memo(move |_| {
+            let row_count_after = if let Some(row_count) = row_count.get() {
+                (row_count - display_range.get().end) as f64
+            } else {
+                0.0
+            };
+
+            row_count_after * average_row_height.get()
+        })
+        .into()
+    };
 
     let (tbody_el, set_tbody_el) = create_signal(None::<web_sys::Element>);
 
@@ -234,11 +282,7 @@ where
 
         let mut end = start + visible_row_count * 5;
 
-        if let Some(count) = row_count.get() {
-            end = end.min(count);
-        }
-
-        end = end.min(start + 300);
+        // end = end.min(start + 300);
 
         if let Some(chunk_size) = DataP::CHUNK_SIZE {
             start /= chunk_size;
@@ -249,6 +293,10 @@ where
             end *= chunk_size;
         }
 
+        if let Some(count) = row_count.get() {
+            end = end.min(count);
+        }
+
         loaded_rows.update_untracked(|loaded_rows| {
             if end > loaded_rows.len() {
                 loaded_rows.resize(end);
@@ -256,7 +304,13 @@ where
         });
 
         let range = start..end;
-        set_display_range.set(range.clone());
+
+        set_display_range.set(match display_strategy {
+            DisplayStrategy::Virtualization | DisplayStrategy::InfiniteScroll => range.clone(),
+            DisplayStrategy::Pagination { row_count, .. } => {
+                first_visible_row_index..first_visible_row_index + row_count
+            }
+        });
 
         let missing_range =
             loaded_rows.with_untracked(|loaded_rows| loaded_rows.missing_range(range.clone()));
@@ -280,9 +334,15 @@ where
                 let compute_average_row_height = compute_average_row_height.clone();
                 spawn_local({
                     let rows = Rc::clone(&rows);
+                    let set_known_row_count = set_known_row_count.clone();
 
                     async move {
                         let result = rows.borrow().get_rows(missing_range.clone()).await;
+                        if let Ok((_, loaded_range)) = &result {
+                            if loaded_range.end < missing_range.end {
+                                set_known_row_count(missing_range.end);
+                            }
+                        }
                         loaded_rows
                             .update(|loaded_rows| loaded_rows.write_loaded(result, missing_range));
 
@@ -419,7 +479,7 @@ fn compute_average_row_height_from_loaded<Row, ClsP>(
     y: Signal<f64>,
     set_y: &impl Fn(f64),
     set_average_row_height: WriteSignal<f64>,
-    placeholder_height_before: Memo<f64>,
+    placeholder_height_before: Signal<f64>,
     loaded_rows: RwSignal<LoadedRows<Row>>,
 ) where
     Row: RowRenderer<ClassesProvider = ClsP> + Clone + 'static,

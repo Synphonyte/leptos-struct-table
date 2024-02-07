@@ -29,7 +29,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        example: [bootstrap, custom_renderers_svg, getter, rest_datasource, selectable, simple, tailwind, generic]
+        example: [ bootstrap, custom_renderers_svg, custom_row_renderer, editable, generic, getter, paginated_rest_datasource, pagination, selectable, simple, tailwind ]
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/rust_toolchain/
@@ -42,7 +42,7 @@ jobs:
   publish:
     name: Publish
     runs-on: ubuntu-latest
-    needs: [cargo_checks, test_examples]
+    needs: [ cargo_checks, test_examples ]
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/rust_toolchain/
