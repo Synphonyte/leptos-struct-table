@@ -49,7 +49,7 @@ renderer_fn!(
 );
 
 renderer_fn!(
-    LoadingRowRendererFn(class: Signal<String>, inner_class: Signal<String>, index: usize, col_count: usize)
+    LoadingRowRendererFn(class: Signal<String>, cell_class: Signal<String>, cell_inner_class: Signal<String>, index: usize, col_count: usize)
     default DefaultLoadingRowRenderer
 );
 
@@ -73,7 +73,8 @@ pub fn TableContent<Row, DataP, ClsP>(
     #[prop(optional, into)] thead_class: MaybeSignal<String>,
     #[prop(optional, into)] thead_row_class: MaybeSignal<String>,
     #[prop(optional, into)] tbody_class: MaybeSignal<String>,
-    #[prop(optional, into)] loading_row_inner_class: MaybeSignal<String>,
+    #[prop(optional, into)] loading_cell_class: MaybeSignal<String>,
+    #[prop(optional, into)] loading_cell_inner_class: MaybeSignal<String>,
     #[prop(default = create_rw_signal(VecDeque::new()), into)] sorting: RwSignal<
         VecDeque<(usize, ColumnSort)>,
     >,
@@ -114,7 +115,8 @@ where
     let class_provider = ClsP::new();
 
     let row_class = Signal::derive(move || row_class.get());
-    let loading_row_inner_class = Signal::derive(move || loading_row_inner_class.get());
+    let loading_cell_inner_class = Signal::derive(move || loading_cell_inner_class.get());
+    let loading_cell_class = Signal::derive(move || loading_cell_class.get());
     let thead_class = Signal::derive(move || class_provider.thead(&thead_class.get()));
     let thead_row_class = Signal::derive(move || class_provider.thead_row(&thead_row_class.get()));
     let tbody_class = Signal::derive(move || class_provider.tbody(&tbody_class.get()));
@@ -433,7 +435,10 @@ where
                                             move || class_provider.row(i, false, &row_class.get())
                                         ),
                                         Signal::derive(
-                                            move || class_provider.loading_row_inner(&loading_row_inner_class.get())
+                                            move || class_provider.loading_cell(&loading_cell_class.get())
+                                        ),
+                                        Signal::derive(
+                                            move || class_provider.loading_cell_inner(i, &loading_cell_inner_class.get())
                                         ),
                                         i,
                                         Row::COLUMN_COUNT,

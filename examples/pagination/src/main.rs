@@ -14,7 +14,7 @@ pub fn App() -> impl IntoView {
 
     view! {
         <div class="rounded-md overflow-clip m-10 border dark:border-gray-700".to_string()>
-            <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
+            <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px] w-[calc(100vw-5rem)]">
                 <TableContent
                     rows=rows
                     display_strategy=DisplayStrategy::Pagination {

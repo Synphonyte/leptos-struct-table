@@ -54,10 +54,18 @@ pub trait TableClassesProvider {
     }
 
     /// Get the classes for the elements inside of the cells of rows that are currently
+    /// being loaded.
+    /// The `prop_class` parameter contains the classes specified in the
+    /// `loading_cell_class` prop of the [`TableContent`] component.
+    fn loading_cell(&self, prop_class: &str) -> String {
+        prop_class.to_string()
+    }
+
+    /// Get the classes for the elements inside of the cells of rows that are currently
     /// being loaded. Usually this will be some loading indicator like a sceleton bar.
     /// The `prop_class` parameter contains the classes specified in the
-    /// `loading_row_inner_class` prop of the [`TableContent`] component.
-    fn loading_row_inner(&self, prop_class: &str) -> String {
+    /// `loading_cell_inner_class` prop of the [`TableContent`] component.
+    fn loading_cell_inner(&self, row_index: usize, prop_class: &str) -> String {
         prop_class.to_string()
     }
 

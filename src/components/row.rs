@@ -47,7 +47,8 @@ pub fn DefaultErrorRowRenderer(err: String, index: usize, col_count: usize) -> i
 #[allow(unused_variables)]
 pub fn DefaultLoadingRowRenderer(
     class: Signal<String>,
-    inner_class: Signal<String>,
+    cell_class: Signal<String>,
+    inner_cell_class: Signal<String>,
     index: usize,
     col_count: usize,
 ) -> impl IntoView {
@@ -55,8 +56,8 @@ pub fn DefaultLoadingRowRenderer(
         <tr class=class>
             {
                 (0..col_count).map(|_| view! {
-                    <td>
-                        <div class=inner_class></div>
+                    <td class=cell_class>
+                        <div class=inner_cell_class></div>
                         " "
                     </td>
                 }).collect_view()
