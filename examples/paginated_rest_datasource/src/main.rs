@@ -34,7 +34,7 @@ pub fn App() -> impl IntoView {
                     <TableContent
                         rows=rows
                         scroll_container=container
-                        loading_row_inner_class="loading-skeleton"
+                        loading_cell_inner_class="loading-skeleton"
                         reload_controller=reload_controller
                         on_row_count=set_count
                     />
