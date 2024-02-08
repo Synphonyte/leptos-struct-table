@@ -60,18 +60,18 @@
 //! - **`head_cell_renderer`** - Specifies the name of the header cell renderer component. Used to customize the rendering of header cells. Defaults to [`DefaultTableHeaderRenderer`]. See the [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs) for more information.
 //! - **`impl_vec_data_provider`** - If given, then [`TableDataProvider`] is automatically implemented for `Vec<ThisStruct>` to allow
 //!    for easy local data use. See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) for more information.
-//! - **`row_type`** - Specifies the type of the rows in the table. Defaults to the struct that this is applied to.
+//! - **`row_type`** - Specifies the type of the rows in the table. Defaults to the struct that this is applied to. See the [custom_type example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/custom_type/src/main.rs) for more information.
 //!
 //! ## Field attributes
 //!
 //! These attributes can be applied to any field in the struct.
 //!
-//! - **`key`** - Specifies the field that is used as the key for each row. This is required on exactly one field.
 //! - **`class`** - Specifies the classes that are applied to each cell (head and body) in the field's column. Can be used in conjuction with `classes_provider` to customize the classes.
 //! - **`head_class`** - Specifies the classes that are applied to the header cell in the field's column. Can be used in conjuction with `classes_provider` to customize the classes.
 //! - **`cell_class`** - Specifies the classes that are applied to the body cells in the field's column. Can be used in conjuction with `classes_provider` to customize the classes.
 //! - **`skip`** - Specifies that the field should be skipped. This is useful for fields that are not displayed in the table.
 //! - **`skip_sort`** - Only applies if `sortable` is set on the struct. Specifies that the field should not be used for sorting. Clicking it's header will not do anything.
+//! - **`skip_header`** - Makes the title of the field not be displayed in the head row.
 //! - **`title`** - Specifies the title that is displayed in the header cell. Defaults to the field name converted to title case (`this_field` becomes `"This Field"`).
 //! - **`renderer`** - Specifies the name of the cell renderer component. Used to customize the rendering of cells.
 //!    Defaults to [`DefaultNumberTableCellRenderer`] for number types and [`DefaultTableCellRenderer`] for anything else.
@@ -97,13 +97,10 @@ Example:
 ```
 # use leptos::*;
 # use leptos_struct_table::*;
-# use serde::{Deserialize, Serialize};
-# use async_trait::async_trait;
 # use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
-#[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+#
+#[derive(TableRow, Clone)]
 pub struct TemperatureMeasurement {
-    #[table(key)]
-    id: u32,
     #[table(title = "Temperature (°C)", format(precision = 2))]
     temperature: f32,
     #[table(format(string = "%m.%d.%Y"))]
@@ -124,12 +121,10 @@ pub struct TemperatureMeasurement {
 //! ```
 //! # use leptos::*;
 //! # use leptos_struct_table::*;
-//! # use serde::{Deserialize, Serialize};
-//! # use async_trait::async_trait;
-//! #[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+//! #
+//! #[derive(TableRow, Clone)]
 //! #[table(classes_provider = "TailwindClassesPreset")]
 //! pub struct Book {
-//!     #[table(key)]
 //!     id: u32,
 //!     title: String,
 //! }
@@ -148,10 +143,10 @@ pub struct TemperatureMeasurement {
 //! # use leptos_struct_table::*;
 //! # use serde::{Deserialize, Serialize};
 //! # use async_trait::async_trait;
-//! #[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+//! #
+//! #[derive(TableRow, Clone)]
 //! #[table(classes_provider = "TailwindClassesPreset")]
 //! pub struct Book {
-//!     #[table(key)]
 //!     id: u32,
 //!     title: String,
 //!     author: String,
@@ -173,14 +168,10 @@ pub struct TemperatureMeasurement {
 //! ```
 //! # use leptos::*;
 //! # use leptos_struct_table::*;
-//! # use serde::{Deserialize, Serialize};
-//! # use async_trait::async_trait;
-//! #[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+//! #
+//! #[derive(TableRow, Clone)]
 //! #[table(classes_provider = "TailwindClassesPreset")]
 //! pub struct Book {
-//!     #[table(key)]
-//!     id: u32,
-//!
 //!     // this tells the macro that you're going to provide a method called `get_title` that returns a `String`
 //!     #[table(getter = "get_title")]
 //!     title: String,
@@ -205,15 +196,21 @@ pub struct TemperatureMeasurement {
 //! # Custom Renderers
 //!
 //! Custom renderers can be used to customize almost every aspect of the table.
-//! They are specified by using the various `...renderer` attributes on the struct or fields.
+//! They are specified by using the various `...renderer` attributes on the struct or fields or props of the [`TableContent`] component.
 //! To implement a custom renderer please have a look at the default renderers listed below.
 //!
-//! On the struct level you can use these attributes:
-//! - **`row_renderer`** - Defaults to [`DefaultTableRowRenderer`].
-//! - **`head_row_renderer`** - Defaults to the tag `tr`. This only takes a `class` attribute.
-//! - **`head_cell_renderer`** - Defaults to [`DefaultTableHeaderRenderer`].
-//! - **`thead_renderer`** - Defaults to the tag `thead`. Takes no attributes.
+//! On the struct level you can use this attribute:
+//! - **`thead_cell_renderer`** - Defaults to [`DefaultTableHeaderCellRenderer`] which renders `<th><span>Title</span></th>`
+//!    together with sorting functionality (if enabled).
+//!
+//! As props of the [`TableContent`] component you can use the following:
+//! - **`thead_renderer`** - Defaults to [`DefaultTableHeadRenderer`] which just renders the tag `thead`.
+//! - **`thead_row_renderer`** - Defaults to [`DefaultTableHeadRowRenderer`] which just renders the tag `tr`.
 //! - **`tbody_renderer`** - Defaults to the tag `tbody`. Takes no attributes.
+//! - **`row_renderer`** - Defaults to [`DefaultTableRowRenderer`].
+//! - **`loading_row_renderer`** - Defaults to [`DefaultLoadingRowRenderer`].
+//! - **`error_row_renderer`** - Defaults to [`DefaultErrorRowRenderer`].
+//! - **`row_placeholder_renderer`** - Defaults to [`DefaultRowPlaceholderRenderer`].
 //!
 //! On the field level you can use the **`renderer`** attribute.
 //!
@@ -227,12 +224,9 @@ pub struct TemperatureMeasurement {
 //! ```
 //! # use leptos::*;
 //! # use leptos_struct_table::*;
-//! # use serde::{Deserialize, Serialize};
-//! # use async_trait::async_trait;
-//! #[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+//! #
+//! #[derive(TableRow, Clone)]
 //! pub struct Book {
-//!     #[table(key)]
-//!     id: u32,
 //!     title: String,
 //!     #[table(renderer = "ImageTableCellRenderer")]
 //!     img: String,
@@ -241,7 +235,7 @@ pub struct TemperatureMeasurement {
 //! // Easy cell renderer that just displays an image from an URL.
 //! #[component]
 //! fn ImageTableCellRenderer<F>(
-//!     #[prop(into)] class: MaybeSignal<String>,
+//!     class: String,
 //!     #[prop(into)] value: MaybeSignal<String>,
 //!     on_change: F,
 //!     index: usize,
@@ -257,10 +251,10 @@ pub struct TemperatureMeasurement {
 //! }
 //! ```
 //!
-//! For more detailed information please have a look at the `custom_renderers_svg` example for a complete customization.
+//! For more detailed information please have a look at the [custom_renderers_svg example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs) for a complete customization.
 //!
 //!
-//! ### Editable Cells
+//! ## Editable Cells
 //!
 //! You might have noticed the type parameter `F` in the custom cell renderer above. This can be used
 //! to emit an event when the cell is changed. In the simplest case you can use a cell renderer that
@@ -269,11 +263,10 @@ pub struct TemperatureMeasurement {
 //! ```
 //! # use leptos::*;
 //! # use leptos_struct_table::*;
-//! # use serde::{Deserialize, Serialize};
-//! # use async_trait::async_trait;
-//! #[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
+//! #
+//! #[derive(TableRow, Clone, Default, Debug)]
+//! #[table(impl_vec_data_provider)]
 //! pub struct Book {
-//!     #[table(key)]
 //!     id: u32,
 //!     #[table(renderer = "InputCellRenderer")]
 //!     title: String,
@@ -282,7 +275,7 @@ pub struct TemperatureMeasurement {
 //! // Easy input cell renderer that emits `on_change` when the input is changed.
 //! #[component]
 //! fn InputCellRenderer<F>(
-//!     #[prop(into)] class: MaybeSignal<String>,
+//!     class: String,
 //!     #[prop(into)] value: MaybeSignal<String>,
 //!     on_change: F,
 //!     index: usize,
@@ -296,36 +289,38 @@ pub struct TemperatureMeasurement {
 //!         </td>
 //!     }
 //! }
-//! ```
 //!
-//! Then in the table component you can listen to the `on_change` event:
-//!
-//! ```
-//! # use leptos::*;
-//! # use leptos_struct_table::*;
-//! # use serde::{Deserialize, Serialize};
-//! # use async_trait::async_trait;
-//! # #[derive(TableComponent, Serialize, Deserialize, Debug, Clone, Default, PartialEq)]
-//! # pub struct Book {
-//! #     #[table(key)]
-//! #     id: u32,
-//! #     title: String,
-//! # }
+//! // Then in the table component you can listen to the `on_change` event:
 //!
 //! #[component]
 //! pub fn App() -> impl IntoView {
-//! #    let items = create_rw_signal(vec![Book::default(), Book::default()]);
-//!     let on_change = move |evt: ChangeEvent<Book, BookColumnName, BookColumnValue>| {
-//!         // Do something
+//!     let rows = vec![Book::default(), Book::default()];
+//!
+//!     let on_change = move |evt: ChangeEvent<Book>| {
+//!         logging::log!("Changed row at index {}:\n{:#?}", evt.row_index, evt.changed_row);
 //!     };
 //!
 //!     view! {
-//!         <BookTable items=items on_change=on_change />
+//!         <table>
+//!             <TableContent rows on_change />
+//!         </table>
 //!     }
 //! }
 //! ```
 //!
-//! Please have a look at the `editable` example for fully working example.
+//! Please have a look at the [editable example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/editable/src/main.rs) for fully working example.
+//!
+//! # Pagination / Virtualization / InfiniteScroll
+//!
+//! This table component supports different display acceleration strategies. You can set them through the `display_strategy` prop of
+//! the [`TableContent`] component.
+//!
+//! The following options are available. Check their docs for more details.
+//! - [`DisplayStrategy::Virtualization`] (default)
+//! - [`DisplayStrategy::InfiniteScroll`]
+//! - [`DisplayStrategy::Pagination`]
+//!
+//! Please have a look at the [pagination example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/pagination/src/main.rs) for more information on how to use pagination.
 //!
 //! # Contribution
 //!

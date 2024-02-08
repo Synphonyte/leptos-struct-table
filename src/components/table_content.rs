@@ -9,7 +9,6 @@ use crate::{
     ReloadController, ScrollContainer, SelectionChangeEvent, TableClassesProvider,
     TableDataProvider, TableHeadEvent,
 };
-use leptos::wasm_bindgen::JsCast;
 use leptos::*;
 use leptos_use::{
     use_debounce_fn, use_element_size_with_options, use_scroll_with_options, UseElementSizeOptions,
@@ -19,6 +18,7 @@ use std::cell::RefCell;
 use std::collections::{HashSet, VecDeque};
 use std::ops::Range;
 use std::rc::Rc;
+use wasm_bindgen::JsCast;
 use web_sys::Element;
 
 renderer_fn!(
@@ -120,7 +120,7 @@ pub fn TableContent<Row, DataP, ClsP>(
     /// This is used in place of rows that are not shown
     /// before and after the currently visible rows.
     #[prop(optional, into)]
-    row_placeholder_renderer_fn: RowPlaceholderRendererFn,
+    row_placeholder_renderer: RowPlaceholderRendererFn,
 
     /// Additional classes to add to rows
     #[prop(optional, into)]
@@ -431,7 +431,7 @@ where
     let thead_content = Row::render_head_row(sorting.into(), on_head_click).into_view();
 
     let tbody_content = view! {
-        {row_placeholder_renderer_fn.run(placeholder_height_before.into())}
+        {row_placeholder_renderer.run(placeholder_height_before.into())}
 
         {move || {
             let row_renderer = row_renderer.clone();
@@ -525,7 +525,7 @@ where
 
         }}
 
-        {row_placeholder_renderer_fn.run(placeholder_height_after.into())}
+        {row_placeholder_renderer.run(placeholder_height_after.into())}
     }.into_view();
 
     let tbody = tbody_renderer.run(tbody_content, tbody_class);

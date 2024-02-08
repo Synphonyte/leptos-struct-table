@@ -7,7 +7,7 @@ use leptos_struct_table::*;
 
 // This generates the component BookTable
 #[derive(TableRow, Clone)]
-#[table(head_cell_renderer = "SvgHeadCellRenderer", impl_vec_data_provider)]
+#[table(thead_cell_renderer = "SvgHeadCellRenderer", impl_vec_data_provider)]
 pub struct Form {
     #[table(renderer = "SvgTextCellRenderer")]
     pub name: String,

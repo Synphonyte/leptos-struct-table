@@ -1,8 +1,8 @@
 use leptos::html::ElementDescriptor;
-use leptos::wasm_bindgen::JsCast;
 use leptos::{NodeRef, Signal};
 use leptos_use::core::ElementMaybeSignal;
 use leptos_use::use_document;
+use wasm_bindgen::JsCast;
 
 #[derive(Copy, Clone, Debug)]
 pub struct ScrollContainer(Signal<Option<web_sys::Element>>);
