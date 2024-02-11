@@ -5,28 +5,20 @@ use leptos::*;
 /// See the [paginated_rest_datasource example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/paginated_rest_datasource/src/main.rs)
 /// for how to use.
 #[derive(Copy, Clone)]
-pub struct ReloadController(RwSignal<()>);
+pub struct ReloadController(Trigger);
 
 impl Default for ReloadController {
     fn default() -> Self {
-        Self(create_rw_signal(()))
+        Self(create_trigger())
     }
 }
 
 impl ReloadController {
     pub fn reload(&self) {
-        self.0.set(());
-    }
-}
-
-impl SignalGet for ReloadController {
-    type Value = ();
-
-    fn get(&self) -> () {
-        self.0.get()
+        self.0.notify();
     }
 
-    fn try_get(&self) -> Option<Self::Value> {
-        self.0.try_get()
+    pub fn track(&self) {
+        self.0.track();
     }
 }

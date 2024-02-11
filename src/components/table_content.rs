@@ -224,7 +224,7 @@ where
 
     create_effect(move |_| {
         // triggered when `ReloadController::reload()` is called
-        reload_controller.get();
+        reload_controller.track();
         clear();
     });
 
