@@ -1,6 +1,7 @@
 use crate::ColumnSort;
 use async_trait::async_trait;
 use std::collections::VecDeque;
+use std::fmt::Debug;
 use std::ops::Range;
 
 /// The trait that provides data for the `<TableContent>` component.
@@ -10,13 +11,16 @@ use std::ops::Range;
 /// this is automatically implemented for `Vec<Row>`.
 /// This way a simple list of items can be passed to the table.
 ///
-/// This is also automatically implemented for any struct that implements [`PaginatedTableDataProvider`]
-/// which is a more convenient way of connecting to a paginated data source.
+/// This is also automatically implemented for any struct that implements
+/// [`PaginatedTableDataProvider`] or [`ExactTableDataProvider`].
+/// The first is a more convenient way of connecting to a paginated data source and the second is
+/// more convenient if you know you're always going to return exactly the requested range (except maybe
+/// at the end of the data).
 ///
 /// Please note that because of the use of [`async-trait`](https://docs.rs/async-trait/latest/async_trait/)
 /// this documentation looks a bit cluttered.
-#[async_trait(?Send)]
-pub trait TableDataProvider<Row> {
+#[async_trait(? Send)]
+pub trait TableDataProvider<Row, Err: Debug = String> {
     /// If Some(...), data will be loaded in chunks of this size. This is useful for paginated data sources.
     /// If you have such a paginated data source, you probably want to implement `PaginatedTableDataProvider`
     /// instead of this trait.
@@ -36,7 +40,7 @@ pub trait TableDataProvider<Row> {
     ///
     /// In the case of an error the returned error `String` is going to be displayed in a
     /// in place of the failed rows.
-    async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Row>, Range<usize>), String>;
+    async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Row>, Range<usize>), Err>;
 
     /// The total number of rows in the table. Returns `None` if unknown (which is the default).
     async fn row_count(&self) -> Option<usize> {
@@ -64,8 +68,8 @@ pub trait TableDataProvider<Row> {
 /// > You do not have implement this trait if you're using pagination and you vice versa if you're not using pagination
 /// > you can still implement this trait. And in case if you use this trait together with pagination the
 /// > display row count can be different from the `PAGE_ROW_COUNT`.
-#[async_trait(?Send)]
-pub trait PaginatedTableDataProvider<Row> {
+#[async_trait(? Send)]
+pub trait PaginatedTableDataProvider<Row, Err: Debug = String> {
     /// How many rows per page
     const PAGE_ROW_COUNT: usize;
 
@@ -73,7 +77,7 @@ pub trait PaginatedTableDataProvider<Row> {
     ///
     /// If you return less than `PAGE_ROW_COUNT` rows, it is assumed that the end of the
     /// data has been reached.
-    async fn get_page(&self, page_index: usize) -> Result<Vec<Row>, String>;
+    async fn get_page(&self, page_index: usize) -> Result<Vec<Row>, Err>;
 
     /// The total number of rows in the table. Returns `None` if unknown (which is the default).
     ///
@@ -98,14 +102,15 @@ pub trait PaginatedTableDataProvider<Row> {
     }
 }
 
-#[async_trait(?Send)]
-impl<Row, D> TableDataProvider<Row> for D
+#[async_trait(? Send)]
+impl<Row, Err, D> TableDataProvider<Row, Err> for D
 where
-    D: PaginatedTableDataProvider<Row>,
+    D: PaginatedTableDataProvider<Row, Err>,
+    Err: Debug,
 {
     const CHUNK_SIZE: Option<usize> = Some(D::PAGE_ROW_COUNT);
 
-    async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Row>, Range<usize>), String> {
+    async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Row>, Range<usize>), Err> {
         let Range { start, end } = range;
         debug_assert_eq!(end - start, D::PAGE_ROW_COUNT);
 
@@ -116,11 +121,11 @@ where
     }
 
     async fn row_count(&self) -> Option<usize> {
-        PaginatedTableDataProvider::<Row>::row_count(self).await
+        PaginatedTableDataProvider::<Row, Err>::row_count(self).await
     }
 
     fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
-        PaginatedTableDataProvider::<Row>::set_sorting(self, sorting)
+        PaginatedTableDataProvider::<Row, Err>::set_sorting(self, sorting)
     }
 }
 

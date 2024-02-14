@@ -47,10 +47,10 @@ impl BookDataProvider {
         }
 
         format!(
-                "https://archive.org/advancedsearch.php?q=creator%3A%28Lewis%29&fl%5B%5D=creator&fl%5B%5D=identifier&fl%5B%5D=publicdate&fl%5B%5D=title{sort}&rows={}&page={}&output=json&callback=",
-                Self::PAGE_ROW_COUNT,
-                page_index + 1,
-            )
+            "https://archive.org/advancedsearch.php?q=creator%3A%28Lewis%29&fl%5B%5D=creator&fl%5B%5D=identifier&fl%5B%5D=publicdate&fl%5B%5D=title{sort}&rows={}&page={}&output=json&callback=",
+            Self::PAGE_ROW_COUNT,
+            page_index + 1,
+        )
     }
 }
 

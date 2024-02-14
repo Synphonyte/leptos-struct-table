@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.1] -
+
+### Changes
+
+- Added generic error type to `TableDataProvider`
+- Fixed sorting for tables with skipped fields
+
 ## [0.7.0] - 2024-02-08
 
 ### Features 🚀

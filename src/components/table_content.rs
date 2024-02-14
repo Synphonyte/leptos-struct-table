@@ -16,6 +16,8 @@ use leptos_use::{
 };
 use std::cell::RefCell;
 use std::collections::{HashSet, VecDeque};
+use std::fmt::Debug;
+use std::marker::PhantomData;
 use std::ops::Range;
 use std::rc::Rc;
 use wasm_bindgen::JsCast;
@@ -55,7 +57,7 @@ renderer_fn!(
 
 /// Render the content of a table. This is the main component of this crate.
 #[component]
-pub fn TableContent<Row, DataP, ClsP>(
+pub fn TableContent<Row, DataP, Err, ClsP>(
     /// The data to be rendered in this table.
     /// This must implement [`TableDataProvider`] or [`PaginatedTableDataProvider`].
     rows: DataP,
@@ -176,10 +178,13 @@ pub fn TableContent<Row, DataP, ClsP>(
     /// Please check [`DisplayStrategy`] to see explanations of all available options.
     #[prop(optional)]
     display_strategy: DisplayStrategy,
+
+    #[prop(optional)] _marker: PhantomData<Err>,
 ) -> impl IntoView
 where
     Row: TableRow<ClassesProvider = ClsP> + Clone + 'static,
-    DataP: TableDataProvider<Row> + 'static,
+    DataP: TableDataProvider<Row, Err> + 'static,
+    Err: Debug,
     ClsP: TableClassesProvider + Copy + 'static,
 {
     let on_change = store_value(on_change);
@@ -412,7 +417,11 @@ where
                     let set_known_row_count = set_known_row_count.clone();
 
                     async move {
-                        let result = rows.borrow().get_rows(missing_range.clone()).await;
+                        let result = rows
+                            .borrow()
+                            .get_rows(missing_range.clone())
+                            .await
+                            .map_err(|err| format!("{err:?}"));
                         if let Ok((_, loaded_range)) = &result {
                             if loaded_range.end < missing_range.end {
                                 set_known_row_count(missing_range.end);
