@@ -51,11 +51,11 @@ impl TableClassesProvider for TailwindClassesPreset {
         )
     }
 
-    fn loading_cell(&self, prop_class: &str) -> String {
+    fn loading_cell(&self, _row_index: usize, _col_index: usize, prop_class: &str) -> String {
         format!("{} {}", "px-5 py-2", prop_class)
     }
 
-    fn loading_cell_inner(&self, row_index: usize, prop_class: &str) -> String {
+    fn loading_cell_inner(&self, row_index: usize, _col_index: usize, prop_class: &str) -> String {
         let width = match row_index % 4 {
             0 => "w-[calc(85%-2.5rem)]",
             1 => "w-[calc(90%-2.5rem)]",

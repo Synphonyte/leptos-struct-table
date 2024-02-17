@@ -51,6 +51,23 @@ impl TableClassesProvider for TailwindClassesPreset {
         )
     }
 
+    fn loading_cell(&self, _row_index: usize, _col_index: usize, prop_class: &str) -> String {
+        format!("{} {}", "px-5 py-2", prop_class)
+    }
+
+    fn loading_cell_inner(&self, row_index: usize, _col_index: usize, prop_class: &str) -> String {
+        let width = match row_index % 4 {
+            0 => "w-[calc(85%-2.5rem)]",
+            1 => "w-[calc(90%-2.5rem)]",
+            2 => "w-[calc(75%-2.5rem)]",
+            _ => "w-[calc(60%-2.5rem)]",
+        };
+        format!(
+            "animate-pulse h-2 bg-gray-200 rounded-full dark:bg-gray-700 inline-block align-middle {} {}",
+            width, prop_class
+        )
+    }
+
     fn cell(&self, template_classes: &str) -> String {
         format!("{} {}", "px-5 py-2", template_classes)
     }

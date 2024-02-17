@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.8.0] - 2024-02-17
+
+### Feature 🚀
+
+- Added `loading_row_display_limit` prop to `TableContent` to make it possible to load smaller row counts nicely
+
+### Breaking Changes 🛠️
+
+- Added `row_index` and `col_index` to `TableClassesProvider::loading_cell`
+- Added `col_index` to `TableClassesProvider::loading_cell_inner`
+- Changed the type of prop `loading_row_renderer` of the component `TableContent`
+
+### Fix 🐛
+
+- Data loading for small data sets
+
 ## [0.7.1] - 2024-02-14
 
 ### Changes

@@ -9,6 +9,7 @@ use crate::{
     ReloadController, ScrollContainer, SelectionChangeEvent, TableClassesProvider,
     TableDataProvider, TableHeadEvent,
 };
+use leptos::leptos_dom::is_browser;
 use leptos::*;
 use leptos_use::{
     use_debounce_fn, use_element_size_with_options, use_scroll_with_options, UseElementSizeOptions,
@@ -51,7 +52,7 @@ renderer_fn!(
 );
 
 renderer_fn!(
-    LoadingRowRendererFn(class: Signal<String>, cell_class: Signal<String>, cell_inner_class: Signal<String>, index: usize, col_count: usize)
+    LoadingRowRendererFn(class: Signal<String>, get_cell_class: Callback<usize, String>, get_cell_inner_class: Callback<usize, String>, index: usize, col_count: usize)
     default DefaultLoadingRowRenderer
 );
 
@@ -61,16 +62,13 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     /// The data to be rendered in this table.
     /// This must implement [`TableDataProvider`] or [`PaginatedTableDataProvider`].
     rows: DataP,
-
     /// The container element which has scrolling capabilities. By default this is the `body` element.
     #[prop(optional, into)]
     scroll_container: ScrollContainer,
-
     /// Event handler for when a row is edited.
     /// Check out the [editable example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/editable/src/main.rs).
     #[prop(optional, into)]
     on_change: EventHandler<ChangeEvent<Row>>,
-
     /// Selection mode together with the `RwSignal` to hold the selection. Available modes are
     /// - `None` - No selection (default)
     /// - `Single` - Single selection
@@ -80,80 +78,64 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     /// [selectable example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/selectable/src/main.rs).
     #[prop(optional, into)]
     selection: Selection,
-
     /// Event handler callback for when the selection changes.
     /// See the [selectable example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/selectable/src/main.rs) for details.
     #[prop(optional, into)]
     on_selection_change: EventHandler<SelectionChangeEvent<Row>>,
-
     /// Renderer function for the table head. Defaults to [`DefaultTableHeadRenderer`]. For a full example see the
     /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
     #[prop(default = DefaultTableHeadRenderer.into(), into)]
     thead_renderer: WrapperRendererFn,
-
     /// Renderer function for the table body. Defaults to [`DefaultTableBodyRenderer`]. For a full example see the
     /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
     #[prop(default = DefaultTableBodyRenderer.into(), into)]
     tbody_renderer: WrapperRendererFn,
-
     /// Renderer function for the table head row. Defaults to [`DefaultTableHeadRowRenderer`]. For a full example see the
     /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
     #[prop(default = DefaultTableHeadRowRenderer.into(), into)]
     thead_row_renderer: WrapperRendererFn,
-
     /// The row renderer. Defaults to [`DefaultTableRowRenderer`]. For a full example see the
     /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
     #[prop(optional, into)]
     row_renderer: RowRendererFn<Row>,
-
     /// The row renderer for when that row is currently being loaded.
     /// Defaults to [`DefaultLoadingRowRenderer`]. For a full example see the
     /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
     #[prop(optional, into)]
     loading_row_renderer: LoadingRowRendererFn,
-
     /// The row renderer for when that row failed to load.
     /// Defaults to [`DefaultErrorRowRenderer`]. For a full example see the
     /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
     #[prop(optional, into)]
     error_row_renderer: ErrorRowRendererFn,
-
     /// The row placeholder renderer. Defaults to [`DefaultRowPlaceholderRenderer`].
     /// This is used in place of rows that are not shown
     /// before and after the currently visible rows.
     #[prop(optional, into)]
     row_placeholder_renderer: RowPlaceholderRendererFn,
-
     /// Additional classes to add to rows
     #[prop(optional, into)]
     row_class: MaybeSignal<String>,
-
     /// Additional classes to add to the thead
     #[prop(optional, into)]
     thead_class: MaybeSignal<String>,
-
     /// Additional classes to add to the row inside the thead
     #[prop(optional, into)]
     thead_row_class: MaybeSignal<String>,
-
     /// Additional classes to add to the tbody
     #[prop(optional, into)]
     tbody_class: MaybeSignal<String>,
-
     /// Additional classes to add to the cell inside a row that is being loaded
     #[prop(optional, into)]
     loading_cell_class: MaybeSignal<String>,
-
     /// Additional classes to add to the inner element inside a cell that is inside a row that is being loaded
     #[prop(optional, into)]
     loading_cell_inner_class: MaybeSignal<String>,
-
     /// The sorting to apply to the table.
     /// For this to work you have add `#[table(sortable)]` to your struct.
     /// Please see the [simple example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs).
     #[prop(default = create_rw_signal(VecDeque::new()), into)]
     sorting: RwSignal<VecDeque<(usize, ColumnSort)>>,
-
     /// This is called once the number of rows is known.
     /// It will only be executed if [`TableDataProvider::row_count`] returns `Some(...)`.
     ///
@@ -161,14 +143,12 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     /// for how to use.
     #[prop(optional, into)]
     on_row_count: EventHandler<usize>,
-
     /// Allows to manually trigger a reload.
     ///
     /// See the [paginated_rest_datasource example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/paginated_rest_datasource/src/main.rs)
     /// for how to use.
     #[prop(optional)]
     reload_controller: ReloadController,
-
     /// The display strategy to use when rendering the table.
     /// Can be one of
     /// - `Virtualization`
@@ -178,7 +158,11 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     /// Please check [`DisplayStrategy`] to see explanations of all available options.
     #[prop(optional)]
     display_strategy: DisplayStrategy,
-
+    /// The maximum number of loading rows to display. Defaults to `None` which means unlimited.
+    /// Use this if you load a small number of rows and don't want the entire screen to be full of
+    /// loading rows.
+    #[prop(optional)]
+    loading_row_display_limit: Option<usize>,
     #[prop(optional)] _marker: PhantomData<Err>,
 ) -> impl IntoView
 where
@@ -263,10 +247,12 @@ where
         display_strategy.set_row_count(row_count);
     };
 
-    if matches!(
-        display_strategy,
-        DisplayStrategy::Virtualization | DisplayStrategy::Pagination { .. }
-    ) {
+    if is_browser()
+        && matches!(
+            display_strategy,
+            DisplayStrategy::Virtualization | DisplayStrategy::Pagination { .. }
+        )
+    {
         spawn_local({
             let rows = Rc::clone(&rows);
             let set_known_row_count = set_known_row_count.clone();
@@ -318,7 +304,7 @@ where
     } else {
         create_memo(move |_| {
             let row_count_after = if let Some(row_count) = row_count.get() {
-                (row_count - display_range.get().end) as f64
+                (row_count.saturating_sub(display_range.get().end)) as f64
             } else {
                 0.0
             };
@@ -362,8 +348,6 @@ where
 
         let mut end = start + visible_row_count * 5;
 
-        // end = end.min(start + 300);
-
         if let Some(chunk_size) = DataP::CHUNK_SIZE {
             start /= chunk_size;
             start *= chunk_size;
@@ -373,8 +357,8 @@ where
             end *= chunk_size;
         }
 
-        if let Some(count) = row_count.get() {
-            end = end.min(count);
+        if let Some(row_count) = row_count.get() {
+            end = end.min(row_count);
         }
 
         loaded_rows.update_untracked(|loaded_rows| {
@@ -396,11 +380,21 @@ where
             loaded_rows.with_untracked(|loaded_rows| loaded_rows.missing_range(range.clone()));
 
         if let Some(missing_range) = missing_range {
+            let mut end = missing_range.end;
+            if let Some(row_count) = row_count.get() {
+                end = end.min(row_count);
+
+                if end <= missing_range.start {
+                    return;
+                }
+            }
+
             loaded_rows.update(|loaded_rows| loaded_rows.write_loading(missing_range.clone()));
 
             let mut loading_ranges = vec![];
             if let Some(chunk_size) = DataP::CHUNK_SIZE {
-                let mut current_range = missing_range.start..missing_range.start + chunk_size;
+                let start = missing_range.start / chunk_size * chunk_size;
+                let mut current_range = start..start + chunk_size;
                 while current_range.end <= missing_range.end {
                     loading_ranges.push(current_range.clone());
                     current_range = current_range.end..current_range.end + chunk_size;
@@ -422,9 +416,16 @@ where
                             .get_rows(missing_range.clone())
                             .await
                             .map_err(|err| format!("{err:?}"));
+
                         if let Ok((_, loaded_range)) = &result {
                             if loaded_range.end < missing_range.end {
-                                set_known_row_count(missing_range.end);
+                                if let Some(row_count) = row_count.get_untracked() {
+                                    if loaded_range.end < row_count {
+                                        set_known_row_count(loaded_range.end);
+                                    }
+                                } else {
+                                    set_known_row_count(loaded_range.end);
+                                }
                             }
                         }
                         loaded_rows
@@ -452,21 +453,34 @@ where
                 <For
                     each=move || {
                         with!(|loaded_rows, display_range| {
-                            loaded_rows[display_range.clone()]
+                            let iter = loaded_rows[display_range.clone()]
                                 .iter()
                                 .cloned()
                                 .enumerate()
-                                .map(|(i, row)| ( i + display_range.start, row))
-                                .collect::<Vec<_>>()
+                                .map(|(i, row)| ( i + display_range.start, row));
+
+                            if let Some(loading_row_display_limit) = loading_row_display_limit {
+                                let mut loading_row_count = 0;
+
+                                iter.filter(|(_, row)| {
+                                    if matches!(row, RowState::Loading | RowState::Placeholder) {
+                                        loading_row_count += 1;
+                                        loading_row_count <= loading_row_display_limit
+                                    } else {
+                                        true
+                                    }
+                                }).collect::<Vec<_>>()
+                            } else {
+                                iter.collect::<Vec<_>>()
+                            }
                         })
                     }
 
                     key=|(idx, row)| {
                         match row {
                             RowState::Loaded(_) => idx.to_string(),
-                            RowState::Placeholder => format!("placeholder-{idx}"),
                             RowState::Error(_) => format!("error-{idx}"),
-                            RowState::Loading => format!("loading-{idx}"),
+                            RowState::Loading | RowState::Placeholder => format!("loading-{idx}"),
                         }
                     }
 
@@ -516,11 +530,11 @@ where
                                         Signal::derive(
                                             move || class_provider.row(i, false, &row_class.get())
                                         ),
-                                        Signal::derive(
-                                            move || class_provider.loading_cell(&loading_cell_class.get())
+                                        Callback::new(
+                                            move |col_index: usize| class_provider.loading_cell(i, col_index, &loading_cell_class.get())
                                         ),
-                                        Signal::derive(
-                                            move || class_provider.loading_cell_inner(i, &loading_cell_inner_class.get())
+                                        Callback::new(
+                                            move |col_index: usize| class_provider.loading_cell_inner(i, col_index, &loading_cell_inner_class.get())
                                         ),
                                         i,
                                         Row::COLUMN_COUNT,
@@ -540,10 +554,12 @@ where
     let tbody = tbody_renderer.run(tbody_content, tbody_class);
     let mut tbody_err = None;
 
-    if let Ok(tbody_el) = tbody.clone().into_html_element() {
-        set_tbody_el.set(Some(tbody_el.unchecked_ref::<web_sys::Element>().clone()));
-    } else {
-        tbody_err = Some("The tbody_renderer has to return a single root Element");
+    if is_browser() {
+        if let Ok(tbody_el) = tbody.clone().into_html_element() {
+            set_tbody_el.set(Some(tbody_el.unchecked_ref::<web_sys::Element>().clone()));
+        } else {
+            tbody_err = Some("The tbody_renderer has to return a single root Element");
+        }
     }
 
     view! {

@@ -44,20 +44,20 @@ pub fn DefaultErrorRowRenderer(err: String, index: usize, col_count: usize) -> i
 }
 
 /// The default loading row renderer which just displays a loading indicator.
-#[allow(unused_variables)]
+#[allow(unused_variables, unstable_name_collisions)]
 pub fn DefaultLoadingRowRenderer(
     class: Signal<String>,
-    cell_class: Signal<String>,
-    inner_cell_class: Signal<String>,
+    get_cell_class: Callback<usize, String>,
+    get_inner_cell_class: Callback<usize, String>,
     index: usize,
     col_count: usize,
 ) -> impl IntoView {
     view! {
         <tr class=class>
             {
-                (0..col_count).map(|_| view! {
-                    <td class=cell_class>
-                        <div class=inner_cell_class></div>
+                (0..col_count).map(|col_index| view! {
+                    <td class=get_cell_class.call(col_index)>
+                        <div class=get_inner_cell_class.call(col_index)></div>
                         " "
                     </td>
                 }).collect_view()

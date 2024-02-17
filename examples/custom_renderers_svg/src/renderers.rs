@@ -57,11 +57,11 @@ pub fn SvgErrorRowRenderer(err: String, index: usize, _col_count: usize) -> impl
     }
 }
 
-#[allow(non_snake_case)]
+#[allow(non_snake_case, unstable_name_collisions)]
 pub fn SvgLoadingRowRenderer(
     class: Signal<String>,
-    _cell_class: Signal<String>,
-    inner_cell_class: Signal<String>,
+    _get_cell_class: Callback<usize, String>,
+    get_inner_cell_class: Callback<usize, String>,
     index: usize,
     _col_count: usize,
 ) -> impl IntoView {
@@ -69,7 +69,7 @@ pub fn SvgLoadingRowRenderer(
 
     view! {
         <g class=class transform=transform>
-            <text x="0" y=ROW_HEIGHT_HALF class=inner_cell_class dominant-baseline="central">
+            <text x="0" y=ROW_HEIGHT_HALF class=get_inner_cell_class.call(0) dominant-baseline="central">
                 Loading...
             </text>
         </g>
