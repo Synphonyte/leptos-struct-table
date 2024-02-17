@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.8.1] - 2024-02-17
+
+### Fix 🐛
+
+- Removed debug log
+
 ## [0.8.0] - 2024-02-17
 
 ### Feature 🚀

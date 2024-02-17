@@ -116,7 +116,6 @@ where
         debug_assert_eq!(start % D::PAGE_ROW_COUNT, 0);
         debug_assert_eq!(end - start, D::PAGE_ROW_COUNT);
 
-        leptos::logging::log!("get_rows: {}..{}", start, end);
         self.get_page(start / D::PAGE_ROW_COUNT).await.map(|rows| {
             let len = rows.len();
             (rows, start..start + len)
