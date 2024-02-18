@@ -1,18 +1,20 @@
 use crate::models::{ArchiveOrgApiResponse, ArchiveOrgCountRespone, Book};
 use async_trait::async_trait;
 use gloo_net::http::Request;
-use leptos::logging;
+use leptos::*;
 use leptos_struct_table::{ColumnSort, PaginatedTableDataProvider};
 use std::collections::VecDeque;
 
 pub struct BookDataProvider {
     sorting: VecDeque<(usize, ColumnSort)>,
+    pub search: RwSignal<String>,
 }
 
 impl Default for BookDataProvider {
     fn default() -> Self {
         Self {
             sorting: VecDeque::new(),
+            search: RwSignal::new("lewis".to_string()),
         }
     }
 }
@@ -47,14 +49,15 @@ impl BookDataProvider {
         }
 
         format!(
-            "https://archive.org/advancedsearch.php?q=creator%3A%28Lewis%29&fl%5B%5D=creator&fl%5B%5D=identifier&fl%5B%5D=publicdate&fl%5B%5D=title{sort}&rows={}&page={}&output=json&callback=",
+            "https://archive.org/advancedsearch.php?q=creator%3A%28{}%29&fl%5B%5D=creator&fl%5B%5D=identifier&fl%5B%5D=publicdate&fl%5B%5D=title{sort}&rows={}&page={}&output=json&callback=",
+            self.search.get_untracked(),
             Self::PAGE_ROW_COUNT,
             page_index + 1,
         )
     }
 }
 
-#[async_trait(?Send)]
+#[async_trait(? Send)]
 impl PaginatedTableDataProvider<Book> for BookDataProvider {
     const PAGE_ROW_COUNT: usize = 50;
 
@@ -96,5 +99,10 @@ impl PaginatedTableDataProvider<Book> for BookDataProvider {
 
     fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
         self.sorting = sorting.clone();
+    }
+
+    fn track(&self) {
+        // we depend on the search so we need to track it here
+        self.search.track();
     }
 }

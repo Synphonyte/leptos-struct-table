@@ -66,7 +66,12 @@ impl<T: Clone> LoadedRows<T> {
                 }
             }
             Err(error) => {
-                for row in &mut self.rows[missing_range] {
+                let range = missing_range.start..missing_range.end.min(self.rows.len());
+                if range.start >= range.end {
+                    return;
+                }
+
+                for row in &mut self.rows[range] {
                     *row = RowState::Error(error.clone());
                 }
             }

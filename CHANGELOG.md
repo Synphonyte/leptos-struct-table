@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.8.2] - 2024-02-18
+
+### Feature 🚀
+
+- Added method `TableDataProvider::track` to easily specify reactive dependencies of data loading
+
 ## [0.8.1] - 2024-02-17
 
 ### Fix 🐛

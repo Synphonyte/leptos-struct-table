@@ -187,8 +187,10 @@ where
 
     let first_selected_index = create_rw_signal(None::<usize>);
 
-    let (do_reload, set_reload) = create_signal(false);
-    let clear = move || {
+    let (row_count, set_row_count) = create_signal(None::<usize>);
+
+    let (reload_count, set_reload_count) = create_signal(0_usize);
+    let clear = move |clear_row_count: bool| {
         selection.clear();
         first_selected_index.set(None);
 
@@ -196,7 +198,11 @@ where
             loaded_rows.clear();
         });
 
-        set_reload.set(true);
+        if clear_row_count {
+            set_row_count.set(None);
+        }
+
+        set_reload_count.set(reload_count.get().overflowing_add(1).0);
     };
 
     let on_head_click = {
@@ -207,14 +213,19 @@ where
 
             rows.borrow_mut().set_sorting(&sorting());
 
-            clear();
+            clear(false);
         }
     };
 
-    create_effect(move |_| {
-        // triggered when `ReloadController::reload()` is called
-        reload_controller.track();
-        clear();
+    create_effect({
+        let rows = Rc::clone(&rows);
+
+        move |_| {
+            // triggered when `ReloadController::reload()` is called
+            reload_controller.track();
+            rows.borrow().track();
+            clear(true);
+        }
     });
 
     let selected_indices = match selection {
@@ -237,8 +248,6 @@ where
         scroll_container,
         UseElementSizeOptions::default().box_(web_sys::ResizeObserverBoxOptions::ContentBox),
     );
-
-    let (row_count, set_row_count) = create_signal(None::<usize>);
 
     let set_known_row_count = move |row_count: usize| {
         set_row_count.set(Some(row_count));
@@ -335,13 +344,11 @@ where
         let first_visible_row_index = first_visible_row_index.get();
         let visible_row_count = visible_row_count.get();
 
+        // with this a reload triggers this effect
+        reload_count.track();
+
         if visible_row_count == 0 {
             return;
-        }
-
-        // with this a reload triggers this effect
-        if do_reload.get() {
-            set_reload.set_untracked(false);
         }
 
         let mut start = first_visible_row_index.saturating_sub(visible_row_count * 2);
@@ -411,11 +418,18 @@ where
                     let set_known_row_count = set_known_row_count.clone();
 
                     async move {
+                        let latest_reload_count = reload_count.get_untracked();
+
                         let result = rows
                             .borrow()
                             .get_rows(missing_range.clone())
                             .await
                             .map_err(|err| format!("{err:?}"));
+
+                        // make sure the loaded data is still valid
+                        if reload_count.get_untracked() != latest_reload_count {
+                            return;
+                        }
 
                         if let Ok((_, loaded_range)) = &result {
                             if loaded_range.end < missing_range.end {

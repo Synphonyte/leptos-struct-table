@@ -57,6 +57,12 @@ pub trait TableDataProvider<Row, Err: Debug = String> {
     fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
         // by default do nothing
     }
+
+    /// Call `.track()` in this method on all signals that loading data relies on.
+    /// For example a search of filters. Please check the [paginated_rest_datasource example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/paginated_rest_datasource/src/data_provider.rs)
+    fn track(&self) {
+        // by default do nothing
+    }
 }
 
 /// A paginated data source. This is meant to provide a more convenient way
@@ -100,6 +106,11 @@ pub trait PaginatedTableDataProvider<Row, Err: Debug = String> {
     fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
         // by default do nothing
     }
+
+    /// Same as [`TableDataProvider::track`]
+    fn track(&self) {
+        // by default do nothing
+    }
 }
 
 #[async_trait(? Send)]
@@ -128,6 +139,10 @@ where
 
     fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
         PaginatedTableDataProvider::<Row, Err>::set_sorting(self, sorting)
+    }
+
+    fn track(&self) {
+        PaginatedTableDataProvider::<Row, Err>::track(self)
     }
 }
 
