@@ -24,6 +24,8 @@ use std::rc::Rc;
 use wasm_bindgen::JsCast;
 use web_sys::Element;
 
+const MAX_DISPLAY_ROW_COUNT: usize = 500;
+
 renderer_fn!(
     RowRendererFn<Row>(
         class: Signal<String>,
@@ -367,6 +369,8 @@ where
         if let Some(row_count) = row_count.get() {
             end = end.min(row_count);
         }
+
+        end = end.min(start + MAX_DISPLAY_ROW_COUNT);
 
         loaded_rows.update_untracked(|loaded_rows| {
             if end > loaded_rows.len() {

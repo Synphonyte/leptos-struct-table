@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.8.3] - 2024-02-20
+
+### Fix 🐛
+
+- When not limiting a scroll container this could lead to a runaway row loading. This is now limited to max 500 rows.
+
 ## [0.8.2] - 2024-02-18
 
 ### Feature 🚀
