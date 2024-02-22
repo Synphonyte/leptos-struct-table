@@ -170,11 +170,11 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     loading_row_display_limit: Option<usize>,
     #[prop(optional)] _marker: PhantomData<Err>,
 ) -> impl IntoView
-    where
-        Row: TableRow<ClassesProvider=ClsP> + Clone + 'static,
-        DataP: TableDataProvider<Row, Err> + 'static,
-        Err: Debug,
-        ClsP: TableClassesProvider + Copy + 'static,
+where
+    Row: TableRow<ClassesProvider = ClsP> + Clone + 'static,
+    DataP: TableDataProvider<Row, Err> + 'static,
+    Err: Debug,
+    ClsP: TableClassesProvider + Copy + 'static,
 {
     let on_change = store_value(on_change);
     let rows = Rc::new(RefCell::new(rows));
@@ -299,7 +299,7 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
             create_memo(move |_| {
                 ((height.get() / average_row_height.get()).ceil() as usize).max(20)
             })
-                .into()
+            .into()
         }
     };
 
@@ -325,7 +325,7 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
 
             row_count_after * average_row_height.get()
         })
-            .into()
+        .into()
     };
 
     let tbody_ref = create_node_ref::<AnyElement>();
@@ -592,7 +592,7 @@ fn compute_average_row_height_from_loaded<Row, ClsP>(
     placeholder_height_before: Signal<f64>,
     loaded_rows: RwSignal<LoadedRows<Row>>,
 ) where
-    Row: TableRow<ClassesProvider=ClsP> + Clone + 'static,
+    Row: TableRow<ClassesProvider = ClsP> + Clone + 'static,
 {
     if let Some(el) = tbody_ref.get_untracked() {
         let el: &web_sys::Element = &el;

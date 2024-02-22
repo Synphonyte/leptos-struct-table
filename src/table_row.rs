@@ -18,15 +18,15 @@ pub trait TableRow: Clone {
     ///
     /// This render function has to render exactly one root element.
     fn render_row(&self, index: usize, on_change: EventHandler<ChangeEvent<Self>>)
-                  -> impl IntoView;
+        -> impl IntoView;
 
     /// Render the head row of the table.
     fn render_head_row<F>(
         sorting: Signal<VecDeque<(usize, ColumnSort)>>,
         on_head_click: F,
     ) -> impl IntoView
-        where
-            F: Fn(TableHeadEvent) + Clone + 'static;
+    where
+        F: Fn(TableHeadEvent) + Clone + 'static;
 
     /// The name of the column (= struct field name) at the given index. This can be used to implement
     /// sorting in a database. It takes the `#[table(skip)]` attributes into account. `col_index`

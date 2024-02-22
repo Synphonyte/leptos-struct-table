@@ -33,8 +33,8 @@ pub fn SvgRowRenderer<Row>(
     on_select: EventHandler<web_sys::MouseEvent>,
     on_change: EventHandler<ChangeEvent<Row>>,
 ) -> impl IntoView
-    where
-        Row: TableRow + Clone + 'static,
+where
+    Row: TableRow + Clone + 'static,
 {
     let transform = y_transform_from_index(index);
 
@@ -114,8 +114,8 @@ pub fn SvgHeadCellRenderer<F>(
     on_click: F,
     children: Children,
 ) -> impl IntoView
-    where
-        F: Fn(TableHeadEvent) + 'static,
+where
+    F: Fn(TableHeadEvent) + 'static,
 {
     let style = move || {
         let sort = match sort_direction() {
@@ -160,9 +160,9 @@ pub fn SvgTextCellRenderer<T, F>(
     on_change: F,
     index: usize,
 ) -> impl IntoView
-    where
-        T: IntoView + Clone + 'static,
-        F: Fn(T) + 'static,
+where
+    T: IntoView + Clone + 'static,
+    F: Fn(T) + 'static,
 {
     let x = x_from_index(index);
 
@@ -181,8 +181,8 @@ pub fn SvgPathCellRenderer<F>(
     on_change: F,
     index: usize,
 ) -> impl IntoView
-    where
-        F: Fn(String) + 'static,
+where
+    F: Fn(String) + 'static,
 {
     let transform = transform_from_index(index, 3);
 
