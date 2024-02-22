@@ -2,9 +2,11 @@
 
 ## [0.9.0] - 2024-02-20
 
-### Feature 🚀
+### Breaking Changes 🛠️
 
 - Added method `TableRow::col_name` to make it easy to implement db sorting
+- Removed dependency `async-trait`. The traits `TableDataProvider` and `PaginatedTableDataProvider` now use the native
+  async method support.
 
 ## [0.8.3] - 2024-02-20
 
@@ -52,7 +54,7 @@
 ### Features 🚀
 
 - Virtualization — Only elements that are visible are rendered (with some extra for smooth scrolling).
-  - Other display acceleration strategies like infinite scroll and pagination are implemented as well. 
+    - Other display acceleration strategies like infinite scroll and pagination are implemented as well.
 - Caching — Only rows that are visible are requested from the data source and then cached.
 - Error handling — If an error occurs while loading data, it is displayed in a table row instead of the failed data.
 - Easy reloading — The data can be reloaded through the `ReloadController`.
@@ -85,7 +87,6 @@ Please check the docs and examples.
 ### Other Changes
 
 - Modified REST example to include sorting
-
 
 ## [0.4.0] - 2023-10-02
 

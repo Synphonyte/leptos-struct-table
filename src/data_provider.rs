@@ -1,5 +1,6 @@
+#![allow(async_fn_in_trait)]
+
 use crate::ColumnSort;
-use async_trait::async_trait;
 use std::collections::VecDeque;
 use std::fmt::Debug;
 use std::ops::Range;
@@ -16,10 +17,6 @@ use std::ops::Range;
 /// The first is a more convenient way of connecting to a paginated data source and the second is
 /// more convenient if you know you're always going to return exactly the requested range (except maybe
 /// at the end of the data).
-///
-/// Please note that because of the use of [`async-trait`](https://docs.rs/async-trait/latest/async_trait/)
-/// this documentation looks a bit cluttered.
-#[async_trait(? Send)]
 pub trait TableDataProvider<Row, Err: Debug = String> {
     /// If Some(...), data will be loaded in chunks of this size. This is useful for paginated data sources.
     /// If you have such a paginated data source, you probably want to implement `PaginatedTableDataProvider`
@@ -74,7 +71,6 @@ pub trait TableDataProvider<Row, Err: Debug = String> {
 /// > You do not have implement this trait if you're using pagination and you vice versa if you're not using pagination
 /// > you can still implement this trait. And in case if you use this trait together with pagination the
 /// > display row count can be different from the `PAGE_ROW_COUNT`.
-#[async_trait(? Send)]
 pub trait PaginatedTableDataProvider<Row, Err: Debug = String> {
     /// How many rows per page
     const PAGE_ROW_COUNT: usize;
@@ -113,7 +109,6 @@ pub trait PaginatedTableDataProvider<Row, Err: Debug = String> {
     }
 }
 
-#[async_trait(? Send)]
 impl<Row, Err, D> TableDataProvider<Row, Err> for D
 where
     D: PaginatedTableDataProvider<Row, Err>,

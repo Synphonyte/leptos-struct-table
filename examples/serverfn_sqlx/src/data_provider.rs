@@ -1,4 +1,4 @@
-use async_trait::async_trait;
+use crate::classes::ClassesPreset;
 use leptos::*;
 use leptos_struct_table::*;
 use serde::{Deserialize, Serialize};
@@ -9,7 +9,7 @@ use std::ops::Range;
 
 #[derive(TableRow, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(sqlx::FromRow))]
-#[table(classes_provider = TailwindClassesPreset)]
+#[table(classes_provider = ClassesPreset)]
 pub struct Customer {
     pub customer_id: String,
     pub first_name: String,
@@ -91,7 +91,6 @@ pub struct CustomerTableDataProvider {
     pub name: RwSignal<String>,
 }
 
-#[async_trait(? Send)]
 impl TableDataProvider<Customer> for CustomerTableDataProvider {
     async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Customer>, Range<usize>), String> {
         list_customers(CustomerQuery {

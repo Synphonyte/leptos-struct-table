@@ -1,4 +1,5 @@
 pub mod app;
+pub mod classes;
 pub mod data_provider;
 #[cfg(feature = "ssr")]
 pub mod database;

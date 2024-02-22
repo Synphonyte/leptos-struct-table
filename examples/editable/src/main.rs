@@ -2,7 +2,6 @@ mod renderer;
 mod tailwind;
 
 use crate::renderer::*;
-use async_trait::async_trait;
 use chrono::NaiveDate;
 use leptos::*;
 use leptos_struct_table::*;
@@ -21,7 +20,6 @@ pub struct Book {
     pub publish_date: NaiveDate,
 }
 
-#[async_trait(?Send)]
 impl TableDataProvider<Book> for RwSignal<Vec<Book>> {
     async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Book>, Range<usize>), String> {
         Ok((self.get_untracked()[range.clone()].to_vec(), range))

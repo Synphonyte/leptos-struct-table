@@ -142,7 +142,6 @@ pub struct TemperatureMeasurement {
 //! # use leptos::*;
 //! # use leptos_struct_table::*;
 //! # use serde::{Deserialize, Serialize};
-//! # use async_trait::async_trait;
 //! #
 //! #[derive(TableRow, Clone)]
 //! #[table(classes_provider = "TailwindClassesPreset")]

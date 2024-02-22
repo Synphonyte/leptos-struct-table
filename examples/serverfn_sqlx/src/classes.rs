@@ -1,9 +1,9 @@
-use crate::{ColumnSort, TableClassesProvider};
+use leptos_struct_table::{ColumnSort, TableClassesProvider};
 
 #[derive(Clone, Copy)]
-pub struct TailwindClassesPreset;
+pub struct ClassesPreset;
 
-impl TableClassesProvider for TailwindClassesPreset {
+impl TableClassesProvider for ClassesPreset {
     fn new() -> Self {
         Self
     }
@@ -23,7 +23,7 @@ impl TableClassesProvider for TailwindClassesPreset {
         };
 
         format!(
-            "cursor-pointer px-5 py-2 {} {}",
+            "cursor-pointer px-5 py-2 sticky whitespace-nowrap {} {}",
             sort_class, template_classes
         )
     }
@@ -69,6 +69,6 @@ impl TableClassesProvider for TailwindClassesPreset {
     }
 
     fn cell(&self, template_classes: &str) -> String {
-        format!("{} {}", "px-5 py-2", template_classes)
+        format!("{} {}", "px-5 py-2 whitespace-nowrap", template_classes)
     }
 }

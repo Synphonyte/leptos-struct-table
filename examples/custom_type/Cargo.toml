@@ -10,7 +10,6 @@ chrono = { version = "0.4", features = ["serde"] }
 console_error_panic_hook = "0.1"
 console_log = "1"
 log = "0.4"
-async-trait = "0.1"
 derive_more = { version = "0.99" }
 
 [dev-dependencies]

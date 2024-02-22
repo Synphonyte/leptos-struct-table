@@ -1,5 +1,4 @@
 use crate::models::{ArchiveOrgApiResponse, ArchiveOrgCountRespone, Book};
-use async_trait::async_trait;
 use gloo_net::http::Request;
 use leptos::logging;
 use leptos_struct_table::{ColumnSort, PaginatedTableDataProvider};
@@ -54,7 +53,6 @@ impl BookDataProvider {
     }
 }
 
-#[async_trait(?Send)]
 impl PaginatedTableDataProvider<Book> for BookDataProvider {
     const PAGE_ROW_COUNT: usize = 50;
 
