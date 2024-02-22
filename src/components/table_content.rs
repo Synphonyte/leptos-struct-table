@@ -9,6 +9,7 @@ use crate::{
     ReloadController, ScrollContainer, SelectionChangeEvent, TableClassesProvider,
     TableDataProvider, TableHeadEvent,
 };
+use leptos::html::AnyElement;
 use leptos::leptos_dom::is_browser;
 use leptos::*;
 use leptos_use::{
@@ -21,8 +22,6 @@ use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::ops::Range;
 use std::rc::Rc;
-use wasm_bindgen::JsCast;
-use web_sys::Element;
 
 const MAX_DISPLAY_ROW_COUNT: usize = 500;
 
@@ -46,6 +45,10 @@ renderer_fn!(
 
 renderer_fn!(
     WrapperRendererFn(view: View, class: Signal<String>)
+);
+
+renderer_fn!(
+    TbodyRendererFn(view: Fragment, class: Signal<String>, node_ref: NodeRef<AnyElement>)
 );
 
 renderer_fn!(
@@ -91,7 +94,7 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     /// Renderer function for the table body. Defaults to [`DefaultTableBodyRenderer`]. For a full example see the
     /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
     #[prop(default = DefaultTableBodyRenderer.into(), into)]
-    tbody_renderer: WrapperRendererFn,
+    tbody_renderer: TbodyRendererFn,
     /// Renderer function for the table head row. Defaults to [`DefaultTableHeadRowRenderer`]. For a full example see the
     /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
     #[prop(default = DefaultTableHeadRowRenderer.into(), into)]
@@ -300,7 +303,7 @@ where
         }
     };
 
-    let (display_range, set_display_range) = create_signal(0..0);
+    let (display_range, set_display_range) = create_signal(0..5);
 
     let placeholder_height_before =
         if matches!(display_strategy, DisplayStrategy::Pagination { .. }) {
@@ -325,12 +328,12 @@ where
         .into()
     };
 
-    let (tbody_el, set_tbody_el) = create_signal(None::<web_sys::Element>);
+    let tbody_ref = create_node_ref::<AnyElement>();
 
     let compute_average_row_height = use_debounce_fn(
         move || {
             compute_average_row_height_from_loaded(
-                tbody_el,
+                tbody_ref,
                 display_range,
                 y,
                 &set_y,
@@ -458,127 +461,114 @@ where
 
     let thead_content = Row::render_head_row(sorting.into(), on_head_click).into_view();
 
-    let tbody_content = view! {
-        {row_placeholder_renderer.run(placeholder_height_before.into())}
+    let tbody_content = {
+        let row_renderer = row_renderer.clone();
+        let loading_row_renderer = loading_row_renderer.clone();
+        let error_row_renderer = error_row_renderer.clone();
+        let on_selection_change = on_selection_change.clone();
 
-        {move || {
-            let row_renderer = row_renderer.clone();
-            let loading_row_renderer = loading_row_renderer.clone();
-            let error_row_renderer = error_row_renderer.clone();
-            let on_selection_change = on_selection_change.clone();
+        view! {
+            {row_placeholder_renderer.run(placeholder_height_before.into())}
 
-            view! {
-                <For
-                    each=move || {
-                        with!(|loaded_rows, display_range| {
-                            let iter = loaded_rows[display_range.clone()]
-                                .iter()
-                                .cloned()
-                                .enumerate()
-                                .map(|(i, row)| ( i + display_range.start, row));
+            <For
+                each=move || {
+                    with!(|loaded_rows, display_range| {
+                        let iter = loaded_rows[display_range.clone()]
+                            .iter()
+                            .cloned()
+                            .enumerate()
+                            .map(|(i, row)| ( i + display_range.start, row));
 
-                            if let Some(loading_row_display_limit) = loading_row_display_limit {
-                                let mut loading_row_count = 0;
+                        if let Some(loading_row_display_limit) = loading_row_display_limit {
+                            let mut loading_row_count = 0;
 
-                                iter.filter(|(_, row)| {
-                                    if matches!(row, RowState::Loading | RowState::Placeholder) {
-                                        loading_row_count += 1;
-                                        loading_row_count <= loading_row_display_limit
-                                    } else {
-                                        true
-                                    }
-                                }).collect::<Vec<_>>()
-                            } else {
-                                iter.collect::<Vec<_>>()
-                            }
-                        })
+                            iter.filter(|(_, row)| {
+                                if matches!(row, RowState::Loading | RowState::Placeholder) {
+                                    loading_row_count += 1;
+                                    loading_row_count <= loading_row_display_limit
+                                } else {
+                                    true
+                                }
+                            }).collect::<Vec<_>>()
+                        } else {
+                            iter.collect::<Vec<_>>()
+                        }
+                    })
+                }
+
+                key=|(idx, row)| {
+                    match row {
+                        RowState::Loaded(_) => idx.to_string(),
+                        RowState::Error(_) => format!("error-{idx}"),
+                        RowState::Loading | RowState::Placeholder => format!("loading-{idx}"),
                     }
+                }
 
-                    key=|(idx, row)| {
+                children={
+                    let row_renderer = row_renderer.clone();
+                    let loading_row_renderer = loading_row_renderer.clone();
+                    let error_row_renderer = error_row_renderer.clone();
+                    let on_selection_change = on_selection_change.clone();
+
+                    move |(i, row)| {
                         match row {
-                            RowState::Loaded(_) => idx.to_string(),
-                            RowState::Error(_) => format!("error-{idx}"),
-                            RowState::Loading | RowState::Placeholder => format!("loading-{idx}"),
-                        }
-                    }
+                            RowState::Loaded(row) => {
+                                let selected_signal = Signal::derive(
+                                    move || selected_indices.get().contains(&i)
+                                );
 
-                    children={
-                        let row_renderer = row_renderer.clone();
-                        let loading_row_renderer = loading_row_renderer.clone();
-                        let error_row_renderer = error_row_renderer.clone();
-                        let on_selection_change = on_selection_change.clone();
+                                let class_signal = Signal::derive(move || {
+                                    class_provider
+                                        .row(
+                                            i,
+                                            selected_signal.get(),
+                                            &row_class.get(),
+                                        )
+                                });
 
-                        move |(i, row)| {
-                            match row {
-                                RowState::Loaded(row) => {
-                                    let selected_signal = Signal::derive(
-                                        move || selected_indices.get().contains(&i)
-                                    );
+                                let on_select = {
+                                    let on_selection_change = on_selection_change.clone();
+                                    let row = row.clone();
 
-                                    let class_signal = Signal::derive(move || {
-                                        class_provider
-                                            .row(
-                                                i,
-                                                selected_signal.get(),
-                                                &row_class.get(),
-                                            )
-                                    });
+                                    move |evt: web_sys::MouseEvent| {
+                                        update_selection(evt, selection, first_selected_index, i);
 
-                                    let on_select = {
-                                        let on_selection_change = on_selection_change.clone();
-                                        let row = row.clone();
+                                        let selection_change_event = SelectionChangeEvent {
+                                            row: row.clone(),
+                                            row_index:i,
+                                            selected: selected_signal.get_untracked(),
+                                        };
+                                        on_selection_change.run(selection_change_event);
+                                    }
+                                };
 
-                                        move |evt: web_sys::MouseEvent| {
-                                            update_selection(evt, selection, first_selected_index, i);
-
-                                            let selection_change_event = SelectionChangeEvent {
-                                                row: row.clone(),
-                                                row_index:i,
-                                                selected: selected_signal.get_untracked(),
-                                            };
-                                            on_selection_change.run(selection_change_event);
-                                        }
-                                    };
-
-                                    row_renderer.run(class_signal, row, i, selected_signal, on_select.into(), on_change.get_value())
-                                }
-                                RowState::Error(err) => error_row_renderer.run(err, i, Row::COLUMN_COUNT),
-                                RowState::Loading | RowState::Placeholder => {
-                                    loading_row_renderer.run(
-                                        Signal::derive(
-                                            move || class_provider.row(i, false, &row_class.get())
-                                        ),
-                                        Callback::new(
-                                            move |col_index: usize| class_provider.loading_cell(i, col_index, &loading_cell_class.get())
-                                        ),
-                                        Callback::new(
-                                            move |col_index: usize| class_provider.loading_cell_inner(i, col_index, &loading_cell_inner_class.get())
-                                        ),
-                                        i,
-                                        Row::COLUMN_COUNT,
-                                    )
-                                }
+                                row_renderer.run(class_signal, row, i, selected_signal, on_select.into(), on_change.get_value())
+                            }
+                            RowState::Error(err) => error_row_renderer.run(err, i, Row::COLUMN_COUNT),
+                            RowState::Loading | RowState::Placeholder => {
+                                loading_row_renderer.run(
+                                    Signal::derive(
+                                        move || class_provider.row(i, false, &row_class.get())
+                                    ),
+                                    Callback::new(
+                                        move |col_index: usize| class_provider.loading_cell(i, col_index, &loading_cell_class.get())
+                                    ),
+                                    Callback::new(
+                                        move |col_index: usize| class_provider.loading_cell_inner(i, col_index, &loading_cell_inner_class.get())
+                                    ),
+                                    i,
+                                    Row::COLUMN_COUNT,
+                                )
                             }
                         }
                     }
-                />
-            }
-
-        }}
-
-        {row_placeholder_renderer.run(placeholder_height_after.into())}
-    }.into_view();
-
-    let tbody = tbody_renderer.run(tbody_content, tbody_class);
-    let mut tbody_err = None;
-
-    if is_browser() {
-        if let Ok(tbody_el) = tbody.clone().into_html_element() {
-            set_tbody_el.set(Some(tbody_el.unchecked_ref::<web_sys::Element>().clone()));
-        } else {
-            tbody_err = Some("The tbody_renderer has to return a single root Element");
+                }
+            />
+            {row_placeholder_renderer.run(placeholder_height_after.into())}
         }
-    }
+    };
+
+    let tbody = tbody_renderer.run(tbody_content, tbody_class, tbody_ref);
 
     view! {
         {thead_renderer.run(
@@ -589,13 +579,12 @@ where
             thead_class,
         )}
 
-        {tbody_err}
         {tbody}
     }
 }
 
 fn compute_average_row_height_from_loaded<Row, ClsP>(
-    tbody_el: ReadSignal<Option<Element>>,
+    tbody_ref: NodeRef<AnyElement>,
     display_range: ReadSignal<Range<usize>>,
     y: Signal<f64>,
     set_y: &impl Fn(f64),
@@ -605,7 +594,7 @@ fn compute_average_row_height_from_loaded<Row, ClsP>(
 ) where
     Row: TableRow<ClassesProvider = ClsP> + Clone + 'static,
 {
-    if let Some(el) = tbody_el.get_untracked() {
+    if let Some(el) = tbody_ref.get_untracked() {
         let el: &web_sys::Element = &el;
         let display_range = display_range.get_untracked();
         if display_range.end > 0 {

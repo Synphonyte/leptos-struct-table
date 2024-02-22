@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.9.0] - 2024-02-20
+
+### Feature 🚀
+
+- Added method `TableRow::col_name` to make it easy to implement db sorting
+
 ## [0.8.3] - 2024-02-20
 
 ### Fix 🐛
