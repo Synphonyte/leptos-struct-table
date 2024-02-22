@@ -18,15 +18,15 @@ pub trait TableRow: Clone {
     ///
     /// This render function has to render exactly one root element.
     fn render_row(&self, index: usize, on_change: EventHandler<ChangeEvent<Self>>)
-        -> impl IntoView;
+                  -> impl IntoView;
 
     /// Render the head row of the table.
     fn render_head_row<F>(
         sorting: Signal<VecDeque<(usize, ColumnSort)>>,
         on_head_click: F,
     ) -> impl IntoView
-    where
-        F: Fn(TableHeadEvent) + Clone + 'static;
+        where
+            F: Fn(TableHeadEvent) + Clone + 'static;
 
     /// The name of the column (= struct field name) at the given index. This can be used to implement
     /// sorting in a database. It takes the `#[table(skip)]` attributes into account. `col_index`
@@ -53,6 +53,25 @@ pub trait TableRow: Clone {
     /// assert_eq!(Person::col_name(1), "age");
     /// ```
     fn col_name(col_index: usize) -> &'static str;
+
+    /// Converts the given sorting to an SQL statement.
+    /// Return `None` when there is nothing to be sorted otherwise `Some("ORDER BY ...")`.
+    /// Uses [`Self::col_name`] to get the column names for sorting.
+    fn sorting_to_sql(sorting: &VecDeque<(usize, ColumnSort)>) -> Option<String> {
+        let mut sort = vec![];
+
+        for (col, col_sort) in sorting {
+            if let Some(col_sort) = col_sort.as_sql() {
+                sort.push(format!("{} {}", Self::col_name(*col), col_sort))
+            }
+        }
+
+        if sort.is_empty() {
+            return None;
+        }
+
+        Some(format!("ORDER BY {}", sort.join(", ")))
+    }
 }
 
 pub fn get_sorting_for_column(

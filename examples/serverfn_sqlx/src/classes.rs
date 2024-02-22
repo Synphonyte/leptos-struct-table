@@ -11,8 +11,7 @@ impl TableClassesProvider for ClassesPreset {
     fn thead_row(&self, template_classes: &str) -> String {
         format!(
             "{} {}",
-            "text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-300",
-            template_classes
+            "text-xs text-gray-700 uppercase dark:text-gray-300", template_classes
         )
     }
 
@@ -23,7 +22,7 @@ impl TableClassesProvider for ClassesPreset {
         };
 
         format!(
-            "cursor-pointer px-5 py-2 sticky whitespace-nowrap {} {}",
+            "bg-gray-200 dark:bg-gray-700 cursor-pointer px-5 py-2 sticky top-0 whitespace-nowrap {} {}",
             sort_class, template_classes
         )
     }
@@ -69,6 +68,9 @@ impl TableClassesProvider for ClassesPreset {
     }
 
     fn cell(&self, template_classes: &str) -> String {
-        format!("{} {}", "px-5 py-2 whitespace-nowrap", template_classes)
+        format!(
+            "{} {}",
+            "px-5 py-2 whitespace-nowrap overflow-hidden text-ellipsis", template_classes
+        )
     }
 }

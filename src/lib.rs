@@ -90,8 +90,8 @@
 //! - **`string`** - Specifies a format string. Currently only used for `NaiveDate`, `NaiveDateTime` and `NaiveTime`. See [`chrono::format::strftime`] for more information.
 
 #![cfg_attr(
-    feature = "chrono",
-    doc = r##"
+feature = "chrono",
+doc = r##"
 Example:
 
 ```
@@ -363,11 +363,21 @@ pub enum ColumnSort {
 }
 
 impl ColumnSort {
+    /// Returns the a default class name
     pub fn as_class(&self) -> &'static str {
         match self {
             ColumnSort::Ascending => "sort-asc",
             ColumnSort::Descending => "sort-desc",
             _ => "",
+        }
+    }
+
+    /// Returns the SQL sort order (ASC or DESC) or `None` if `ColumnSort::None`.
+    pub fn as_sql(&self) -> Option<&'static str> {
+        match self {
+            ColumnSort::Ascending => Some("ASC"),
+            ColumnSort::Descending => Some("DESC"),
+            _ => None,
         }
     }
 }
@@ -377,6 +387,6 @@ impl ColumnSort {
 ///
 /// Please refer to the [`getter` example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/getter) for how this is used
 #[derive(
-    Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default, Serialize, Deserialize,
+Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default, Serialize, Deserialize,
 )]
 pub struct FieldGetter<T>(PhantomData<T>);

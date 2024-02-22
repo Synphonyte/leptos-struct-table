@@ -1,5 +1,6 @@
 use crate::data_provider::CustomerTableDataProvider;
 use crate::error_template::{AppError, ErrorTemplate};
+use leptos::html::Div;
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
@@ -34,6 +35,8 @@ pub fn App() -> impl IntoView {
 /// Renders the home page of your application.
 #[component]
 fn HomePage() -> impl IntoView {
+    let scroll_container = create_node_ref::<Div>();
+
     let rows = CustomerTableDataProvider::default();
 
     let name = rows.name;
@@ -57,17 +60,18 @@ fn HomePage() -> impl IntoView {
                     </span>
                     <input
                         class="w-full bg-white placeholder:font-italitc border border-slate-300 rounded-full py-2 pl-10 pr-4 focus:outline-none"
-                        placeholder="Enter your keyword to search"
+                        placeholder="Search by name or company"
                         type="text"
                         value=name
                         on:change=move |e| name.set(event_target_value(&e))
                     />
                 </label>
             </div>
-            <div class="overflow-auto grow min-h-0">
-                <table class="text-sm text-left text-gray-500 dark:text-gray-400 w-full">
+            <div node_ref=scroll_container class="overflow-auto grow min-h-0">
+                <table class="table-fixed text-sm text-left text-gray-500 dark:text-gray-400 w-full">
                     <TableContent
                         rows
+                        scroll_container
                     />
                 </table>
             </div>

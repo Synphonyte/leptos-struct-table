@@ -3,7 +3,7 @@ use leptos::*;
 use leptos_struct_table::*;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]
-use sqlx::Row;
+use sqlx::{QueryBuilder, Row};
 use std::collections::VecDeque;
 use std::ops::Range;
 
@@ -36,37 +36,28 @@ pub async fn list_customers(query: CustomerQuery) -> Result<Vec<Customer>, Serve
 
     let CustomerQuery { sort, range, name } = query;
 
-    let wher = if !name.is_empty() {
-        format!("WHERE name ILIKE '%{name}%'")
-    } else {
-        "".to_owned()
-    };
-
-    let order: Vec<String> = sort
-        .into_iter()
-        .filter_map(|(col, col_sort)| {
-            let col_sort = match col_sort {
-                ColumnSort::Ascending => Some("ASC"),
-                ColumnSort::Descending => Some("DESC"),
-                ColumnSort::None => None,
-            };
-
-            col_sort.map(|col_sort| format!("{} {}", Customer::col_name(col), col_sort))
-        })
-        .collect();
-
-    let mut order = order.join(", ");
-    if !order.is_empty() {
-        order = format!("ORDER BY {order}");
+    let mut query = QueryBuilder::new("SELECT customer_id, first_name, last_name, company, city, country, phone, email, website FROM customers");
+    if !name.is_empty() {
+        query.push(" WHERE first_name LIKE concat('%', ");
+        query.push_bind(&name);
+        query.push(", '%') OR last_name LIKE concat('%', ");
+        query.push_bind(&name);
+        query.push(", '%') OR company LIKE concat('%', ");
+        query.push_bind(&name);
+        query.push(", '%')");
     }
 
-    let sql = format!(
-        r#"select customer_id, first_name, last_name, company, city, country, phone, email, website from customers {wher} {order} LIMIT $1 OFFSET $2"#
-    );
+    if let Some(order) = Customer::sorting_to_sql(&sort) {
+        query.push(order);
+    }
 
-    sqlx::query_as::<_, Customer>(&sql)
-        .bind(range.len() as i64)
-        .bind(range.start as i64)
+    query.push(" LIMIT ");
+    query.push_bind(range.len() as i64);
+    query.push(" OFFSET ");
+    query.push_bind(range.start as i64);
+
+    query
+        .build_query_as::<Customer>()
         .fetch_all(get_db())
         .await
         .map_err(|e| ServerFnError::WrappedServerError(format!("{e:?}")))
@@ -94,16 +85,16 @@ pub struct CustomerTableDataProvider {
 impl TableDataProvider<Customer> for CustomerTableDataProvider {
     async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Customer>, Range<usize>), String> {
         list_customers(CustomerQuery {
-            name: self.name.get_untracked(),
+            name: self.name.get_untracked().trim().to_string(),
             sort: self.sort.clone(),
             range: range.clone(),
         })
-        .await
-        .map(|rows| {
-            let len = rows.len();
-            (rows, range.start..range.start + len)
-        })
-        .map_err(|e| format!("{e:?}"))
+            .await
+            .map(|rows| {
+                let len = rows.len();
+                (rows, range.start..range.start + len)
+            })
+            .map_err(|e| format!("{e:?}"))
     }
 
     async fn row_count(&self) -> Option<usize> {

@@ -33,7 +33,7 @@ where
 /// appropriate height. This is used in place of rows that are not shown
 /// before and after the currently visible rows.
 pub fn DefaultRowPlaceholderRenderer(height: Signal<f64>) -> impl IntoView {
-    view! { <div style:height=move || format!("{}px", height.get())></div> }
+    view! { <tr style:height=move || format!("{}px", height.get()) style="display: block"></tr> }
 }
 
 /// The default error row renderer which just displays the error message when

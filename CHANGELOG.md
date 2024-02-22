@@ -1,12 +1,21 @@
 # Changelog
 
-## [0.9.0] - 2024-02-20
+## [0.9.0] - 2024-02-22
 
 ### Breaking Changes 🛠️
 
-- Added method `TableRow::col_name` to make it easy to implement db sorting
+- Added methods `TableRow::col_name`, `ColumnSort::as_sql` and `TableRow::sorting_to_sql` to make it easy to implement
+  db sorting
 - Removed dependency `async-trait`. The traits `TableDataProvider` and `PaginatedTableDataProvider` now use the native
   async method support.
+
+### Fix 🐛
+
+- The default placeholder renderer now uses `<tr>...</tr>` to produce valid HTML. This fixes SSR rendering issues.
+
+### Other Changes
+
+- Added an example for how to use server functions and sqlx together with this crate.
 
 ## [0.8.3] - 2024-02-20
 
