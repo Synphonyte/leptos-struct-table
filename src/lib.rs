@@ -90,8 +90,8 @@
 //! - **`string`** - Specifies a format string. Currently only used for `NaiveDate`, `NaiveDateTime` and `NaiveTime`. See [`chrono::format::strftime`] for more information.
 
 #![cfg_attr(
-feature = "chrono",
-doc = r##"
+    feature = "chrono",
+    doc = r##"
 Example:
 
 ```
@@ -387,6 +387,6 @@ impl ColumnSort {
 ///
 /// Please refer to the [`getter` example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/getter) for how this is used
 #[derive(
-Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default, Serialize, Deserialize,
+    Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default, Serialize, Deserialize,
 )]
 pub struct FieldGetter<T>(PhantomData<T>);
