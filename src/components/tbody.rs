@@ -1,15 +1,15 @@
 use leptos::html::{AnyElement, Tbody};
 use leptos::*;
 
-/// Default tbody renderer. Please note that this is  **NOT**  a  `#[component]` .
+/// Default tbody renderer. Please note that this is **NOT** a `#[component]`.
 ///
 /// # Arguments
 ///
 /// * `content` - The content of the renderer. It's like the children of this view.
 /// * `class` - The class attribute that is passed to the root element
 /// * `node_ref` - The `NodeRef` referencing the root tbody element.
-#[doc = ""]
-#[doc = " This render function has to render exactly one root element."]
+///
+/// This render function has to render exactly one root element.
 #[allow(non_snake_case)]
 pub fn DefaultTableBodyRenderer(
     content: Fragment,

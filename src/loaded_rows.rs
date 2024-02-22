@@ -27,9 +27,7 @@ pub struct LoadedRows<T: Clone> {
 
 impl<T: Clone> LoadedRows<T> {
     pub fn new() -> Self {
-        Self {
-            rows: vec![RowState::Placeholder; 5],
-        }
+        Self { rows: vec![] }
     }
 
     #[inline]

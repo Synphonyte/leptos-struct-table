@@ -1,3 +1,5 @@
+use leptos::html::AnyElement;
+use leptos::svg::G;
 use leptos::*;
 use leptos_struct_table::*;
 
@@ -10,6 +12,18 @@ wrapper_render_fn!(
     g,
 );
 
+#[allow(non_snake_case)]
+pub fn SvgTbodyRenderer(
+    content: Fragment,
+    class: Signal<String>,
+    node_ref: NodeRef<AnyElement>,
+) -> impl IntoView {
+    let tbody_ref = create_node_ref::<G>();
+    tbody_ref.on_load(move |e| node_ref.load(&e.into_any()));
+
+    view! { <g class=class node_ref=tbody_ref>{content}</g> }
+}
+
 #[allow(unused_variables, non_snake_case)]
 pub fn SvgRowRenderer<Row>(
     class: Signal<String>,
@@ -19,10 +33,10 @@ pub fn SvgRowRenderer<Row>(
     on_select: EventHandler<web_sys::MouseEvent>,
     on_change: EventHandler<ChangeEvent<Row>>,
 ) -> impl IntoView
-where
-    Row: TableRow + Clone + 'static,
+    where
+        Row: TableRow + Clone + 'static,
 {
-    let transform = format!("translate(0, {})", (index + 1) * ROW_HEIGHT);
+    let transform = y_transform_from_index(index);
 
     view! {
         <g
@@ -44,9 +58,13 @@ where
     }
 }
 
+fn y_transform_from_index(index: usize) -> String {
+    format!("translate(0, {})", (index + 1) * ROW_HEIGHT)
+}
+
 #[allow(non_snake_case)]
 pub fn SvgErrorRowRenderer(err: String, index: usize, _col_count: usize) -> impl IntoView {
-    let transform = transform_from_index(index, 0);
+    let transform = y_transform_from_index(index);
 
     view! {
         <g transform=transform>
@@ -65,7 +83,7 @@ pub fn SvgLoadingRowRenderer(
     index: usize,
     _col_count: usize,
 ) -> impl IntoView {
-    let transform = transform_from_index(index, 0);
+    let transform = y_transform_from_index(index);
 
     view! {
         <g class=class transform=transform>
@@ -96,8 +114,8 @@ pub fn SvgHeadCellRenderer<F>(
     on_click: F,
     children: Children,
 ) -> impl IntoView
-where
-    F: Fn(TableHeadEvent) + 'static,
+    where
+        F: Fn(TableHeadEvent) + 'static,
 {
     let style = move || {
         let sort = match sort_direction() {
@@ -142,9 +160,9 @@ pub fn SvgTextCellRenderer<T, F>(
     on_change: F,
     index: usize,
 ) -> impl IntoView
-where
-    T: IntoView + Clone + 'static,
-    F: Fn(T) + 'static,
+    where
+        T: IntoView + Clone + 'static,
+        F: Fn(T) + 'static,
 {
     let x = x_from_index(index);
 
@@ -163,8 +181,8 @@ pub fn SvgPathCellRenderer<F>(
     on_change: F,
     index: usize,
 ) -> impl IntoView
-where
-    F: Fn(String) + 'static,
+    where
+        F: Fn(String) + 'static,
 {
     let transform = transform_from_index(index, 3);
 

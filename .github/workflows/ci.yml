@@ -29,11 +29,23 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        example: [ bootstrap, custom_renderers_svg, custom_row_renderer, editable, generic, getter, paginated_rest_datasource, pagination, selectable, simple, tailwind ]
+        example:
+          - bootstrap
+          - custom_renderers_svg
+          - custom_row_renderer
+          - editable
+          - generic
+          - getter
+          - paginated_rest_datasource
+          - pagination
+          - selectable
+          - serverfn_sqlx
+          - simple
+          - tailwind
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/rust_toolchain/
-      - name: Run example ${{ matrix.example }}
+      - name: Build example ${{ matrix.example }}
         run: |
           cd ${{ github.workspace }}/examples/${{ matrix.example }}/
           cargo build
