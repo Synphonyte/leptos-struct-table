@@ -89,12 +89,12 @@ impl TableDataProvider<Customer> for CustomerTableDataProvider {
             sort: self.sort.clone(),
             range: range.clone(),
         })
-            .await
-            .map(|rows| {
-                let len = rows.len();
-                (rows, range.start..range.start + len)
-            })
-            .map_err(|e| format!("{e:?}"))
+        .await
+        .map(|rows| {
+            let len = rows.len();
+            (rows, range.start..range.start + len)
+        })
+        .map_err(|e| format!("{e:?}"))
     }
 
     async fn row_count(&self) -> Option<usize> {
