@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.9.1] - 2024-02-28
+
+### Fixes 🐛
+
+- Fixed row height detection for virtualization
+- Row count now reloads when the data source triggers changes
+
 ## [0.9.0] - 2024-02-22
 
 ### Breaking Changes 🛠️

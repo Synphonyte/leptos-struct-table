@@ -168,6 +168,7 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     /// loading rows.
     #[prop(optional)]
     loading_row_display_limit: Option<usize>,
+
     #[prop(optional)] _marker: PhantomData<Err>,
 ) -> impl IntoView
 where
@@ -194,24 +195,60 @@ where
 
     let (row_count, set_row_count) = create_signal(None::<usize>);
 
-    let (reload_count, set_reload_count) = create_signal(0_usize);
-    let clear = move |clear_row_count: bool| {
-        selection.clear();
-        first_selected_index.set(None);
+    let set_known_row_count = move |row_count: usize| {
+        set_row_count.set(Some(row_count));
+        loaded_rows.update(|loaded_rows| loaded_rows.resize(row_count));
+        on_row_count.run(row_count);
+        display_strategy.set_row_count(row_count);
+    };
 
-        loaded_rows.update(|loaded_rows| {
-            loaded_rows.clear();
-        });
+    let load_row_count = {
+        let rows = Rc::clone(&rows);
+        let set_known_row_count = set_known_row_count.clone();
 
-        if clear_row_count {
-            set_row_count.set(None);
+        move || {
+            spawn_local({
+                let rows = Rc::clone(&rows);
+                let set_known_row_count = set_known_row_count.clone();
+
+                async move {
+                    let row_count = rows.borrow().row_count().await;
+
+                    if let Some(row_count) = row_count {
+                        set_known_row_count(row_count);
+                    }
+                }
+            })
         }
+    };
 
-        set_reload_count.set(reload_count.get().overflowing_add(1).0);
+    let (reload_count, set_reload_count) = create_signal(0_usize);
+    let clear = {
+        let load_row_count = load_row_count.clone();
+
+        move |clear_row_count: bool| {
+            selection.clear();
+            first_selected_index.set(None);
+
+            loaded_rows.update(|loaded_rows| {
+                loaded_rows.clear();
+            });
+
+            if clear_row_count {
+                let reload = row_count.get_untracked().is_some();
+                set_row_count.set(None);
+                if reload {
+                    load_row_count();
+                }
+            }
+
+            set_reload_count.set(reload_count.get().overflowing_add(1).0);
+        }
     };
 
     let on_head_click = {
         let rows = Rc::clone(&rows);
+        let clear = clear.clone();
 
         move |event: TableHeadEvent| {
             sorting.update(move |sorting| update_sorting_from_event(sorting, event));
@@ -254,31 +291,13 @@ where
         UseElementSizeOptions::default().box_(web_sys::ResizeObserverBoxOptions::ContentBox),
     );
 
-    let set_known_row_count = move |row_count: usize| {
-        set_row_count.set(Some(row_count));
-        loaded_rows.update(|loaded_rows| loaded_rows.resize(row_count));
-        on_row_count.run(row_count);
-        display_strategy.set_row_count(row_count);
-    };
-
     if is_browser()
         && matches!(
             display_strategy,
             DisplayStrategy::Virtualization | DisplayStrategy::Pagination { .. }
         )
     {
-        spawn_local({
-            let rows = Rc::clone(&rows);
-            let set_known_row_count = set_known_row_count.clone();
-
-            async move {
-                let row_count = rows.borrow().row_count().await;
-
-                if let Some(row_count) = row_count {
-                    set_known_row_count(row_count);
-                }
-            }
-        });
+        load_row_count();
     }
 
     let (average_row_height, set_average_row_height) = create_signal(20.0);
@@ -599,37 +618,44 @@ fn compute_average_row_height_from_loaded<Row, ClsP>(
         let display_range = display_range.get_untracked();
         if display_range.end > 0 {
             let avg_row_height = loaded_rows.with_untracked(|loaded_rows| {
-                let mut loaded_row_end_index = None;
+                let mut loading_row_start_index = None;
+                let mut loading_row_end_index = None;
 
                 for i in display_range.clone() {
-                    if matches!(loaded_rows[i], RowState::Loaded(_)) {
-                        loaded_row_end_index = Some(i);
+                    if matches!(loaded_rows[i], RowState::Loaded(_) | RowState::Loading) {
+                        if loading_row_start_index.is_none() {
+                            loading_row_start_index = Some(i);
+                        }
+                        loading_row_end_index = Some(i);
                     } else {
-                        if loaded_row_end_index.is_some() {
+                        if loading_row_end_index.is_some() {
                             break;
                         }
                     }
                 }
 
-                if let Some(loaded_row_end_index) = loaded_row_end_index {
-                    if loaded_row_end_index == 0 {
+                if let (Some(loading_row_start_index), Some(loading_row_end_index)) =
+                    (loading_row_start_index, loading_row_end_index)
+                {
+                    if loading_row_end_index == loading_row_start_index {
                         return None;
                     }
 
                     let children = el.children();
 
-                    let placeholder_before = children.get_with_index(0);
                     // skip first element, because it's the "before" placeholder
-                    let last_loaded_row = children
-                        .get_with_index((loaded_row_end_index + 1 - display_range.start) as u32);
+                    let first_loading_row = children
+                        .get_with_index((loading_row_start_index + 1 - display_range.start) as u32);
+                    let last_loading_row = children
+                        .get_with_index((loading_row_end_index + 1 - display_range.start) as u32);
 
-                    if let (Some(placeholder_before), Some(last_loaded_row)) =
-                        (placeholder_before, last_loaded_row)
+                    if let (Some(first_loading_row), Some(last_loaded_row)) =
+                        (first_loading_row, last_loading_row)
                     {
                         return Some(
                             (last_loaded_row.get_bounding_client_rect().top()
-                                - placeholder_before.get_bounding_client_rect().top())
-                                / (loaded_row_end_index - 1) as f64,
+                                - first_loading_row.get_bounding_client_rect().top())
+                                / (loading_row_end_index - loading_row_start_index) as f64,
                         );
                     }
                 }

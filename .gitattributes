@@ -1,2 +1,2 @@
 *.sqlite3 filter=lfs diff=lfs merge=lfs -text
-*.sqlite3* filter=lfs diff=lfs merge=lfs -text
+*.sqlite3-wal filter=lfs diff=lfs merge=lfs -text
