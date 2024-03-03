@@ -54,13 +54,16 @@
 //! ```toml
 //! [dependencies]
 //! leptos-use = "<current version>"
-//! ...
+//! # ...
 //!
 //! [features]
-//! hydrate = [...]
+//! hydrate = [
+//!     "leptos/hydrate",
+//!     # ...
+//! ]
 //! ssr = [
 //!     "leptos/ssr",
-//!     ...
+//!     # ...
 //!     "leptos-use/ssr",
 //! ]
 //! ```
