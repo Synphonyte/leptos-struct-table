@@ -46,6 +46,44 @@
 //! }
 //! ```
 //!
+//! # Server-Side Rendering
+//!
+//! To use this with Leptos' server-side rendering, you can have to add `leptos-use` as a dependency to your `Cargo.toml` and
+//! then configure it for SSR like the following.
+//!
+//! ```toml
+//! [dependencies]
+//! leptos-use = "<current version>"
+//! ...
+//!
+//! [features]
+//! hydrate = [...]
+//! ssr = [
+//!     "leptos/ssr",
+//!     ...
+//!     "leptos-use/ssr",
+//! ]
+//! ```
+//!
+//! Please see the [serverfn_sqlx example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/serverfn_sqlx/Cargo.toml)
+//! for a working project with SSR.
+//!
+//! # Data Providers
+//!
+//! As shown in the inital usage example, when you add `#[table(impl_vec_data_provider)]` to your struct,
+//! the table will automatically generate a data provider for you. You can then directly pass a `Vec<T>` to the `rows` prop.
+//! Internally this implements the trait [`TableDataProvider`] for `Vec<T>`.
+//!
+//! To leverage the full power of async partial data loading with caching you should implement the trait
+//! [`PaginatedTableDataProvider`] or the trait [`TableDataProvider`] yourself. It's quite easy to do so.
+//! Which of the two traits you choose depends on your data source. If your data source provides
+//! paginated data, as is the case for many REST APIs, you should implement [`PaginatedTableDataProvider`].
+//! Otherwise you should probably implement [`TableDataProvider`].
+//!
+//! See the [paginated_rest_datasource example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/paginated_rest_datasource/src/data_provider.rs)
+//! and the [serverfn_sqlx example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/serverfn_sqlx/src/data_provider.rs)
+//! for working demo projects that implement these traits.
+//!
 //! # Macro options
 //!
 //! The `#[table(...)]` attribute can be used to customize the generated component. The following options are available:
