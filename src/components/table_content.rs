@@ -366,7 +366,7 @@ where
 
     create_effect(move |_| {
         let first_visible_row_index = first_visible_row_index.get();
-        let visible_row_count = visible_row_count.get();
+        let visible_row_count = visible_row_count.get().min(MAX_DISPLAY_ROW_COUNT);
 
         // with this a reload triggers this effect
         reload_count.track();
