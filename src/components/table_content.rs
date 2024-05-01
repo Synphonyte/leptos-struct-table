@@ -405,7 +405,7 @@ where
         set_display_range.set(match display_strategy {
             DisplayStrategy::Virtualization | DisplayStrategy::InfiniteScroll => range.clone(),
             DisplayStrategy::Pagination { row_count, .. } => {
-                first_visible_row_index..first_visible_row_index + row_count
+                first_visible_row_index..first_visible_row_index + row_count.min(end)
             }
         });
 
