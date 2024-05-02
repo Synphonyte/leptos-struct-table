@@ -1,7 +1,7 @@
 #![deny(missing_docs)]
 //! Simple showcase example.
 
-use crate::uuid::Uuid;
+use ::uuid::Uuid;
 use chrono::NaiveDate;
 use leptos::*;
 use leptos_struct_table::*;
@@ -33,7 +33,7 @@ fn main() {
     mount_to_body(|| {
         let rows = vec![
             Book {
-                id: Uuid::default(),
+                id: Uuid::new_v4(),
                 title: "The Great Gatsby".to_string(),
                 author: "F. Scott Fitzgerald".to_string(),
                 publish_date: Some(NaiveDate::from_ymd_opt(1925, 4, 10).unwrap()),
@@ -43,7 +43,7 @@ fn main() {
                 hidden_field: "hidden".to_string(),
             },
             Book {
-                id: Uuid::default(),
+                id: Uuid::new_v4(),
                 title: "The Grapes of Wrath".to_string(),
                 author: "John Steinbeck".to_string(),
                 publish_date: Some(NaiveDate::from_ymd_opt(1939, 4, 14).unwrap()),
@@ -51,7 +51,7 @@ fn main() {
                 hidden_field: "not visible in the table".to_string(),
             },
             Book {
-                id: Uuid::default(),
+                id: Uuid::new_v4(),
                 title: "Nineteen Eighty-Four".to_string(),
                 author: "George Orwell".to_string(),
                 publish_date: Some(NaiveDate::from_ymd_opt(1949, 6, 8).unwrap()),
@@ -59,7 +59,7 @@ fn main() {
                 hidden_field: "hidden".to_string(),
             },
             Book {
-                id: Uuid::default(),
+                id: Uuid::new_v4(),
                 title: "Ulysses".to_string(),
                 author: "James Joyce".to_string(),
                 publish_date: Some(NaiveDate::from_ymd_opt(1922, 2, 2).unwrap()),
