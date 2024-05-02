@@ -9,7 +9,7 @@ use std::ops::Range;
 
 #[derive(TableRow, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "ssr", derive(sqlx::FromRow))]
-#[table(classes_provider = ClassesPreset)]
+#[table(sortable, classes_provider = ClassesPreset)]
 pub struct Customer {
     pub customer_id: String,
     pub first_name: String,
@@ -36,15 +36,15 @@ pub async fn list_customers(query: CustomerQuery) -> Result<Vec<Customer>, Serve
 
     let CustomerQuery { sort, range, name } = query;
 
-    let mut query = QueryBuilder::new("SELECT customer_id, first_name, last_name, company, city, country, phone, email, website FROM customers");
+    let mut query = QueryBuilder::new("SELECT customer_id, first_name, last_name, company, city, country, phone, email, website FROM customers ");
     if !name.is_empty() {
-        query.push(" WHERE first_name LIKE concat('%', ");
+        query.push("WHERE first_name LIKE concat('%', ");
         query.push_bind(&name);
         query.push(", '%') OR last_name LIKE concat('%', ");
         query.push_bind(&name);
         query.push(", '%') OR company LIKE concat('%', ");
         query.push_bind(&name);
-        query.push(", '%')");
+        query.push(", '%') ");
     }
 
     if let Some(order) = Customer::sorting_to_sql(&sort) {
