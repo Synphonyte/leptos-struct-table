@@ -387,12 +387,13 @@ pub use components::*;
 pub use data_provider::*;
 pub use display_strategy::*;
 pub use events::*;
+use leptos::{view, IntoView};
 pub use leptos_struct_table_macro::TableRow;
 pub use reload_controller::*;
 pub use scroll_container::*;
 pub use selection::*;
 use serde::{Deserialize, Serialize};
-use std::marker::PhantomData;
+use std::{borrow::Cow, marker::PhantomData};
 pub use table_row::*;
 
 /// Type of sorting of a column
@@ -431,3 +432,87 @@ impl ColumnSort {
     Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default, Serialize, Deserialize,
 )]
 pub struct FieldGetter<T>(PhantomData<T>);
+
+// A value that can be rendered as part of a table 
+pub trait CellValue {
+    fn render_value(self) -> impl IntoView;
+}
+
+impl CellValue for String {
+    fn render_value(self) -> impl IntoView {
+        view! {
+            <>{self}</>
+        }
+    }
+}
+
+impl CellValue for &'static str {
+    fn render_value(self) -> impl IntoView {
+        view! {
+            <>{self}</>
+        }
+    }
+}
+impl CellValue for Cow<'static, str> {
+    fn render_value(self) -> impl IntoView {
+        view! {
+            <>{self}</>
+        }
+    }
+}
+
+macro_rules! viewable_primitive {
+  ($($child_type:ty),* $(,)?) => {
+    $(
+      impl CellValue for $child_type {
+        #[inline(always)]
+        fn render_value(self) -> impl IntoView {
+            view! {
+                <>{self.to_string()}</>
+            }
+        }
+      }
+    )*
+  };
+}
+
+viewable_primitive![
+    &String,
+    usize,
+    u8,
+    u16,
+    u32,
+    u64,
+    u128,
+    isize,
+    i8,
+    i16,
+    i32,
+    i64,
+    i128,
+    f32,
+    f64,
+    char,
+    bool,
+    std::net::IpAddr,
+    std::net::SocketAddr,
+    std::net::SocketAddrV4,
+    std::net::SocketAddrV6,
+    std::net::Ipv4Addr,
+    std::net::Ipv6Addr,
+    std::char::ToUppercase,
+    std::char::ToLowercase,
+    std::num::NonZeroI8,
+    std::num::NonZeroU8,
+    std::num::NonZeroI16,
+    std::num::NonZeroU16,
+    std::num::NonZeroI32,
+    std::num::NonZeroU32,
+    std::num::NonZeroI64,
+    std::num::NonZeroU64,
+    std::num::NonZeroI128,
+    std::num::NonZeroU128,
+    std::num::NonZeroIsize,
+    std::num::NonZeroUsize,
+    std::panic::Location<'_>,
+];
