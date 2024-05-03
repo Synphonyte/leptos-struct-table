@@ -2,7 +2,7 @@
 
 #[cfg(feature = "chrono")]
 mod chrono;
-use crate::Value;
+use crate::CellValue;
 
 #[cfg(feature = "chrono")]
 pub use self::chrono::*;
@@ -24,7 +24,7 @@ pub fn DefaultTableCellRenderer<T, F>(
     index: usize,
 ) -> impl IntoView
 where
-    T: Value + Clone + 'static,
+    T: CellValue + Clone + 'static,
     F: Fn(T) + 'static,
 {
     view! {

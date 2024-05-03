@@ -433,12 +433,12 @@ impl ColumnSort {
 )]
 pub struct FieldGetter<T>(PhantomData<T>);
 
-// A value that is displayable in a table
-pub trait Value {
+// A value that can be rendered as part of a table 
+pub trait CellValue {
     fn render_value(self) -> impl IntoView;
 }
 
-impl Value for String {
+impl CellValue for String {
     fn render_value(self) -> impl IntoView {
         view! {
             <>{self}</>
@@ -446,14 +446,14 @@ impl Value for String {
     }
 }
 
-impl Value for &'static str {
+impl CellValue for &'static str {
     fn render_value(self) -> impl IntoView {
         view! {
             <>{self}</>
         }
     }
 }
-impl Value for Cow<'static, str> {
+impl CellValue for Cow<'static, str> {
     fn render_value(self) -> impl IntoView {
         view! {
             <>{self}</>
@@ -464,7 +464,7 @@ impl Value for Cow<'static, str> {
 macro_rules! viewable_primitive {
   ($($child_type:ty),* $(,)?) => {
     $(
-      impl Value for $child_type {
+      impl CellValue for $child_type {
         #[inline(always)]
         fn render_value(self) -> impl IntoView {
             view! {
