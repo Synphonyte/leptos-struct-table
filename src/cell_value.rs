@@ -3,36 +3,43 @@ use std::borrow::Cow;
 use leptos::{view, IntoView};
 
 #[derive(Default)]
-pub struct RenderOptions {
-    pub format_string: Option<String>,
+pub struct NumberRenderOptions {
     pub precision: Option<usize>,
 }
 // A value that can be rendered as part of a table
 pub trait CellValue {
-    fn render_value(self, options: &RenderOptions) -> impl IntoView;
+    type RenderOptions;
+
+    fn render_value(self, options: &Self::RenderOptions) -> impl IntoView;
 }
 
 impl CellValue for String {
-    fn render_value(self, _options: &RenderOptions) -> impl IntoView {
+    fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
         view! {
             <>{self}</>
         }
     }
+    
+    type RenderOptions = ();
 }
 
 impl CellValue for &'static str {
-    fn render_value(self, _options: &RenderOptions) -> impl IntoView {
+    fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
         view! {
             <>{self}</>
         }
     }
+
+    type RenderOptions = ();
 }
 impl CellValue for Cow<'static, str> {
-    fn render_value(self, _options: &RenderOptions) -> impl IntoView {
+    fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
         view! {
             <>{self}</>
         }
     }
+
+    type RenderOptions = ();
 }
 
 macro_rules! viewable_primitive {
@@ -40,11 +47,13 @@ macro_rules! viewable_primitive {
     $(
       impl CellValue for $child_type {
         #[inline(always)]
-        fn render_value(self, _options: &RenderOptions) -> impl IntoView {
+        fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
             view! {
                 <>{self.to_string()}</>
             }
         }
+
+        type RenderOptions = ();
       }
     )*
   };
@@ -53,8 +62,9 @@ macro_rules! viewable_number_primitive {
   ($($child_type:ty),* $(,)?) => {
     $(
       impl CellValue for $child_type {
+        type RenderOptions = NumberRenderOptions;
         #[inline(always)]
-        fn render_value(self, options: &RenderOptions) -> impl IntoView {
+        fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.precision.as_ref() {
             view! {
                 <>{format!("{:.value$}", self)}</>

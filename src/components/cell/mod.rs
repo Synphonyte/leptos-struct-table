@@ -1,6 +1,6 @@
 #![allow(unused_variables)]
 
-use crate::{CellValue, RenderOptions};
+use crate::CellValue;
 
 use leptos::*;
 
@@ -16,7 +16,7 @@ pub fn DefaultTableCellRenderer<T, F>(
     on_change: F,
     /// The index of the column. Starts at 0.
     index: usize,
-    options: RenderOptions,
+    options: T::RenderOptions,
 ) -> impl IntoView
 where
     T: CellValue + Clone + 'static,
