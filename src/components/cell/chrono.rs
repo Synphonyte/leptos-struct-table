@@ -3,7 +3,6 @@
 
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use leptos::*;
-use paste::paste;
 
 impl crate::CellValue for NaiveDate {
     fn render_value(self, options: &crate::RenderOptions) -> impl IntoView {

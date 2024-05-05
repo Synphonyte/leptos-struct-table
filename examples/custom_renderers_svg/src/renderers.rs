@@ -159,6 +159,7 @@ pub fn SvgTextCellRenderer<T, F>(
     #[prop(into)] value: MaybeSignal<T>,
     on_change: F,
     index: usize,
+    options: RenderOptions,
 ) -> impl IntoView
 where
     T: IntoView + Clone + 'static,
@@ -180,6 +181,7 @@ pub fn SvgPathCellRenderer<F>(
     #[prop(into)] value: MaybeSignal<String>,
     on_change: F,
     index: usize,
+    options: RenderOptions,
 ) -> impl IntoView
 where
     F: Fn(String) + 'static,
