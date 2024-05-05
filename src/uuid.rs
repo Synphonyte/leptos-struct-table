@@ -13,8 +13,8 @@ use leptos::*;
 ///     my_field: ::uuid::Uuid
 /// }
 /// ```
-impl crate::CellValue for uuid::Uuid {
-    fn render_value(self, _options: &crate::RenderOptions) -> impl IntoView {
+impl crate::cell_value::CellValue for uuid::Uuid {
+    fn render_value(self, _options: &crate::cell_value::RenderOptions) -> impl IntoView {
         view! {
             <>{self.to_string()}</>
         }
