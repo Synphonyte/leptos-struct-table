@@ -14,7 +14,7 @@ use leptos::*;
 /// }
 /// ```
 impl crate::CellValue for uuid::Uuid {
-    fn render_value(self) -> impl IntoView {
+    fn render_value(self, _options: &crate::RenderOptions) -> impl IntoView {
         view! {
             <>{self.to_string()}</>
         }

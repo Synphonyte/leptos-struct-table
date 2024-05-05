@@ -115,10 +115,7 @@
 //! - **`skip_header`** - Makes the title of the field not be displayed in the head row.
 //! - **`title`** - Specifies the title that is displayed in the header cell. Defaults to the field name converted to title case (`this_field` becomes `"This Field"`).
 //! - **`renderer`** - Specifies the name of the cell renderer component. Used to customize the rendering of cells.
-//!    Defaults to [`DefaultNumberTableCellRenderer`] for number types and [`DefaultTableCellRenderer`] for anything else.
-//!    As long as Leptos supports rendering the type it will work.
-//!    If the feature `chrono` is enabled then [`DefaultNaiveDateTableCellRenderer`], [`DefaultNaiveDateTimeTableCellRenderer`] and
-//!    [`DefaultNaiveTimeTableCellRenderer`] are used for [`chrono::NaiveDate`], [`chrono::NaiveDateTime`] and [`chrono::NaiveTime`] respectively.
+//!    Defaults to [`DefaultTableCellRenderer`].
 //!  - **`format`** - Quick way to customize the formatting of cells without having to create a custom renderer. See [Formatting](#formatting) below for more information.
 //! - **`getter`** - Specifies a method that returns the value of the field instead of accessing the field directly when rendering.
 //! - **`none_value`** - Specifies a display value for `Option` types when they are `None`. Defaults to empty string
@@ -128,7 +125,7 @@
 //! The `format` attribute can be used to customize the formatting of cells. It is an easier alternative to creating a custom renderer when you just want to customize some basic formatting.
 //!
 //! - **`precision`** - Specifies the number of digits to display after the decimal point. Only works for numbers.
-//! - **`string`** - Specifies a format string. Currently only used for `NaiveDate`, `NaiveDateTime` and `NaiveTime`. See [`chrono::format::strftime`] for more information.
+//! - **`format_string`** - Specifies a format string. Currently only used for `NaiveDate`, `NaiveDateTime` and `NaiveTime`. See [`chrono::format::strftime`] for more information.
 
 #![cfg_attr(
     feature = "chrono",
@@ -279,6 +276,7 @@ pub struct TemperatureMeasurement {
 //!     #[prop(into)] value: MaybeSignal<String>,
 //!     on_change: F,
 //!     index: usize,
+//!     options: RenderOptions,
 //! ) -> impl IntoView
 //! where
 //!     F: Fn(String) + 'static,
@@ -319,6 +317,7 @@ pub struct TemperatureMeasurement {
 //!     #[prop(into)] value: MaybeSignal<String>,
 //!     on_change: F,
 //!     index: usize,
+//!     options: RenderOptions,
 //! ) -> impl IntoView
 //! where
 //!     F: Fn(String) + 'static,
@@ -433,13 +432,18 @@ impl ColumnSort {
 )]
 pub struct FieldGetter<T>(PhantomData<T>);
 
-// A value that can be rendered as part of a table 
+#[derive(Default)]
+pub struct RenderOptions {
+    pub format_string: Option<String>,
+    pub precision: Option<usize>,
+}
+// A value that can be rendered as part of a table
 pub trait CellValue {
-    fn render_value(self) -> impl IntoView;
+    fn render_value(self, options: &RenderOptions) -> impl IntoView;
 }
 
 impl CellValue for String {
-    fn render_value(self) -> impl IntoView {
+    fn render_value(self, _options: &RenderOptions) -> impl IntoView {
         view! {
             <>{self}</>
         }
@@ -447,14 +451,14 @@ impl CellValue for String {
 }
 
 impl CellValue for &'static str {
-    fn render_value(self) -> impl IntoView {
+    fn render_value(self, _options: &RenderOptions) -> impl IntoView {
         view! {
             <>{self}</>
         }
     }
 }
 impl CellValue for Cow<'static, str> {
-    fn render_value(self) -> impl IntoView {
+    fn render_value(self, _options: &RenderOptions) -> impl IntoView {
         view! {
             <>{self}</>
         }
@@ -466,7 +470,7 @@ macro_rules! viewable_primitive {
     $(
       impl CellValue for $child_type {
         #[inline(always)]
-        fn render_value(self) -> impl IntoView {
+        fn render_value(self, _options: &RenderOptions) -> impl IntoView {
             view! {
                 <>{self.to_string()}</>
             }
@@ -475,23 +479,33 @@ macro_rules! viewable_primitive {
     )*
   };
 }
+macro_rules! viewable_number_primitive {
+  ($($child_type:ty),* $(,)?) => {
+    $(
+      impl CellValue for $child_type {
+        #[inline(always)]
+        fn render_value(self, options: &RenderOptions) -> impl IntoView {
+        if let Some(value) = options.precision.as_ref() {
+            view! {
+                <>{format!("{:.value$}", self)}</>
+            }
+        }
+        else {
+            view! {
+                <>{self.to_string()}</>
+            }
+        }
+        }
+      }
+    )*
+  };
+}
+viewable_number_primitive![
+    usize, u8, u16, u32, u64, u128, isize, i8, i16, i32, i64, i128, f32, f64,
+];
 
 viewable_primitive![
     &String,
-    usize,
-    u8,
-    u16,
-    u32,
-    u64,
-    u128,
-    isize,
-    i8,
-    i16,
-    i32,
-    i64,
-    i128,
-    f32,
-    f64,
     char,
     bool,
     std::net::IpAddr,

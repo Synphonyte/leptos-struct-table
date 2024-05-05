@@ -2,10 +2,7 @@
 
 #[cfg(feature = "chrono")]
 mod chrono;
-use crate::CellValue;
-
-#[cfg(feature = "chrono")]
-pub use self::chrono::*;
+use crate::{CellValue, RenderOptions};
 
 use core::fmt::Display;
 use leptos::*;
@@ -22,13 +19,14 @@ pub fn DefaultTableCellRenderer<T, F>(
     on_change: F,
     /// The index of the column. Starts at 0.
     index: usize,
+    options: RenderOptions,
 ) -> impl IntoView
 where
     T: CellValue + Clone + 'static,
     F: Fn(T) + 'static,
 {
     view! {
-        <td class=class>{value.get().render_value()}</td>
+        <td class=class>{value.get().render_value(&options)}</td>
     }
 }
 
