@@ -125,7 +125,7 @@
 //! The `format` attribute can be used to customize the formatting of cells. It is an easier alternative to creating a custom renderer when you just want to customize some basic formatting.
 //!
 //! - **`precision`** - Specifies the number of digits to display after the decimal point. Only works for numbers.
-//! - **`format_string`** - Specifies a format string. Currently only used for `NaiveDate`, `NaiveDateTime` and `NaiveTime`. See [`chrono::format::strftime`] for more information.
+//! - **`string`** - Specifies a format string. Currently only used for `NaiveDate`, `NaiveDateTime` and `NaiveTime`. See [`chrono::format::strftime`] for more information.
 
 #![cfg_attr(
     feature = "chrono",
