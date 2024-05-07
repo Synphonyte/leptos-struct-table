@@ -6,13 +6,13 @@ use leptos::*;
 
 #[derive(Default)]
 pub struct RenderChronoOptions {
-    pub format_string: Option<String>,
+    pub string: Option<String>,
 }
 
 impl crate::cell_value::CellValue for NaiveDate {
     type RenderOptions = RenderChronoOptions;
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
-        if let Some(value) = options.format_string.as_ref() {
+        if let Some(value) = options.string.as_ref() {
             view! {
                 <>{self.format(&value).to_string()}</>
             }
@@ -26,7 +26,7 @@ impl crate::cell_value::CellValue for NaiveDate {
 impl crate::cell_value::CellValue for NaiveDateTime {
     type RenderOptions = RenderChronoOptions;
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
-        if let Some(value) = options.format_string.as_ref() {
+        if let Some(value) = options.string.as_ref() {
             view! {
                 <>{self.format(&value).to_string()}</>
             }
@@ -41,7 +41,7 @@ impl crate::cell_value::CellValue for NaiveDateTime {
 impl crate::cell_value::CellValue for NaiveTime {
     type RenderOptions = RenderChronoOptions;
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
-        if let Some(value) = options.format_string.as_ref() {
+        if let Some(value) = options.string.as_ref() {
             view! {
                 <>{self.format(&value).to_string()}</>
             }
