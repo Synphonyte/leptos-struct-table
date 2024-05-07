@@ -6,6 +6,7 @@ use leptos::*;
 /// ``` 
 /// # use leptos_struct_table::*;
 /// # use leptos::*;
+/// # use uuid::Uuid;
 /// 
 /// #[derive(TableRow, Clone)]
 /// #[table]

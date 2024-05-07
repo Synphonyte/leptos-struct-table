@@ -139,7 +139,7 @@ Example:
 #
 #[derive(TableRow, Clone)]
 pub struct TemperatureMeasurement {
-    #[table(title = "Temperature (°C)", format(precision = 2))]
+    #[table(title = "Temperature (°C)", format(precision = 2usize))]
     temperature: f32,
     #[table(format(string = "%m.%d.%Y"))]
     date: NaiveDate,
@@ -276,7 +276,6 @@ pub struct TemperatureMeasurement {
 //!     #[prop(into)] value: MaybeSignal<String>,
 //!     on_change: F,
 //!     index: usize,
-//!     options: RenderOptions,
 //! ) -> impl IntoView
 //! where
 //!     F: Fn(String) + 'static,
@@ -317,7 +316,6 @@ pub struct TemperatureMeasurement {
 //!     #[prop(into)] value: MaybeSignal<String>,
 //!     on_change: F,
 //!     index: usize,
-//!     options: RenderOptions,
 //! ) -> impl IntoView
 //! where
 //!     F: Fn(String) + 'static,
