@@ -6,19 +6,27 @@ use leptos::*;
 pub struct DecimalNumberRenderOptions {
     pub precision: Option<usize>,
 }
-
+/// CellValue implementation for uuid for uuid to work with the TableRow derive
+/// ``` 
+/// # use leptos_struct_table::*;
+/// # use leptos::*;
+/// # use rust_decimal::Decimal;
+/// 
+/// #[derive(TableRow, Clone)]
+/// #[table]
+/// struct SomeStruct {
+///     #[table(format(precision = 2usize))]
+///     my_field: Decimal
+/// }
+/// ```
 impl crate::cell_value::CellValue for Decimal {
     type RenderOptions = DecimalNumberRenderOptions;
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.precision.as_ref() {
-            view! {
-                <>{format!("{:.value$}", self)}</>
-            }
+            format!("{:.value$}", self)
         }
         else {
-            view! {
-                <>{self.to_string()}</>
-            }
+           self.to_string()
         }
     }
 }

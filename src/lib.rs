@@ -251,10 +251,8 @@ pub struct TemperatureMeasurement {
 //!
 //! On the field level you can use the **`renderer`** attribute.
 //!
-//! It defaults to [`DefaultNumberTableCellRenderer`] for number types and [`DefaultTableCellRenderer`] for anything else.
-//! As long as Leptos supports rendering the type it will work.
-//! If the feature `chrono` is enabled then [`DefaultNaiveDateTableCellRenderer`], [`DefaultNaiveDateTimeTableCellRenderer`] and
-//! [`DefaultNaiveTimeTableCellRenderer`] are used for [`chrono::NaiveDate`], [`chrono::NaiveDateTime`] and [`chrono::NaiveTime`] respectively.
+//! It defaults to [`DefaultTableCellRenderer`] 
+//! Works for any type that implements the [`CellValue`] trait that is implemented for types in the standard library, popular crates with feature flags and for your own type if you implement this trait for them.
 //!
 //! Example:
 //!
@@ -379,6 +377,8 @@ mod table_row;
 mod cell_value;
 #[cfg(feature = "uuid")]
 mod uuid;
+#[cfg(feature = "decimal")]
+mod decimal;
 #[cfg(feature = "chrono")]
 mod chrono;
 pub use class_providers::*;
