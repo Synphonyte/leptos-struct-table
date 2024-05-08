@@ -123,10 +123,18 @@
 //! ### Formatting
 //!
 //! The `format` attribute can be used to customize the formatting of cells. It is an easier alternative to creating a custom renderer when you just want to customize some basic formatting.
+//! It is type safe and tied to the type the formatting is applied on. see [`CellValue`] and the associated type for the type you are rendering to see a list of options
 //!
-//! - **`precision`** - Specifies the number of digits to display after the decimal point. Only works for numbers.
-//! - **`string`** - Specifies a format string. Currently only used for `NaiveDate`, `NaiveDateTime` and `NaiveTime`. See [`chrono::format::strftime`] for more information.
-
+//! See:
+//! - [`cell_value::NumberRenderOptions`]
+ #![cfg_attr(
+    feature = "chrono",
+    doc = r##"- [`chrono::RenderChronoOptions`]"##)]
+ #![cfg_attr(
+    feature = "rust_decimal",
+    doc = r##"- [`rust_decimal::DecimalNumberRenderOptions`]"##)]
+//!
+//! 
 #![cfg_attr(
     feature = "chrono",
     doc = r##"
@@ -135,7 +143,7 @@ Example:
 ```
 # use leptos::*;
 # use leptos_struct_table::*;
-# use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+# use ::chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 #
 #[derive(TableRow, Clone)]
 pub struct TemperatureMeasurement {
@@ -377,10 +385,10 @@ mod table_row;
 mod cell_value;
 #[cfg(feature = "uuid")]
 mod uuid;
-#[cfg(feature = "decimal")]
-mod decimal;
+#[cfg(feature = "rust_decimal")]
+pub mod rust_decimal;
 #[cfg(feature = "chrono")]
-mod chrono;
+pub mod chrono;
 pub use class_providers::*;
 pub use components::*;
 pub use data_provider::*;

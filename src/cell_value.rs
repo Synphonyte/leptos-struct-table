@@ -4,11 +4,15 @@ use leptos::{view, IntoView};
 
 #[derive(Default)]
 pub struct NumberRenderOptions {
+    /// Specifies the number of digits to display after the decimal point
     pub precision: Option<usize>,
 }
-// A value that can be rendered as part of a table
+
+/// A value that can be rendered as part of a table, required for types if the [`crate::DefaultTableCellRenderer()`] is used
 pub trait CellValue {
-    type RenderOptions;
+    /// Formatting options for this cell value type, needs to implement default and have public named fields, 
+    /// the empty tuple: () is fine if no formatting options can be accepted.
+    type RenderOptions: Default;
 
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView;
 }

@@ -1,17 +1,20 @@
-#![allow(unused_variables)]
-#![doc(cfg(feature = "decimal"))]
-use rust_decimal::Decimal;
+#![doc(cfg(feature = "rust_decimal"))]
+
+//! Support for [::rust_decimal] crate.
+use crate::*;
+use ::rust_decimal::Decimal;
 use leptos::*;
+
 #[derive(Default)]
 pub struct DecimalNumberRenderOptions {
+    /// Specifies the number of digits to display after the decimal point
     pub precision: Option<usize>,
 }
-/// CellValue implementation for uuid for uuid to work with the TableRow derive
-/// ``` 
+/// Implementation for [`Decimal`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
+/// ```
 /// # use leptos_struct_table::*;
 /// # use leptos::*;
-/// # use rust_decimal::Decimal;
-/// 
+/// # use ::rust_decimal::Decimal;
 /// #[derive(TableRow, Clone)]
 /// #[table]
 /// struct SomeStruct {
@@ -19,14 +22,13 @@ pub struct DecimalNumberRenderOptions {
 ///     my_field: Decimal
 /// }
 /// ```
-impl crate::cell_value::CellValue for Decimal {
+impl CellValue for Decimal {
     type RenderOptions = DecimalNumberRenderOptions;
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.precision.as_ref() {
             format!("{:.value$}", self)
-        }
-        else {
-           self.to_string()
+        } else {
+            self.to_string()
         }
     }
 }

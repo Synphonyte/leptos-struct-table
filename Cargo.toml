@@ -27,7 +27,7 @@ wasm-bindgen = "0.2"
 [features]
 chrono = ["dep:chrono", "dep:paste"]
 uuid = ["dep:uuid"]
-decimal = ["dep:rust_decimal"]
+rust_decimal = ["dep:rust_decimal"]
 
 [package.metadata."docs.rs"]
 all-features = true
