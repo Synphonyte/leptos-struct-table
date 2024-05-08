@@ -16,7 +16,6 @@ leptos = { version = "0.6", features = ["nightly"] }
 leptos-struct-table-macro = { version = "0.10.0", path="../leptos-struct-table-macro" }
 leptos-use = "0.10"
 rust_decimal = { version = "1.35", optional = true }
-paste = { version = "1.0", optional = true }
 chrono = { version = "0.4", optional = true, features = ["serde"] }
 serde = "1"
 uuid = { version = "1", optional = true, features = [] }
@@ -25,7 +24,7 @@ web-sys = "0.3.67"
 wasm-bindgen = "0.2"
 
 [features]
-chrono = ["dep:chrono", "dep:paste"]
+chrono = ["dep:chrono"]
 uuid = ["dep:uuid"]
 rust_decimal = ["dep:rust_decimal"]
 
