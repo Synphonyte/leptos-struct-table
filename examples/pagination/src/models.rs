@@ -1,5 +1,5 @@
 use crate::tailwind::TailwindClassesPreset;
-use leptos::{IntoView, View};
+use leptos::IntoView;
 use leptos_struct_table::*;
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
@@ -11,7 +11,7 @@ pub enum Authors {
     Multiple(Vec<String>),
 }
 
-// we implement Display for Authors which gives use ToString as well. We'll use this for IntoView.
+// we implement Display for Authors which gives use ToString as well. We'll use this for CellValue.
 impl Display for Authors {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
@@ -29,10 +29,12 @@ impl Default for Authors {
     }
 }
 
-// Anything that implements IntoView can be displayed by the default cell renderer.
-impl IntoView for Authors {
-    fn into_view(self) -> View {
-        self.to_string().into_view()
+// Anything that implements CellValue can be displayed by the default cell renderer.
+impl leptos_struct_table::CellValue for Authors {
+    type RenderOptions = ();
+    
+    fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
+        self.to_string()
     }
 }
 

@@ -1,7 +1,7 @@
 #![deny(missing_docs)]
 //! Simple showcase example.
 
-use chrono::NaiveDate;
+use ::chrono::NaiveDate;
 use derive_more::{Deref, DerefMut};
 use leptos::*;
 use leptos_struct_table::*;
