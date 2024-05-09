@@ -5,9 +5,10 @@ edition = "2021"
 
 [dependencies]
 leptos = { version = "0.6", features = ["nightly", "csr"] }
-leptos-struct-table = { path = "../..", features = ["chrono", "uuid"] }
+leptos-struct-table = { path = "../..", features = ["chrono", "uuid", "time"] }
 chrono = { version = "0.4", features = ["serde"] }
 console_error_panic_hook = "0.1"
+time= { version="0.3" }
 uuid = { version="1.8", features=["v4", "serde"]}
 console_log = "1"
 log = "0.4"

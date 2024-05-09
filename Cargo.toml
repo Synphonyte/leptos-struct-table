@@ -18,7 +18,8 @@ leptos-use = "0.10"
 rust_decimal = { version = "1.35", optional = true }
 chrono = { version = "0.4", optional = true }
 serde = "1"
-uuid = { version = "1", optional = true }
+time = { version= "0.3", optional= true, features=["formatting"]}
+uuid = { version = "1", optional = true, features = [] }
 thiserror = "1"
 web-sys = "0.3.67"
 wasm-bindgen = "0.2"
@@ -27,6 +28,7 @@ wasm-bindgen = "0.2"
 chrono = ["dep:chrono"]
 uuid = ["dep:uuid"]
 rust_decimal = ["dep:rust_decimal"]
+time = ["dep:time"]
 
 [package.metadata."docs.rs"]
 all-features = true
