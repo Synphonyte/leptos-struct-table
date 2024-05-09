@@ -1,5 +1,5 @@
 use crate::renderer::ObjectLinkTableCellRenderer;
-use leptos::{IntoView};
+use leptos::IntoView;
 use leptos_struct_table::{FieldGetter, TableRow};
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
