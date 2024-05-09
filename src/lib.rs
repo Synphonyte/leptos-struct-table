@@ -115,10 +115,7 @@
 //! - **`skip_header`** - Makes the title of the field not be displayed in the head row.
 //! - **`title`** - Specifies the title that is displayed in the header cell. Defaults to the field name converted to title case (`this_field` becomes `"This Field"`).
 //! - **`renderer`** - Specifies the name of the cell renderer component. Used to customize the rendering of cells.
-//!    Defaults to [`DefaultNumberTableCellRenderer`] for number types and [`DefaultTableCellRenderer`] for anything else.
-//!    As long as Leptos supports rendering the type it will work.
-//!    If the feature `chrono` is enabled then [`DefaultNaiveDateTableCellRenderer`], [`DefaultNaiveDateTimeTableCellRenderer`] and
-//!    [`DefaultNaiveTimeTableCellRenderer`] are used for [`chrono::NaiveDate`], [`chrono::NaiveDateTime`] and [`chrono::NaiveTime`] respectively.
+//!    Defaults to [`DefaultTableCellRenderer`].
 //!  - **`format`** - Quick way to customize the formatting of cells without having to create a custom renderer. See [Formatting](#formatting) below for more information.
 //! - **`getter`** - Specifies a method that returns the value of the field instead of accessing the field directly when rendering.
 //! - **`none_value`** - Specifies a display value for `Option` types when they are `None`. Defaults to empty string
@@ -126,10 +123,18 @@
 //! ### Formatting
 //!
 //! The `format` attribute can be used to customize the formatting of cells. It is an easier alternative to creating a custom renderer when you just want to customize some basic formatting.
+//! It is type safe and tied to the type the formatting is applied on. see [`CellValue`] and the associated type for the type you are rendering to see a list of options
 //!
-//! - **`precision`** - Specifies the number of digits to display after the decimal point. Only works for numbers.
-//! - **`string`** - Specifies a format string. Currently only used for `NaiveDate`, `NaiveDateTime` and `NaiveTime`. See [`chrono::format::strftime`] for more information.
-
+//! See:
+//! - [`cell_value::NumberRenderOptions`]
+ #![cfg_attr(
+    feature = "chrono",
+    doc = r##"- [`chrono::RenderChronoOptions`]"##)]
+ #![cfg_attr(
+    feature = "rust_decimal",
+    doc = r##"- [`rust_decimal::DecimalNumberRenderOptions`]"##)]
+//!
+//! 
 #![cfg_attr(
     feature = "chrono",
     doc = r##"
@@ -138,11 +143,11 @@ Example:
 ```
 # use leptos::*;
 # use leptos_struct_table::*;
-# use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+# use ::chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 #
 #[derive(TableRow, Clone)]
 pub struct TemperatureMeasurement {
-    #[table(title = "Temperature (°C)", format(precision = 2))]
+    #[table(title = "Temperature (°C)", format(precision = 2usize))]
     temperature: f32,
     #[table(format(string = "%m.%d.%Y"))]
     date: NaiveDate,
@@ -254,10 +259,8 @@ pub struct TemperatureMeasurement {
 //!
 //! On the field level you can use the **`renderer`** attribute.
 //!
-//! It defaults to [`DefaultNumberTableCellRenderer`] for number types and [`DefaultTableCellRenderer`] for anything else.
-//! As long as Leptos supports rendering the type it will work.
-//! If the feature `chrono` is enabled then [`DefaultNaiveDateTableCellRenderer`], [`DefaultNaiveDateTimeTableCellRenderer`] and
-//! [`DefaultNaiveTimeTableCellRenderer`] are used for [`chrono::NaiveDate`], [`chrono::NaiveDateTime`] and [`chrono::NaiveTime`] respectively.
+//! It defaults to [`DefaultTableCellRenderer`] 
+//! Works for any type that implements the [`CellValue`] trait that is implemented for types in the standard library, popular crates with feature flags and for your own type if you implement this trait for them.
 //!
 //! Example:
 //!
@@ -379,21 +382,25 @@ mod reload_controller;
 mod scroll_container;
 mod selection;
 mod table_row;
+mod cell_value;
 #[cfg(feature = "uuid")]
-pub mod uuid;
-
+mod uuid;
+#[cfg(feature = "rust_decimal")]
+pub mod rust_decimal;
+#[cfg(feature = "chrono")]
+pub mod chrono;
 pub use class_providers::*;
 pub use components::*;
 pub use data_provider::*;
 pub use display_strategy::*;
 pub use events::*;
-use leptos::{view, IntoView};
 pub use leptos_struct_table_macro::TableRow;
 pub use reload_controller::*;
 pub use scroll_container::*;
 pub use selection::*;
+pub use cell_value::*;
 use serde::{Deserialize, Serialize};
-use std::{borrow::Cow, marker::PhantomData};
+use std::marker::PhantomData;
 pub use table_row::*;
 
 /// Type of sorting of a column
@@ -432,87 +439,3 @@ impl ColumnSort {
     Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default, Serialize, Deserialize,
 )]
 pub struct FieldGetter<T>(PhantomData<T>);
-
-// A value that can be rendered as part of a table 
-pub trait CellValue {
-    fn render_value(self) -> impl IntoView;
-}
-
-impl CellValue for String {
-    fn render_value(self) -> impl IntoView {
-        view! {
-            <>{self}</>
-        }
-    }
-}
-
-impl CellValue for &'static str {
-    fn render_value(self) -> impl IntoView {
-        view! {
-            <>{self}</>
-        }
-    }
-}
-impl CellValue for Cow<'static, str> {
-    fn render_value(self) -> impl IntoView {
-        view! {
-            <>{self}</>
-        }
-    }
-}
-
-macro_rules! viewable_primitive {
-  ($($child_type:ty),* $(,)?) => {
-    $(
-      impl CellValue for $child_type {
-        #[inline(always)]
-        fn render_value(self) -> impl IntoView {
-            view! {
-                <>{self.to_string()}</>
-            }
-        }
-      }
-    )*
-  };
-}
-
-viewable_primitive![
-    &String,
-    usize,
-    u8,
-    u16,
-    u32,
-    u64,
-    u128,
-    isize,
-    i8,
-    i16,
-    i32,
-    i64,
-    i128,
-    f32,
-    f64,
-    char,
-    bool,
-    std::net::IpAddr,
-    std::net::SocketAddr,
-    std::net::SocketAddrV4,
-    std::net::SocketAddrV6,
-    std::net::Ipv4Addr,
-    std::net::Ipv6Addr,
-    std::char::ToUppercase,
-    std::char::ToLowercase,
-    std::num::NonZeroI8,
-    std::num::NonZeroU8,
-    std::num::NonZeroI16,
-    std::num::NonZeroU16,
-    std::num::NonZeroI32,
-    std::num::NonZeroU32,
-    std::num::NonZeroI64,
-    std::num::NonZeroU64,
-    std::num::NonZeroI128,
-    std::num::NonZeroU128,
-    std::num::NonZeroIsize,
-    std::num::NonZeroUsize,
-    std::panic::Location<'_>,
-];
