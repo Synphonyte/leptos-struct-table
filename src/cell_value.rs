@@ -14,6 +14,7 @@ pub trait CellValue {
     /// the empty tuple: () is fine if no formatting options can be accepted.
     type RenderOptions: Default;
 
+    /// This is called to actually render the value. The parameter `options` is filled by the `#[table(format(...))]` macro attribute or `Default::default()` if omitted.
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView;
 }
 
