@@ -2,7 +2,8 @@
 //! Simple showcase example.
 
 use ::uuid::Uuid;
-use chrono::NaiveDate;
+use ::chrono::NaiveDate;
+use ::time::Date;
 use leptos::*;
 use leptos_struct_table::*;
 
@@ -18,6 +19,8 @@ pub struct Book {
     pub author: String,
     /// Date when book has been published.
     pub publish_date: Option<NaiveDate>,
+    /// Date when book was read 
+    pub read_date: Option<Date>,
     /// Description of the book. Optional.
     #[table(none_value = "-")]
     pub description: Option<String>,
@@ -37,6 +40,7 @@ fn main() {
                 title: "The Great Gatsby".to_string(),
                 author: "F. Scott Fitzgerald".to_string(),
                 publish_date: Some(NaiveDate::from_ymd_opt(1925, 4, 10).unwrap()),
+                read_date: Some(Date::from_calendar_date(2024, ::time::Month::January, 2).unwrap()),
                 description: Some(
                     "A story of wealth, love, and the American Dream in the 1920s.".to_string(),
                 ),
@@ -47,6 +51,7 @@ fn main() {
                 title: "The Grapes of Wrath".to_string(),
                 author: "John Steinbeck".to_string(),
                 publish_date: Some(NaiveDate::from_ymd_opt(1939, 4, 14).unwrap()),
+                read_date: None,
                 description: None,
                 hidden_field: "not visible in the table".to_string(),
             },
@@ -55,6 +60,7 @@ fn main() {
                 title: "Nineteen Eighty-Four".to_string(),
                 author: "George Orwell".to_string(),
                 publish_date: Some(NaiveDate::from_ymd_opt(1949, 6, 8).unwrap()),
+                read_date: None,
                 description: None,
                 hidden_field: "hidden".to_string(),
             },
@@ -63,6 +69,7 @@ fn main() {
                 title: "Ulysses".to_string(),
                 author: "James Joyce".to_string(),
                 publish_date: Some(NaiveDate::from_ymd_opt(1922, 2, 2).unwrap()),
+                read_date: None,
                 description: None,
                 hidden_field: "hidden".to_string(),
             },

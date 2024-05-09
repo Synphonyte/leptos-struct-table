@@ -389,6 +389,8 @@ mod uuid;
 pub mod rust_decimal;
 #[cfg(feature = "chrono")]
 pub mod chrono;
+#[cfg(feature = "time")]
+pub mod time;
 pub use class_providers::*;
 pub use components::*;
 pub use data_provider::*;
