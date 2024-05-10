@@ -2,7 +2,7 @@
 //! Simple showcase example.
 
 use ::uuid::Uuid;
-use chrono::NaiveDate;
+use ::chrono::NaiveDate;
 use leptos::*;
 use leptos_struct_table::*;
 
