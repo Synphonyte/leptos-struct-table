@@ -28,8 +28,8 @@ impl CellValue for Date {
     type RenderOptions = RenderTimeOptions;
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
-            let format = format_description::parse(value).unwrap();
-            self.format(&format).unwrap()
+            let format = format_description::parse(value).expect("Unable to construct a format description given the format string");
+            self.format(&format).expect("Unable to format given the format description")
         } else {
             self.to_string()
         }
@@ -51,8 +51,8 @@ impl CellValue for Time {
     type RenderOptions = RenderTimeOptions;
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
-            let format = format_description::parse(value).unwrap();
-            self.format(&format).unwrap()
+            let format = format_description::parse(value).expect("Unable to construct a format description given the format string");
+            self.format(&format).expect("Unable to format given the format description")
         } else {
             self.to_string()
         }
@@ -75,8 +75,8 @@ impl CellValue for PrimitiveDateTime {
     type RenderOptions = RenderTimeOptions;
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
-            let format = format_description::parse(value).unwrap();
-            self.format(&format).unwrap()
+            let format = format_description::parse(value).expect("Unable to construct a format description given the format string");
+            self.format(&format).expect("Unable to format given the format description")
         } else {
             self.to_string()
         }
@@ -99,8 +99,8 @@ impl CellValue for OffsetDateTime {
     type RenderOptions = RenderTimeOptions;
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
-            let format = format_description::parse(value).unwrap();
-            self.format(&format).unwrap()
+            let format = format_description::parse(value).expect("Unable to construct a format description given the format string");
+            self.format(&format).expect("Unable to format given the format description")
         } else {
             self.to_string()
         }
