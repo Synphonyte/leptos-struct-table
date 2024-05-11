@@ -253,7 +253,7 @@ where
         move |event: TableHeadEvent| {
             sorting.update(move |sorting| update_sorting_from_event(sorting, event));
 
-            rows.borrow_mut().set_sorting(&sorting());
+            rows.borrow_mut().set_sorting(&sorting.get());
 
             clear(false);
         }
@@ -666,7 +666,7 @@ fn compute_average_row_height_from_loaded<Row, ClsP>(
             if let Some(avg_row_height) = avg_row_height {
                 let prev_placeholder_height_before = placeholder_height_before.get_untracked();
 
-                set_average_row_height(avg_row_height);
+                set_average_row_height.set(avg_row_height);
 
                 let new_placeholder_height_before = placeholder_height_before.get_untracked();
                 set_y(
