@@ -10,12 +10,12 @@ crate-type = ["cdylib", "rlib"]
 axum = { version = "0.7", optional = true }
 console_error_panic_hook = "0.1"
 http = "1"
-leptos = { version = "0.6", features = ["nightly"] }
+leptos = { version = "0.6" }
 leptos-struct-table = { path = "../.." }
 leptos-use = "0.10"
 leptos_axum = { version = "0.6", optional = true }
-leptos_meta = { version = "0.6", features = ["nightly"] }
-leptos_router = { version = "0.6", features = ["nightly"] }
+leptos_meta = { version = "0.6" }
+leptos_router = { version = "0.6" }
 serde = { version = "1.0.197", features = ["derive"] }
 sqlx = { version = "0.7", optional = true, features = ["sqlite", "runtime-tokio-rustls"] }
 thiserror = "1"
