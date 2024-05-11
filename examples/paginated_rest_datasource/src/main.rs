@@ -40,7 +40,7 @@ pub fn App() -> impl IntoView {
                         value=rows.search
                     />
                 </div>
-                <Show when=move || { count() > 0 }>
+                <Show when=move || { count.get() > 0 }>
                     <div>"Found " {count} " results"</div>
                 </Show>
             </div>
@@ -51,7 +51,7 @@ pub fn App() -> impl IntoView {
                         scroll_container=container
                         loading_cell_inner_class="loading-skeleton"
                         reload_controller=reload_controller
-                        on_row_count=set_count
+                        on_row_count=move |count| set_count.set(count)
                     />
                 </table>
             </div>

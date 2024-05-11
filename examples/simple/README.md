@@ -1,11 +1,10 @@
 A simple table example with just local data stored as `Vec<Book>`.
 
-If you don't have it installed already, install [Trunk](https://trunkrs.dev/) 
-as well as the nightly toolchain for Rust and the wasm32-unknown-unknown target:
+If you don't have it installed already, install [Trunk](https://trunkrs.dev/)
+as well as the wasm32-unknown-unknown target:
 
 ```bash
 cargo install trunk
-rustup toolchain install nightly
 rustup target add wasm32-unknown-unknown
 ```
 

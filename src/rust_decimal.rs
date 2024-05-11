@@ -1,4 +1,3 @@
-#![doc(cfg(feature = "rust_decimal"))]
 
 //! Support for [::rust_decimal] crate.
 use crate::*;

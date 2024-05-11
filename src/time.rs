@@ -1,4 +1,3 @@
-#![doc(cfg(feature = "time"))]
 
 //! Support for [::time] crate.
 use ::time::{Date, PrimitiveDateTime, OffsetDateTime, Time};

@@ -5,12 +5,11 @@ The way Tailwind works, is to scan the classes in the code. Due to this it is
 recommended to copy the file `src/class_providers/tailwind.rs` into your project as done in this example.
 
 If you don't have it installed already, install [Trunk](https://trunkrs.dev/) and [Tailwind](https://tailwindcss.com/docs/installation)
-as well as the nightly toolchain for Rust and the wasm32-unknown-unknown target:
+as well as the wasm32-unknown-unknown target:
 
 ```bash
 cargo install trunk
 npm install -D tailwindcss
-rustup toolchain install nightly
 rustup target add wasm32-unknown-unknown
 ```
 

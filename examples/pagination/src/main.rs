@@ -36,11 +36,11 @@ pub fn Paginator(pagination_controller: PaginationController) -> impl IntoView {
     let page_count = pagination_controller.page_count();
 
     let page_range = move || {
-        let mut start = current_page().saturating_sub(2);
+        let mut start = current_page.get().saturating_sub(2);
 
         let mut end = start + 5;
 
-        if let Some(row_count) = page_count() {
+        if let Some(row_count) = page_count.get() {
             if end > row_count {
                 end = row_count;
                 start = end.saturating_sub(5);

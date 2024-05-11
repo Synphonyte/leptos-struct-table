@@ -1,5 +1,4 @@
 //! Support for [uuid::Uuid] type.
-#![doc(cfg(feature = "uuid"))]
 use leptos::*;
 use ::uuid::Uuid;
 use crate::*;
