@@ -370,7 +370,6 @@ pub struct TemperatureMeasurement {
 //! All contributions are welcome. Please open an issue or a pull request if you have any ideas or problems.
 
 #![allow(non_snake_case)]
-#![feature(doc_cfg)]
 
 mod class_providers;
 mod components;

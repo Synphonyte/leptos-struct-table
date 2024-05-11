@@ -1,4 +1,3 @@
-#![doc(cfg(feature = "chrono"))]
 
 //! Support for [::chrono] crate.
 use ::chrono::{NaiveDate, NaiveDateTime, NaiveTime};
