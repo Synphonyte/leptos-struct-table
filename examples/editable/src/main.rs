@@ -75,7 +75,7 @@ fn main() {
                 </table>
             </div>
 
-            <pre>{move || format!("{:#?}", rows())}</pre>
+            <pre>{move || format!("{:#?}", rows.get())}</pre>
         }
     })
 }

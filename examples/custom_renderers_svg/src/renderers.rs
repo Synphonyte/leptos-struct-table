@@ -118,13 +118,13 @@ where
     F: Fn(TableHeadEvent) + 'static,
 {
     let style = move || {
-        let sort = match sort_direction() {
+        let sort = match sort_direction.get() {
             ColumnSort::Ascending => "--sort-icon: '▲';",
             ColumnSort::Descending => "--sort-icon: '▼';",
             ColumnSort::None => "--sort-icon: '';",
         };
 
-        let priority = match sort_priority() {
+        let priority = match sort_priority.get() {
             Some(priority) => format!("--sort-priority: '{}';", priority + 1),
             None => "--sort-priority: '';".to_string(),
         };
