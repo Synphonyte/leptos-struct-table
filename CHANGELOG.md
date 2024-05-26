@@ -2,10 +2,33 @@
 
 ## [0.10.0] - 2024-05-26
 
+### Breaking Changes 🛠️
+
+- There is no longer a new-typed `Uuid`. You can now use the `Uuid` type from the crate `uuid` directly (thanks to
+  @lukashermansson).
+- The `DefaultCellRenderer` no longer requires values that implement Leptos' `IntoView` but our own trait `CellValue`
+  which is basically the same but gives us much more flexibility (thanks to @lukashermansson).
+- There are no more chronoe default cell renderers or `DefaultNumberTableCellRenderer` anymore. This can now all be
+  handled by the `DefaultCellRenderer` thanks to the new `CellValue` trait (thanks to @lukashermansson).
+
 ### Features 🚀
 
+- The new `CellValue` trait allows us to have less macro magic and allow you to specify your own format arguments
+  that can be used in the macro attribute `#[table(format(...))]` (thanks to @lukashermansson).
+- There is now the new feature `time` to add support for the equally named crate as cell values
+  (thanks to @lukashermansson).
+- This crate is now ready to be used with stable Rust (thanks to @tyoeer).
 - You can now specify the prop `sorting_mode` on the component `TableContent` to specify multi-column (the default)
   or single-column sorting.
+
+### Examples 🧪
+
+- The `serverfn_sqlx` example now shows how to implement sorting with sqlx (thanks to @lukashermansson).
+
+### Fixes 🐛
+
+- Fixed pagination with data that is too short to fill the first page (thanks to @TimTom2016).
+- Removed serde dependency from feature flag `chrono` (thanks to @lukashermansson).
 
 ## [0.9.1] - 2024-02-28
 

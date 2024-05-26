@@ -160,6 +160,13 @@ pub struct TemperatureMeasurement {
 "##
 )]
 
+//! # Features
+//!
+//! - **`chrono`** - Adds support for types from the crate `chrono`.
+//! - **`rust_decimal`** - Adds support for types from the crate `rust_decimal`.
+//! - **`time`** - Adds support for types from the crate `time`.
+//! - **`uuid`** - Adds support for types from the crate `uuid`.
+//!
 //! # Classes Customization
 //!
 //! Classes can be easily customized by using the `classes_provider` attribute on the struct.
