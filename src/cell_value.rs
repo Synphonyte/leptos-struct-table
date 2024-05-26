@@ -19,26 +19,27 @@ pub trait CellValue {
 }
 
 impl CellValue for String {
+    type RenderOptions = ();
+
     fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
         self
     }
-
-    type RenderOptions = ();
 }
 
 impl CellValue for &'static str {
+    type RenderOptions = ();
+
     fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
         self
     }
-
-    type RenderOptions = ();
 }
+
 impl CellValue for Cow<'static, str> {
+    type RenderOptions = ();
+
     fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
         self
     }
-
-    type RenderOptions = ();
 }
 
 macro_rules! viewable_primitive {
