@@ -8,7 +8,7 @@
   @lukashermansson).
 - The `DefaultCellRenderer` no longer requires values that implement Leptos' `IntoView` but our own trait `CellValue`
   which is basically the same but gives us much more flexibility (thanks to @lukashermansson).
-- There are no more chronoe default cell renderers or `DefaultNumberTableCellRenderer` anymore. This can now all be
+- There are no more chrono default cell renderers or `DefaultNumberTableCellRenderer` anymore. This can now all be
   handled by the `DefaultCellRenderer` thanks to the new `CellValue` trait (thanks to @lukashermansson).
 
 ### Features 🚀
