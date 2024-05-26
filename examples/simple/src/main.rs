@@ -1,9 +1,9 @@
 #![deny(missing_docs)]
 //! Simple showcase example.
 
-use ::uuid::Uuid;
 use ::chrono::NaiveDate;
 use ::time::Date;
+use ::uuid::Uuid;
 use leptos::*;
 use leptos_struct_table::*;
 
@@ -19,7 +19,7 @@ pub struct Book {
     pub author: String,
     /// Date when book has been published.
     pub publish_date: Option<NaiveDate>,
-    /// Date when book was read 
+    /// Date when book was read
     pub read_date: Option<Date>,
     /// Description of the book. Optional.
     #[table(none_value = "-")]
@@ -77,7 +77,7 @@ fn main() {
 
         view! {
             <table>
-                <TableContent rows=rows/>
+                <TableContent rows=rows />
             </table>
         }
     })

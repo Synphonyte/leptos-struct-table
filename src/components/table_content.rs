@@ -6,7 +6,7 @@ use crate::{
     ChangeEvent, ColumnSort, DefaultErrorRowRenderer, DefaultLoadingRowRenderer,
     DefaultRowPlaceholderRenderer, DefaultTableBodyRenderer, DefaultTableHeadRenderer,
     DefaultTableHeadRowRenderer, DefaultTableRowRenderer, DisplayStrategy, EventHandler,
-    ReloadController, ScrollContainer, SelectionChangeEvent, TableClassesProvider,
+    ReloadController, ScrollContainer, SelectionChangeEvent, SortingMode, TableClassesProvider,
     TableDataProvider, TableHeadEvent,
 };
 use leptos::html::AnyElement;
@@ -141,6 +141,10 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     /// Please see the [simple example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs).
     #[prop(default = create_rw_signal(VecDeque::new()), into)]
     sorting: RwSignal<VecDeque<(usize, ColumnSort)>>,
+    /// The sorting mode to use. Defaults to `MultiColumn`. Please note that
+    /// this to have any effect you have to add the macro attribute `#[table(sortable)]`
+    /// to your struct.
+    sorting_mode: SortingMode,
     /// This is called once the number of rows is known.
     /// It will only be executed if [`TableDataProvider::row_count`] returns `Some(...)`.
     ///
@@ -251,7 +255,7 @@ where
         let clear = clear.clone();
 
         move |event: TableHeadEvent| {
-            sorting.update(move |sorting| update_sorting_from_event(sorting, event));
+            sorting.update(move |sorting| sorting_mode.update_sorting_from_event(sorting, event));
 
             rows.borrow_mut().set_sorting(&sorting.get());
 
@@ -675,32 +679,6 @@ fn compute_average_row_height_from_loaded<Row, ClsP>(
                 );
             }
         }
-    }
-}
-
-fn update_sorting_from_event(sorting: &mut VecDeque<(usize, ColumnSort)>, event: TableHeadEvent) {
-    let (i, (_, mut sort)) = sorting
-        .iter()
-        .enumerate()
-        .find(|(_, (col_index, _))| col_index == &event.index)
-        .unwrap_or((0, &(event.index, ColumnSort::None)));
-
-    if i == 0 || sort == ColumnSort::None {
-        sort = match sort {
-            ColumnSort::None => ColumnSort::Ascending,
-            ColumnSort::Ascending => ColumnSort::Descending,
-            ColumnSort::Descending => ColumnSort::None,
-        };
-    }
-
-    *sorting = sorting
-        .clone()
-        .into_iter()
-        .filter(|(col_index, sort)| *col_index != event.index && *sort != ColumnSort::None)
-        .collect();
-
-    if sort != ColumnSort::None {
-        sorting.push_front((event.index, sort));
     }
 }
 

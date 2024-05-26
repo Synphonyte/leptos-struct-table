@@ -1,10 +1,10 @@
 //! Support for [uuid::Uuid] type.
-use leptos::*;
-use ::uuid::Uuid;
 use crate::*;
+use ::uuid::Uuid;
+use leptos::*;
 
 /// Implementation for [`Uuid`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
-/// ``` 
+/// ```
 /// # use leptos_struct_table::*;
 /// # use leptos::*;
 /// # use uuid::Uuid;
@@ -16,6 +16,7 @@ use crate::*;
 /// ```
 impl CellValue for Uuid {
     type RenderOptions = ();
+
     fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
         self.to_string()
     }

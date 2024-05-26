@@ -1,4 +1,3 @@
-
 //! Support for [::rust_decimal] crate.
 use crate::*;
 use ::rust_decimal::Decimal;

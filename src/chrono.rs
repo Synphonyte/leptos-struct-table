@@ -1,8 +1,8 @@
-
 //! Support for [::chrono] crate.
+
+use crate::*;
 use ::chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use leptos::*;
-use crate::*;
 
 #[derive(Default)]
 pub struct RenderChronoOptions {
@@ -11,7 +11,7 @@ pub struct RenderChronoOptions {
 }
 
 /// Implementation for [`NaiveDate`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
-/// ``` 
+/// ```
 /// # use leptos_struct_table::*;
 /// # use leptos::*;
 /// # use ::chrono::NaiveDate;
@@ -34,7 +34,7 @@ impl CellValue for NaiveDate {
 }
 
 /// Implementation for [`NaiveDateTime`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
-/// ``` 
+/// ```
 /// # use leptos_struct_table::*;
 /// # use leptos::*;
 /// # use ::chrono::NaiveDateTime;
@@ -57,7 +57,7 @@ impl CellValue for NaiveDateTime {
 }
 
 /// Implementation for [`NaiveTime`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
-/// ``` 
+/// ```
 /// # use leptos_struct_table::*;
 /// # use leptos::*;
 /// # use ::chrono::NaiveTime;

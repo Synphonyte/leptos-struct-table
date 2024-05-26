@@ -95,7 +95,12 @@
 //!
 //! These attributes can be applied to the struct itself.
 //!
-//! - **`sortable`** - Specifies that the table should be sortable. This makes the header titles clickable to control sorting. See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) for more information.
+//! - **`sortable`** - Specifies that the table should be sortable. This makes the header titles clickable to control sorting.
+//!    You can specify two sorting modes with the prop `sorting_mode` on the `TableContent` component:
+//!    - `sorting_mode=SortingMode::MultiColumn` (the default) allows the table to be sorted by multiple columns ordered by priority.
+//!    - `sorting_mode=SortingMode::SingleColumn"` allows the table to be sorted by a single column. Clicking on another column will simply replace the sorting column.
+//!    See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) and the
+//!    [selectable example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/selectable/src/main.rs) for more information.
 //! - **`classes_provider`** - Specifies the name of the class provider. Used to quickly customize all of the classes that are applied to the table.
 //!    For convenience sensible presets for major CSS frameworks are provided. See [`TableClassesProvider`] and [tailwind example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/tailwind/src/main.rs) for more information.
 //! - **`head_cell_renderer`** - Specifies the name of the header cell renderer component. Used to customize the rendering of header cells. Defaults to [`DefaultTableHeaderRenderer`]. See the [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs) for more information.
@@ -127,14 +132,13 @@
 //!
 //! See:
 //! - [`cell_value::NumberRenderOptions`]
- #![cfg_attr(
-    feature = "chrono",
-    doc = r##"- [`chrono::RenderChronoOptions`]"##)]
- #![cfg_attr(
+#![cfg_attr(feature = "chrono", doc = r##"- [`chrono::RenderChronoOptions`]"##)]
+#![cfg_attr(
     feature = "rust_decimal",
-    doc = r##"- [`rust_decimal::DecimalNumberRenderOptions`]"##)]
+    doc = r##"- [`rust_decimal::DecimalNumberRenderOptions`]"##
+)]
 //!
-//! 
+//!
 #![cfg_attr(
     feature = "chrono",
     doc = r##"
@@ -259,7 +263,7 @@ pub struct TemperatureMeasurement {
 //!
 //! On the field level you can use the **`renderer`** attribute.
 //!
-//! It defaults to [`DefaultTableCellRenderer`] 
+//! It defaults to [`DefaultTableCellRenderer`]
 //! Works for any type that implements the [`CellValue`] trait that is implemented for types in the standard library, popular crates with feature flags and for your own type if you implement this trait for them.
 //!
 //! Example:
@@ -371,6 +375,9 @@ pub struct TemperatureMeasurement {
 
 #![allow(non_snake_case)]
 
+mod cell_value;
+#[cfg(feature = "chrono")]
+pub mod chrono;
 mod class_providers;
 mod components;
 mod data_provider;
@@ -378,18 +385,18 @@ mod display_strategy;
 mod events;
 mod loaded_rows;
 mod reload_controller;
-mod scroll_container;
-mod selection;
-mod table_row;
-mod cell_value;
-#[cfg(feature = "uuid")]
-mod uuid;
 #[cfg(feature = "rust_decimal")]
 pub mod rust_decimal;
-#[cfg(feature = "chrono")]
-pub mod chrono;
+mod scroll_container;
+mod selection;
+mod sorting;
+mod table_row;
 #[cfg(feature = "time")]
 pub mod time;
+#[cfg(feature = "uuid")]
+mod uuid;
+
+pub use cell_value::*;
 pub use class_providers::*;
 pub use components::*;
 pub use data_provider::*;
@@ -399,8 +406,8 @@ pub use leptos_struct_table_macro::TableRow;
 pub use reload_controller::*;
 pub use scroll_container::*;
 pub use selection::*;
-pub use cell_value::*;
 use serde::{Deserialize, Serialize};
+pub use sorting::*;
 use std::marker::PhantomData;
 pub use table_row::*;
 

@@ -70,6 +70,7 @@ fn main() {
                                 *selected_row = Some(evt.row);
                             })
                         }}
+                        sorting_mode=SortingMode::SingleColumn
                     />
                 </table>
             </div>

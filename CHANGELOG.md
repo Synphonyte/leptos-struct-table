@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.0] - 2024-05-26
+
+### Features 🚀
+
+- You can now specify the prop `sorting_mode` on the component `TableContent` to specify multi-column (the default)
+  or single-column sorting.
+
 ## [0.9.1] - 2024-02-28
 
 ### Fixes 🐛

@@ -10,7 +10,7 @@ pub struct NumberRenderOptions {
 
 /// A value that can be rendered as part of a table, required for types if the [`crate::DefaultTableCellRenderer()`] is used
 pub trait CellValue {
-    /// Formatting options for this cell value type, needs to implement default and have public named fields, 
+    /// Formatting options for this cell value type, needs to implement default and have public named fields,
     /// the empty tuple: () is fine if no formatting options can be accepted.
     type RenderOptions: Default;
 
@@ -22,7 +22,7 @@ impl CellValue for String {
     fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
         self
     }
-    
+
     type RenderOptions = ();
 }
 

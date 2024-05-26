@@ -1,9 +1,9 @@
-
 //! Support for [::time] crate.
-use ::time::{Date, PrimitiveDateTime, OffsetDateTime, Time};
-use ::time::format_description;
-use leptos::*;
+
 use crate::*;
+use ::time::format_description;
+use ::time::{Date, OffsetDateTime, PrimitiveDateTime, Time};
+use leptos::*;
 
 #[derive(Default)]
 pub struct RenderTimeOptions {
@@ -12,7 +12,7 @@ pub struct RenderTimeOptions {
 }
 
 /// Implementation for [`Date`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
-/// ``` 
+/// ```
 /// # use leptos_struct_table::*;
 /// # use leptos::*;
 /// # use ::time::Date;
@@ -25,17 +25,20 @@ pub struct RenderTimeOptions {
 /// ```
 impl CellValue for Date {
     type RenderOptions = RenderTimeOptions;
+
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
-            let format = format_description::parse(value).expect("Unable to construct a format description given the format string");
-            self.format(&format).expect("Unable to format given the format description")
+            let format = format_description::parse(value)
+                .expect("Unable to construct a format description given the format string");
+            self.format(&format)
+                .expect("Unable to format given the format description")
         } else {
             self.to_string()
         }
     }
 }
 /// Implementation for [`Time`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
-/// ``` 
+/// ```
 /// # use leptos_struct_table::*;
 /// # use leptos::*;
 /// # use ::time::Time;
@@ -48,10 +51,13 @@ impl CellValue for Date {
 /// ```
 impl CellValue for Time {
     type RenderOptions = RenderTimeOptions;
+
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
-            let format = format_description::parse(value).expect("Unable to construct a format description given the format string");
-            self.format(&format).expect("Unable to format given the format description")
+            let format = format_description::parse(value)
+                .expect("Unable to construct a format description given the format string");
+            self.format(&format)
+                .expect("Unable to format given the format description")
         } else {
             self.to_string()
         }
@@ -59,7 +65,7 @@ impl CellValue for Time {
 }
 
 /// Implementation for [`PrimitiveDateTime`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
-/// ``` 
+/// ```
 /// # use leptos_struct_table::*;
 /// # use leptos::*;
 /// # use ::time::PrimitiveDateTime;
@@ -72,10 +78,13 @@ impl CellValue for Time {
 /// ```
 impl CellValue for PrimitiveDateTime {
     type RenderOptions = RenderTimeOptions;
+
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
-            let format = format_description::parse(value).expect("Unable to construct a format description given the format string");
-            self.format(&format).expect("Unable to format given the format description")
+            let format = format_description::parse(value)
+                .expect("Unable to construct a format description given the format string");
+            self.format(&format)
+                .expect("Unable to format given the format description")
         } else {
             self.to_string()
         }
@@ -83,7 +92,7 @@ impl CellValue for PrimitiveDateTime {
 }
 
 /// Implementation for [`OffsetDateTime`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
-/// ``` 
+/// ```
 /// # use leptos_struct_table::*;
 /// # use leptos::*;
 /// # use ::time::OffsetDateTime;
@@ -96,10 +105,13 @@ impl CellValue for PrimitiveDateTime {
 /// ```
 impl CellValue for OffsetDateTime {
     type RenderOptions = RenderTimeOptions;
+
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
-            let format = format_description::parse(value).expect("Unable to construct a format description given the format string");
-            self.format(&format).expect("Unable to format given the format description")
+            let format = format_description::parse(value)
+                .expect("Unable to construct a format description given the format string");
+            self.format(&format)
+                .expect("Unable to format given the format description")
         } else {
             self.to_string()
         }
