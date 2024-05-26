@@ -144,6 +144,7 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     /// The sorting mode to use. Defaults to `MultiColumn`. Please note that
     /// this to have any effect you have to add the macro attribute `#[table(sortable)]`
     /// to your struct.
+    #[prop(optional)]
     sorting_mode: SortingMode,
     /// This is called once the number of rows is known.
     /// It will only be executed if [`TableDataProvider::row_count`] returns `Some(...)`.
