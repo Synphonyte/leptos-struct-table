@@ -163,7 +163,7 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     /// Can be one of
     /// - `Virtualization`
     /// - `InfiniteScroll`
-    /// - `Pagination`  
+    /// - `Pagination`
     ///
     /// Please check [`DisplayStrategy`] to see explanations of all available options.
     #[prop(optional)]
@@ -252,17 +252,19 @@ where
     };
 
     let on_head_click = {
-        let rows = Rc::clone(&rows);
-        let clear = clear.clone();
-
         move |event: TableHeadEvent| {
             sorting.update(move |sorting| sorting_mode.update_sorting_from_event(sorting, event));
-
-            rows.borrow_mut().set_sorting(&sorting.get());
-
-            clear(false);
         }
     };
+
+    create_effect({
+        let rows = Rc::clone(&rows);
+        let clear = clear.clone();
+        move |_| {
+            rows.borrow_mut().set_sorting(&sorting.get());
+            clear(false);
+        }
+    });
 
     create_effect({
         let rows = Rc::clone(&rows);
