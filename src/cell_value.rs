@@ -1,6 +1,6 @@
 use std::borrow::Cow;
 
-use leptos::{view, IntoView};
+use leptos::{view, Fragment, IntoView, View};
 
 #[derive(Default)]
 pub struct NumberRenderOptions {
@@ -18,69 +18,36 @@ pub trait CellValue {
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView;
 }
 
-impl CellValue for String {
-    type RenderOptions = ();
+macro_rules! viewable_identity {
+    ($($ty:ty),* $(,)?) => {
+        $(
+            impl CellValue for $ty {
+                type RenderOptions = ();
 
-    fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
-        self
-    }
+                fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
+                    self
+                }
+            }
+        )*
+    };
 }
 
-impl CellValue for &'static str {
-    type RenderOptions = ();
-
-    fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
-        self
-    }
-}
-
-impl CellValue for Cow<'static, str> {
-    type RenderOptions = ();
-
-    fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
-        self
-    }
-}
+viewable_identity![String, &'static str, Cow<'static, str>, View, Fragment];
 
 macro_rules! viewable_primitive {
   ($($child_type:ty),* $(,)?) => {
     $(
       impl CellValue for $child_type {
+        type RenderOptions = ();
+
         #[inline(always)]
         fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
             self.to_string()
         }
-
-        type RenderOptions = ();
       }
     )*
   };
 }
-macro_rules! viewable_number_primitive {
-  ($($child_type:ty),* $(,)?) => {
-    $(
-      impl CellValue for $child_type {
-        type RenderOptions = NumberRenderOptions;
-        #[inline(always)]
-        fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
-        if let Some(value) = options.precision.as_ref() {
-            view! {
-                <>{format!("{:.value$}", self)}</>
-            }
-        }
-        else {
-            view! {
-                <>{self.to_string()}</>
-            }
-        }
-        }
-      }
-    )*
-  };
-}
-viewable_number_primitive![
-    usize, u8, u16, u32, u64, u128, isize, i8, i16, i32, i64, i128, f32, f64,
-];
 
 viewable_primitive![
     &String,
@@ -107,4 +74,32 @@ viewable_primitive![
     std::num::NonZeroIsize,
     std::num::NonZeroUsize,
     std::panic::Location<'_>,
+];
+
+macro_rules! viewable_number_primitive {
+  ($($child_type:ty),* $(,)?) => {
+    $(
+      impl CellValue for $child_type {
+        type RenderOptions = NumberRenderOptions;
+
+        #[inline(always)]
+        fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
+        if let Some(value) = options.precision.as_ref() {
+            view! {
+                <>{format!("{:.value$}", self)}</>
+            }
+        }
+        else {
+            view! {
+                <>{self.to_string()}</>
+            }
+        }
+        }
+      }
+    )*
+  };
+}
+
+viewable_number_primitive![
+    usize, u8, u16, u32, u64, u128, isize, i8, i16, i32, i64, i128, f32, f64,
 ];
