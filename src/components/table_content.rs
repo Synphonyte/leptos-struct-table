@@ -232,6 +232,7 @@ where
         let load_row_count = load_row_count.clone();
 
         move |clear_row_count: bool| {
+            logging::log!("clear");
             selection.clear();
             first_selected_index.set(None);
 
@@ -247,22 +248,23 @@ where
                 }
             }
 
-            set_reload_count.set(reload_count.get().overflowing_add(1).0);
+            set_reload_count.set(reload_count.get_untracked().overflowing_add(1).0);
         }
     };
 
-    let on_head_click = {
+    let on_head_click = move |event: TableHeadEvent| {
+        sorting.update(move |sorting| sorting_mode.update_sorting_from_event(sorting, event));
+    };
+
+    create_effect({
         let rows = Rc::clone(&rows);
         let clear = clear.clone();
 
-        move |event: TableHeadEvent| {
-            sorting.update(move |sorting| sorting_mode.update_sorting_from_event(sorting, event));
-
+        move |_| {
             rows.borrow_mut().set_sorting(&sorting.get());
-
             clear(false);
         }
-    };
+    });
 
     create_effect({
         let rows = Rc::clone(&rows);
