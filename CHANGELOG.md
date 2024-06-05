@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.10.1] - 2024-06-05
+
+### Change 🔥
+
+- `CellValue` is now implemented for `leptos::View`. This makes `FieldGetter<View` possible out of the box.
+
+### Fix 🐛
+
+- Fixed mutating the sorting signal programmatically didn't trigger loading or rerendering (thanks @dakaizou).
+
 ## [0.10.0] - 2024-05-26
 
 ### Breaking Changes 🛠️
