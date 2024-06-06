@@ -219,9 +219,17 @@ where
                 async move {
                     let row_count = rows.borrow().row_count().await;
 
+                    // check if this component was disposed of
+                    if sorting.try_with_untracked(|_| {}).is_none() {
+                        return;
+                    }
+
                     if let Some(row_count) = row_count {
                         set_known_row_count(row_count);
                     }
+
+                    // force update to trigger sorting effect below
+                    sorting.update(|_| {});
                 }
             })
         }
@@ -232,7 +240,6 @@ where
         let load_row_count = load_row_count.clone();
 
         move |clear_row_count: bool| {
-            logging::log!("clear");
             selection.clear();
             first_selected_index.set(None);
 
@@ -261,8 +268,11 @@ where
         let clear = clear.clone();
 
         move |_| {
-            rows.borrow_mut().set_sorting(&sorting.get());
-            clear(false);
+            let sorting = sorting.get();
+            if let Ok(mut rows) = rows.try_borrow_mut() {
+                rows.set_sorting(&sorting);
+                clear(false);
+            };
         }
     });
 
@@ -459,26 +469,29 @@ where
                             .await
                             .map_err(|err| format!("{err:?}"));
 
-                        // make sure the loaded data is still valid
-                        if reload_count.get_untracked() != latest_reload_count {
-                            return;
-                        }
+                        if let Some(reload_count) = reload_count.try_get_untracked() {
+                            // make sure the loaded data is still valid
+                            if reload_count != latest_reload_count {
+                                return;
+                            }
 
-                        if let Ok((_, loaded_range)) = &result {
-                            if loaded_range.end < missing_range.end {
-                                if let Some(row_count) = row_count.get_untracked() {
-                                    if loaded_range.end < row_count {
+                            if let Ok((_, loaded_range)) = &result {
+                                if loaded_range.end < missing_range.end {
+                                    if let Some(row_count) = row_count.get_untracked() {
+                                        if loaded_range.end < row_count {
+                                            set_known_row_count(loaded_range.end);
+                                        }
+                                    } else {
                                         set_known_row_count(loaded_range.end);
                                     }
-                                } else {
-                                    set_known_row_count(loaded_range.end);
                                 }
                             }
-                        }
-                        loaded_rows
-                            .update(|loaded_rows| loaded_rows.write_loaded(result, missing_range));
+                            loaded_rows.update(|loaded_rows| {
+                                loaded_rows.write_loaded(result, missing_range)
+                            });
 
-                        compute_average_row_height();
+                            compute_average_row_height();
+                        }
                     }
                 });
             }
@@ -498,28 +511,16 @@ where
 
             <For
                 each=move || {
-                    with!(|loaded_rows, display_range| {
-                        let iter = loaded_rows[display_range.clone()]
-                            .iter()
-                            .cloned()
-                            .enumerate()
-                            .map(|(i, row)| ( i + display_range.start, row));
-
-                        if let Some(loading_row_display_limit) = loading_row_display_limit {
-                            let mut loading_row_count = 0;
-
-                            iter.filter(|(_, row)| {
-                                if matches!(row, RowState::Loading | RowState::Placeholder) {
-                                    loading_row_count += 1;
-                                    loading_row_count <= loading_row_display_limit
-                                } else {
-                                    true
-                                }
-                            }).collect::<Vec<_>>()
-                        } else {
-                            iter.collect::<Vec<_>>()
-                        }
-                    })
+                    with!(
+                        | loaded_rows, display_range | { let iter = loaded_rows[display_range
+                        .clone()].iter().cloned().enumerate().map(| (i, row) | (i + display_range
+                        .start, row)); if let Some(loading_row_display_limit) =
+                        loading_row_display_limit { let mut loading_row_count = 0; iter.filter(| (_,
+                        row) | { if matches!(row, RowState::Loading | RowState::Placeholder) {
+                        loading_row_count += 1; loading_row_count <= loading_row_display_limit }
+                        else { true } }).collect::< Vec < _ >> () } else { iter.collect::< Vec < _
+                        >> () } }
+                    )
                 }
 
                 key=|(idx, row)| {
@@ -535,61 +536,68 @@ where
                     let loading_row_renderer = loading_row_renderer.clone();
                     let error_row_renderer = error_row_renderer.clone();
                     let on_selection_change = on_selection_change.clone();
-
                     move |(i, row)| {
                         match row {
                             RowState::Loaded(row) => {
-                                let selected_signal = Signal::derive(
-                                    move || selected_indices.get().contains(&i)
-                                );
-
-                                let class_signal = Signal::derive(move || {
-                                    class_provider
-                                        .row(
-                                            i,
-                                            selected_signal.get(),
-                                            &row_class.get(),
-                                        )
+                                let selected_signal = Signal::derive(move || {
+                                    selected_indices.get().contains(&i)
                                 });
-
+                                let class_signal = Signal::derive(move || {
+                                    class_provider.row(i, selected_signal.get(), &row_class.get())
+                                });
                                 let on_select = {
                                     let on_selection_change = on_selection_change.clone();
                                     let row = row.clone();
-
                                     move |evt: web_sys::MouseEvent| {
                                         update_selection(evt, selection, first_selected_index, i);
-
                                         let selection_change_event = SelectionChangeEvent {
                                             row: row.clone(),
-                                            row_index:i,
+                                            row_index: i,
                                             selected: selected_signal.get_untracked(),
                                         };
                                         on_selection_change.run(selection_change_event);
                                     }
                                 };
-
-                                row_renderer.run(class_signal, row, i, selected_signal, on_select.into(), on_change.get_value())
+                                row_renderer
+                                    .run(
+                                        class_signal,
+                                        row,
+                                        i,
+                                        selected_signal,
+                                        on_select.into(),
+                                        on_change.get_value(),
+                                    )
                             }
-                            RowState::Error(err) => error_row_renderer.run(err, i, Row::COLUMN_COUNT),
+                            RowState::Error(err) => {
+                                error_row_renderer.run(err, i, Row::COLUMN_COUNT)
+                            }
                             RowState::Loading | RowState::Placeholder => {
-                                loading_row_renderer.run(
-                                    Signal::derive(
-                                        move || class_provider.row(i, false, &row_class.get())
-                                    ),
-                                    Callback::new(
-                                        move |col_index: usize| class_provider.loading_cell(i, col_index, &loading_cell_class.get())
-                                    ),
-                                    Callback::new(
-                                        move |col_index: usize| class_provider.loading_cell_inner(i, col_index, &loading_cell_inner_class.get())
-                                    ),
-                                    i,
-                                    Row::COLUMN_COUNT,
-                                )
+                                loading_row_renderer
+                                    .run(
+                                        Signal::derive(move || {
+                                            class_provider.row(i, false, &row_class.get())
+                                        }),
+                                        Callback::new(move |col_index: usize| {
+                                            class_provider
+                                                .loading_cell(i, col_index, &loading_cell_class.get())
+                                        }),
+                                        Callback::new(move |col_index: usize| {
+                                            class_provider
+                                                .loading_cell_inner(
+                                                    i,
+                                                    col_index,
+                                                    &loading_cell_inner_class.get(),
+                                                )
+                                        }),
+                                        i,
+                                        Row::COLUMN_COUNT,
+                                    )
                             }
                         }
                     }
                 }
             />
+
             {row_placeholder_renderer.run(placeholder_height_after.into())}
         }
     };
@@ -597,13 +605,8 @@ where
     let tbody = tbody_renderer.run(tbody_content, tbody_class, tbody_ref);
 
     view! {
-        {thead_renderer.run(
-            thead_row_renderer.run(
-                thead_content,
-                thead_row_class,
-            ).into_view(),
-            thead_class,
-        )}
+        {thead_renderer
+            .run(thead_row_renderer.run(thead_content, thead_row_class).into_view(), thead_class)}
 
         {tbody}
     }
