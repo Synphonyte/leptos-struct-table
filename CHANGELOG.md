@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.10.2] - 2024-06-07
+
+### Fixes 🐛
+
+- Fixed race condition with loading row count and sorting update.
+- Fixed console errors/warnings for signals accessed in async blocks after component was disposed of.
+
 ## [0.10.1] - 2024-06-05
 
 ### Change 🔥
