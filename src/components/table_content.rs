@@ -409,7 +409,9 @@ where
             end = end.min(row_count);
         }
 
-        end = end.min(start + MAX_DISPLAY_ROW_COUNT);
+        if !matches!(display_strategy, DisplayStrategy::Pagination { .. }) {
+            end = end.min(start + MAX_DISPLAY_ROW_COUNT);
+        }
 
         loaded_rows.update_untracked(|loaded_rows| {
             if end > loaded_rows.len() {
