@@ -154,7 +154,7 @@ See:
 ## Classes Customization
 
 Classes can be easily customized by using the `classes_provider` attribute on the struct.
-You can specify any type that implementats the trait [`TableClassesProvider`]. Please see the documentation for that trait for more information.
+You can specify any type that implements the trait [`TableClassesProvider`]. Please see the documentation for that trait for more information.
 You can also look at [`TailwindClassesPreset`] for an example how this can be implemented.
 
 Example:
