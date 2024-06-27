@@ -6,8 +6,8 @@ use crate::{
     ChangeEvent, ColumnSort, DefaultErrorRowRenderer, DefaultLoadingRowRenderer,
     DefaultRowPlaceholderRenderer, DefaultTableBodyRenderer, DefaultTableHeadRenderer,
     DefaultTableHeadRowRenderer, DefaultTableRowRenderer, DisplayStrategy, EventHandler,
-    ReloadController, ScrollContainer, SelectionChangeEvent, SortingMode, TableClassesProvider,
-    TableDataProvider, TableHeadEvent,
+    ReloadController, RowReader, ScrollContainer, SelectionChangeEvent, SortingMode,
+    TableClassesProvider, TableDataProvider, TableHeadEvent,
 };
 use leptos::html::AnyElement;
 use leptos::leptos_dom::is_browser;
@@ -173,6 +173,9 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     /// loading rows.
     #[prop(optional)]
     loading_row_display_limit: Option<usize>,
+    /// Provides access to the data rows.
+    #[prop(optional)]
+    row_reader: RowReader<Row>,
 
     #[prop(optional)] _marker: PhantomData<Err>,
 ) -> impl IntoView
@@ -195,6 +198,12 @@ where
     let tbody_class = Signal::derive(move || class_provider.tbody(&tbody_class.get()));
 
     let loaded_rows = create_rw_signal(LoadedRows::<Row>::new());
+
+    row_reader
+        .get_loaded_rows
+        .replace(Rc::new(move |index: usize| {
+            loaded_rows.with(|loaded_rows| loaded_rows[index].clone())
+        }));
 
     let first_selected_index = create_rw_signal(None::<usize>);
 

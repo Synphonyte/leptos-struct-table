@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased]
+
+### Features 🚀
+
+- Added row reader to `TableComponent`
+
 ## [0.10.2] - 2024-06-07
 
 ### Fixes 🐛

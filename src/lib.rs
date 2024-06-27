@@ -392,6 +392,7 @@ mod display_strategy;
 mod events;
 mod loaded_rows;
 mod reload_controller;
+mod row_reader;
 #[cfg(feature = "rust_decimal")]
 pub mod rust_decimal;
 mod scroll_container;
@@ -410,13 +411,16 @@ pub use data_provider::*;
 pub use display_strategy::*;
 pub use events::*;
 pub use leptos_struct_table_macro::TableRow;
+pub use loaded_rows::RowState;
 pub use reload_controller::*;
+pub use row_reader::*;
 pub use scroll_container::*;
 pub use selection::*;
-use serde::{Deserialize, Serialize};
 pub use sorting::*;
-use std::marker::PhantomData;
 pub use table_row::*;
+
+use serde::{Deserialize, Serialize};
+use std::marker::PhantomData;
 
 /// Type of sorting of a column
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Deserialize, Serialize)]

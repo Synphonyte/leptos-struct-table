@@ -9,7 +9,7 @@ pub fn InputCellRenderer<F>(
     /// The value to display.
     #[prop(into)]
     value: MaybeSignal<String>,
-    /// Event handler called when the cell is changed. In this default renderer this will never happen.
+    /// Event handler called when the cell is changed.
     on_change: F,
     /// The index of the column. Starts at 0.
     index: usize,

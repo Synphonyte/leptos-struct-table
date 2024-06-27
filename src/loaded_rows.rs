@@ -2,9 +2,13 @@ use std::ops::{Index, Range};
 
 #[derive(Clone)]
 pub enum RowState<T: Clone> {
+    /// The row is not yet loaded and a placeholder is displayed if the row is visible in the viewport.
     Placeholder,
+    /// The row is loading and a placeholder is displayed if the row is visible in the viewport.
     Loading,
+    /// The row has been loaded.
     Loaded(T),
+    /// The row failed to load. This error is shown in the row if it's visible in the viewport.
     Error(String),
 }
 
