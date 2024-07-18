@@ -199,9 +199,9 @@ where
 
     let loaded_rows = create_rw_signal(LoadedRows::<Row>::new());
 
-    row_reader
+    let _ = row_reader
         .get_loaded_rows
-        .replace(Rc::new(move |index: usize| {
+        .replace(Box::new(move |index: usize| {
             loaded_rows.with(|loaded_rows| loaded_rows[index].clone())
         }));
 
@@ -714,7 +714,11 @@ fn update_selection(
     match selection {
         Selection::None => {}
         Selection::Single(selected_index) => {
-            selected_index.set(Some(i));
+            if selected_index.get_untracked() == Some(i) {
+                selected_index.set(None);
+            } else {
+                selected_index.set(Some(i));
+            }
         }
         Selection::Multiple(selected_indices) => {
             selected_indices.update(|selected_indices| {
