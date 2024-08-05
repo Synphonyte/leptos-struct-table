@@ -1,0 +1,24 @@
+[package]
+name = "i18n"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+leptos = { version = "0.6", features = ["csr"] }
+leptos-struct-table = { path = "../..", features = ["chrono", "uuid", "time", "i18n"] }
+leptos_i18n = { version = "0.3", features = ["csr"] }
+chrono = { version = "0.4", features = [] }
+console_error_panic_hook = "0.1"
+time = { version = "0.3" }
+uuid = { version = "1.8", features = ["v4"] }
+console_log = "1"
+log = "0.4"
+
+[dev-dependencies]
+wasm-bindgen = "0.2"
+wasm-bindgen-test = "0.3.0"
+web-sys = "0.3"
+
+[package.metadata.leptos-i18n]
+default = "en"
+locales = ["en", "de"]

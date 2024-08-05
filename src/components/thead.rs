@@ -43,20 +43,7 @@ pub fn DefaultTableHeaderCellRenderer<F>(
 where
     F: Fn(TableHeadEvent) + 'static,
 {
-    let style = move || {
-        let sort = match sort_direction.get() {
-            ColumnSort::Ascending => "--sort-icon: '▲';",
-            ColumnSort::Descending => "--sort-icon: '▼';",
-            ColumnSort::None => "--sort-icon: '';",
-        };
-
-        let priority = match sort_priority.get() {
-            Some(priority) => format!("--sort-priority: '{}';", priority + 1),
-            None => "--sort-priority: '';".to_string(),
-        };
-
-        format!("{} {}", sort, &priority)
-    };
+    let style = default_th_sorting_style(sort_priority, sort_direction);
 
     view! {
         <th class=class
@@ -71,4 +58,27 @@ where
             </span>
         </th>
     }
+}
+
+/// You can use this function to implement your own custom table header cell renderer.
+///
+/// See the implementation of [`DefaultTableHeaderCellRenderer`].
+pub fn default_th_sorting_style(
+    sort_priority: Signal<Option<usize>>,
+    sort_direction: Signal<ColumnSort>,
+) -> Signal<String> {
+    Signal::derive(move || {
+        let sort = match sort_direction.get() {
+            ColumnSort::Ascending => "--sort-icon: '▲';",
+            ColumnSort::Descending => "--sort-icon: '▼';",
+            ColumnSort::None => "--sort-icon: '';",
+        };
+
+        let priority = match sort_priority.get() {
+            Some(priority) => format!("--sort-priority: '{}';", priority + 1),
+            None => "--sort-priority: '';".to_string(),
+        };
+
+        format!("{} {}", sort, &priority)
+    })
 }

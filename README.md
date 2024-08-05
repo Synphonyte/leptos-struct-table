@@ -154,7 +154,7 @@ See:
 ## Classes Customization
 
 Classes can be easily customized by using the `classes_provider` attribute on the struct.
-You can specify any type that implements the trait [`TableClassesProvider`]. Please see the documentation for that trait for more information.
+You can specify any type that implementats the trait [`TableClassesProvider`]. Please see the documentation for that trait for more information.
 You can also look at [`TailwindClassesPreset`] for an example how this can be implemented.
 
 Example:
@@ -344,6 +344,14 @@ The following options are available. Check their docs for more details.
 
 Please have a look at the [pagination example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/pagination/src/main.rs) for more information on how to use pagination.
 
+## I18n
+
+To translate the column titles of the table using `leptos-i18n` you can enable the `"i18n"`
+feature. The field names of the struct are used as keys.
+
+Please have a look at the
+[i18n example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/i18n).
+
 ## Contribution
 
 All contributions are welcome. Please open an issue or a pull request if you have any ideas or problems.
@@ -352,9 +360,9 @@ All contributions are welcome. Please open an issue or a pull request if you hav
 
 ## Leptos Compatibility
 
-| Crate version       | Compatible Leptos version |
-|---------------------|---------------------------|
-| <= 0.2              | 0.3                       |
-| 0.3                 | 0.4                       |
-| 0.4, 0.5, 0.6       | 0.5                       |
-| 0.7, 0.8, 0.9, 0.10 | 0.6                       |
+| Crate version | Compatible Leptos version |
+|---------------|---------------------------|
+| <= 0.2        | 0.3                       |
+| 0.3           | 0.4                       |
+| 0.4, 0.5, 0.6 | 0.5                       |
+| 0.7 – 0.11    | 0.6                       |

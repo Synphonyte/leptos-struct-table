@@ -376,6 +376,14 @@ pub struct TemperatureMeasurement {
 //!
 //! Please have a look at the [pagination example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/pagination/src/main.rs) for more information on how to use pagination.
 //!
+//! # I18n
+//!
+//! To translate the column titles of the table using `leptos-i18n` you can enable the `"i18n"`
+//! feature. The field names of the struct are used as keys.
+//!
+//! Please have a look at the
+//! [i18n example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/i18n).
+//!
 //! # Contribution
 //!
 //! All contributions are welcome. Please open an issue or a pull request if you have any ideas or problems.

@@ -117,20 +117,7 @@ pub fn SvgHeadCellRenderer<F>(
 where
     F: Fn(TableHeadEvent) + 'static,
 {
-    let style = move || {
-        let sort = match sort_direction.get() {
-            ColumnSort::Ascending => "--sort-icon: '▲';",
-            ColumnSort::Descending => "--sort-icon: '▼';",
-            ColumnSort::None => "--sort-icon: '';",
-        };
-
-        let priority = match sort_priority.get() {
-            Some(priority) => format!("--sort-priority: '{}';", priority + 1),
-            None => "--sort-priority: '';".to_string(),
-        };
-
-        format!("{} {}", sort, &priority)
-    };
+    let style = default_th_sorting_style(sort_priority, sort_direction);
 
     let transform = transform_from_index(index, 0);
 

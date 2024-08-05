@@ -36,6 +36,7 @@ jobs:
           - editable
           - generic
           - getter
+          - i18n
           - paginated_rest_datasource
           - pagination
           - selectable
