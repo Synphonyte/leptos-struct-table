@@ -1,9 +1,10 @@
 # Changelog
 
-## [0.10.3] - 2024-08-05
+## [0.11.0] - 2024-08-05
 
 ### Features 🚀
 
+- Changed leptos-use to version 0.11
 - Added i18n support via the `"i18n"` feature which uses `leptos-i18n`. See the `i18n` example for usage.
 - Added row reader to `TableComponent`
 - Added `default_th_sorting_style` to make it easier to write a custom thead cell render component.

@@ -1,6 +1,6 @@
 [package]
 name = "leptos-struct-table"
-version = "0.10.3"
+version = "0.11.0"
 edition = "2021"
 authors = ["Marc-Stefan Cassola"]
 categories = ["gui", "web-programming"]
@@ -14,7 +14,7 @@ repository = "https://github.com/Synphonyte/leptos-struct-table"
 [dependencies]
 leptos = { version = "0.6" }
 leptos-struct-table-macro = { version = "0.11.1" }
-leptos-use = "0.10"
+leptos-use = "0.11"
 rust_decimal = { version = "1.35", optional = true }
 chrono = { version = "0.4", optional = true }
 serde = "1"
