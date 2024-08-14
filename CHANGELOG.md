@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.12.0] - 2024-08-14
+
+### Breaking Change 🛠️
+
+- Updated dependency leptos-use to version 0.12 which supports web-sys 0.3.70 which introduced breaking changes. (thanks
+  to @frnsys)
+
 ## [0.11.0] - 2024-08-05
 
 ### Features 🚀
