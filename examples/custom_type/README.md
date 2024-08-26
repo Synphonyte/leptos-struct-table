@@ -1,4 +1,6 @@
-A table example with custom local data stored as `Vec<Rc<Book>>`.
+### A table example with custom local data stored as `Vec<Rc<Book>>`.
+
+To make this example work, you must download / fork the whole repo because this is in the Cargo.toml: `leptos-struct-table = { path = "../.." }`.
 
 If you don't have it installed already, install [Trunk](https://trunkrs.dev/)
 as well as the wasm32-unknown-unknown target:
