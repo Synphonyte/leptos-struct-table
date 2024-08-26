@@ -1,5 +1,8 @@
-A table example with editable cells and data that is stored as `Vec<Book>`.
-Uses the Tailwind class provider.
+### A table example with editable cells and data that is stored as `Vec<Book>`.
+
+To make this example work, you must download / fork the whole repo because this is in the Cargo.toml: `leptos-struct-table = { path = "../.." }`.
+
+#### Uses the Tailwind class provider.
 
 The way Tailwind works, is to scan the classes in the code. Due to this it is
 recommended to copy the file `src/class_providers/tailwind.rs` into your project as done in this example.

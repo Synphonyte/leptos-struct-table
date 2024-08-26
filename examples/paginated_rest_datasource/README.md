@@ -1,4 +1,6 @@
-Example that shows how to use a paginated REST API as a data source for a table.
+### Example that shows how to use a paginated REST API as a data source for a table.
+
+To make this example work, you must download / fork the whole repo because this is in the Cargo.toml: `leptos-struct-table = { path = "../.." }`.
 
 If you don't have it installed already, install [Trunk](https://trunkrs.dev/)
 as well as the wasm32-unknown-unknown target:
