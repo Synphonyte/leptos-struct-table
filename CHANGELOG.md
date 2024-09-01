@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.12.1] - 2024-09-01
+
+### Features 🚀
+
+- Added support for generics in struct field types (thanks to @frnsys)
+- Added macro options for much more flexibility with leptos-i18n (thanks to @Baptistemontan)
+- Added hint to readmes of examples how to run them (thanks to @luckynumberke7in)
+
 ## [0.12.0] - 2024-08-14
 
 ### Breaking Change 🛠️
