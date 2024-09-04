@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.12.2] - 2024-09-04
+
+### Fixes 🐛
+
+- Updated dependency leptos-use to version 0.13 which fixes some unsatisfied trait bounds.
+
 ## [0.12.1] - 2024-09-01
 
 ### Features 🚀
