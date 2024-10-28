@@ -460,6 +460,10 @@ where
                     loading_ranges.push(current_range.clone());
                     current_range = current_range.end..current_range.end + chunk_size;
                 }
+                // when we got a missing_range which size is less than the chunk_size, add current_range to loading_ranges
+                if current_range.end > missing_range.end && current_range.start < missing_range.end {
+                    loading_ranges.push(current_range);
+                }
             } else {
                 loading_ranges.push(missing_range);
             }
