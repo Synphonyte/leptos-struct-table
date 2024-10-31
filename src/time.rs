@@ -3,7 +3,7 @@
 use crate::*;
 use ::time::format_description;
 use ::time::{Date, OffsetDateTime, PrimitiveDateTime, Time};
-use leptos::*;
+use leptos::prelude::*;
 
 #[derive(Default)]
 pub struct RenderTimeOptions {
@@ -14,7 +14,7 @@ pub struct RenderTimeOptions {
 /// Implementation for [`Date`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
 /// ```
 /// # use leptos_struct_table::*;
-/// # use leptos::*;
+/// # use leptos::prelude::*;
 /// # use ::time::Date;
 /// #[derive(TableRow, Clone)]
 /// #[table]
@@ -23,7 +23,7 @@ pub struct RenderTimeOptions {
 ///     my_field: Date
 /// }
 /// ```
-impl CellValue for Date {
+impl CellValue<Date> for Date {
     type RenderOptions = RenderTimeOptions;
 
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
@@ -40,7 +40,7 @@ impl CellValue for Date {
 /// Implementation for [`Time`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
 /// ```
 /// # use leptos_struct_table::*;
-/// # use leptos::*;
+/// # use leptos::prelude::*;
 /// # use ::time::Time;
 /// #[derive(TableRow, Clone)]
 /// #[table]
@@ -49,7 +49,7 @@ impl CellValue for Date {
 ///     my_field: Time
 /// }
 /// ```
-impl CellValue for Time {
+impl CellValue<Time> for Time {
     type RenderOptions = RenderTimeOptions;
 
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
@@ -67,7 +67,7 @@ impl CellValue for Time {
 /// Implementation for [`PrimitiveDateTime`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
 /// ```
 /// # use leptos_struct_table::*;
-/// # use leptos::*;
+/// # use leptos::prelude::*;
 /// # use ::time::PrimitiveDateTime;
 /// #[derive(TableRow, Clone)]
 /// #[table]
@@ -76,7 +76,7 @@ impl CellValue for Time {
 ///     my_field: PrimitiveDateTime
 /// }
 /// ```
-impl CellValue for PrimitiveDateTime {
+impl CellValue<PrimitiveDateTime> for PrimitiveDateTime {
     type RenderOptions = RenderTimeOptions;
 
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
@@ -94,7 +94,7 @@ impl CellValue for PrimitiveDateTime {
 /// Implementation for [`OffsetDateTime`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
 /// ```
 /// # use leptos_struct_table::*;
-/// # use leptos::*;
+/// # use leptos::prelude::*;
 /// # use ::time::OffsetDateTime;
 /// #[derive(TableRow, Clone)]
 /// #[table]
@@ -103,7 +103,7 @@ impl CellValue for PrimitiveDateTime {
 ///     my_field: OffsetDateTime
 /// }
 /// ```
-impl CellValue for OffsetDateTime {
+impl CellValue<OffsetDateTime> for OffsetDateTime {
     type RenderOptions = RenderTimeOptions;
 
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {

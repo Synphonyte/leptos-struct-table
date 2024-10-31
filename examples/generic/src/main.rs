@@ -1,8 +1,8 @@
 //! Generic showcase example.
 
-use ::uuid::Uuid;
 use ::chrono::NaiveDate;
-use leptos::*;
+use ::uuid::Uuid;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 
 /// This generates the component BookTable

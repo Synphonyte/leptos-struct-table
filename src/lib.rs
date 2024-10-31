@@ -18,7 +18,7 @@
 //! # Usage
 //!
 //! ```
-//! use leptos::*;
+//! use leptos::prelude::*;
 //! use leptos_struct_table::*;
 //!
 //! #[derive(TableRow, Clone)]
@@ -145,7 +145,7 @@
 Example:
 
 ```
-# use leptos::*;
+# use leptos::prelude::*;
 # use leptos_struct_table::*;
 # use ::chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 #
@@ -176,7 +176,7 @@ pub struct TemperatureMeasurement {
 //! Example:
 //!
 //! ```
-//! # use leptos::*;
+//! # use leptos::prelude::*;
 //! # use leptos_struct_table::*;
 //! #
 //! #[derive(TableRow, Clone)]
@@ -196,7 +196,7 @@ pub struct TemperatureMeasurement {
 //! Let's start with [`FieldGetter`] and see an example:
 //!
 //! ```
-//! # use leptos::*;
+//! # use leptos::prelude::*;
 //! # use leptos_struct_table::*;
 //! # use serde::{Deserialize, Serialize};
 //! #
@@ -222,7 +222,7 @@ pub struct TemperatureMeasurement {
 //! To provide maximum flexibility you can use the `getter` attribute.
 //!
 //! ```
-//! # use leptos::*;
+//! # use leptos::prelude::*;
 //! # use leptos_struct_table::*;
 //! #
 //! #[derive(TableRow, Clone)]
@@ -276,7 +276,7 @@ pub struct TemperatureMeasurement {
 //! Example:
 //!
 //! ```
-//! # use leptos::*;
+//! # use leptos::prelude::*;
 //! # use leptos_struct_table::*;
 //! #
 //! #[derive(TableRow, Clone)]
@@ -315,7 +315,7 @@ pub struct TemperatureMeasurement {
 //! uses an `<input>`.
 //!
 //! ```
-//! # use leptos::*;
+//! # use leptos::prelude::*;
 //! # use leptos_struct_table::*;
 //! #
 //! #[derive(TableRow, Clone, Default, Debug)]

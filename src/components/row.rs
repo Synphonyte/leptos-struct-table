@@ -1,6 +1,6 @@
 use crate::table_row::TableRow;
 use crate::{ChangeEvent, EventHandler};
-use leptos::*;
+use leptos::prelude::*;
 
 /// The default table row renderer. Uses the `<tr>` element. Please note that this
 /// is **NOT** a `#[component]`.

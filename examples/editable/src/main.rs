@@ -3,7 +3,7 @@ mod tailwind;
 
 use crate::renderer::*;
 use ::chrono::NaiveDate;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 use std::ops::Range;
 use tailwind::TailwindClassesPreset;
@@ -35,7 +35,7 @@ fn main() {
     console_error_panic_hook::set_once();
 
     mount_to_body(|| {
-        let rows = create_rw_signal(vec![
+        let rows = RwSignal::new(vec![
             Book {
                 id: 1,
                 title: "The Great Gatsby".to_string(),

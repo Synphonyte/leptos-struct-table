@@ -1,21 +1,21 @@
-use leptos::*;
+use leptos::prelude::*;
 
 /// You can pass this to a [`TableContent`] component's `reload_controller` prop to trigger a reload.
 ///
 /// See the [paginated_rest_datasource example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/paginated_rest_datasource/src/main.rs)
 /// for how to use.
 #[derive(Copy, Clone)]
-pub struct ReloadController(Trigger);
+pub struct ReloadController(RwSignal<()>);
 
 impl Default for ReloadController {
     fn default() -> Self {
-        Self(create_trigger())
+        Self(RwSignal::new(()))
     }
 }
 
 impl ReloadController {
     pub fn reload(&self) {
-        self.0.notify();
+        self.0.trigger();
     }
 
     pub fn track(&self) {

@@ -2,7 +2,7 @@ use ::chrono::NaiveDate;
 use ::time::Date;
 use ::uuid::Uuid;
 use i18n::*;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 
 leptos_i18n::load_locales!();

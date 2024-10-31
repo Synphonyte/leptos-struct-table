@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.14.0-beta1] - 2024-09-06
+
+### Breaking Change 🛠️
+
+- Updated dependency leptos-use to version 0.14.0-beta and leptos 0.7.0-beta
+
 ## [0.13.0] - 2024-09-05
 
 ### Breaking Change 🛠️

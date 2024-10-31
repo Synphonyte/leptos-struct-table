@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 
 /// The display acceleration strategy. Defaults to `Virtualization`.
 #[derive(Copy, Clone, Default)]
@@ -60,8 +60,8 @@ impl Default for PaginationController {
     fn default() -> Self {
         Self {
             // the value here doesn't really matter. We'll react only to changes later
-            current_page: create_rw_signal(0),
-            page_count_signal: create_rw_signal(None),
+            current_page: RwSignal::new(0),
+            page_count_signal: RwSignal::new(None),
         }
     }
 }

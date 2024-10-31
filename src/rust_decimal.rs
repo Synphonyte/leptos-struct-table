@@ -1,7 +1,7 @@
 //! Support for [::rust_decimal] crate.
 use crate::*;
 use ::rust_decimal::Decimal;
-use leptos::*;
+use leptos::prelude::*;
 
 #[derive(Default)]
 pub struct DecimalNumberRenderOptions {
@@ -11,7 +11,7 @@ pub struct DecimalNumberRenderOptions {
 /// Implementation for [`Decimal`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
 /// ```
 /// # use leptos_struct_table::*;
-/// # use leptos::*;
+/// # use leptos::prelude::*;
 /// # use ::rust_decimal::Decimal;
 /// #[derive(TableRow, Clone)]
 /// #[table]
@@ -20,7 +20,7 @@ pub struct DecimalNumberRenderOptions {
 ///     my_field: Decimal
 /// }
 /// ```
-impl CellValue for Decimal {
+impl CellValue<Decimal> for Decimal {
     type RenderOptions = DecimalNumberRenderOptions;
     fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.precision.as_ref() {

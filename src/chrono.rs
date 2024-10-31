@@ -2,7 +2,7 @@
 
 use crate::*;
 use ::chrono::{NaiveDate, NaiveDateTime, NaiveTime};
-use leptos::*;
+use leptos::prelude::*;
 
 #[derive(Default)]
 pub struct RenderChronoOptions {
@@ -16,7 +16,7 @@ macro_rules! chrono_cell_value_impl {
         $ty:ty
     ) => {
         $(#[$outer])*
-        impl CellValue for $ty {
+        impl CellValue<$ty> for $ty {
             type RenderOptions = RenderChronoOptions;
 
             fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
@@ -34,7 +34,7 @@ chrono_cell_value_impl!(
     /// Implementation for [`NaiveDate`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
     /// ```
     /// # use leptos_struct_table::*;
-    /// # use leptos::*;
+    /// # use leptos::prelude::*;
     /// # use ::chrono::NaiveDate;
     /// #[derive(TableRow, Clone)]
     /// #[table]
@@ -50,7 +50,7 @@ chrono_cell_value_impl!(
     /// Implementation for [`NaiveDateTime`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
     /// ```
     /// # use leptos_struct_table::*;
-    /// # use leptos::*;
+    /// # use leptos::prelude::*;
     /// # use ::chrono::NaiveDateTime;
     /// #[derive(TableRow, Clone)]
     /// #[table]
@@ -66,7 +66,7 @@ chrono_cell_value_impl!(
     /// Implementation for [`NaiveTime`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
     /// ```
     /// # use leptos_struct_table::*;
-    /// # use leptos::*;
+    /// # use leptos::prelude::*;
     /// # use ::chrono::NaiveTime;
     /// #[derive(TableRow, Clone)]
     /// #[table]

@@ -2,7 +2,7 @@ mod renderers;
 
 use renderers::*;
 
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 
 // This generates the component BookTable

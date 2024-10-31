@@ -1,11 +1,12 @@
-use leptos::html::ElementDescriptor;
-use leptos::{NodeRef, Signal};
+use leptos::html::ElementType;
+use leptos::prelude::*;
 use leptos_use::core::ElementMaybeSignal;
 use leptos_use::use_document;
+use send_wrapper::SendWrapper;
 use wasm_bindgen::JsCast;
 
 #[derive(Copy, Clone, Debug)]
-pub struct ScrollContainer(Signal<Option<web_sys::Element>>);
+pub struct ScrollContainer(Signal<Option<SendWrapper<web_sys::Element>>>);
 
 impl Default for ScrollContainer {
     fn default() -> Self {
@@ -13,28 +14,33 @@ impl Default for ScrollContainer {
             use_document()
                 .body()
                 .as_ref()
-                .map(|w| w.unchecked_ref::<web_sys::Element>().clone())
+                .map(|w| SendWrapper::new(w.unchecked_ref::<web_sys::Element>().clone()))
         }))
     }
 }
 
 impl From<web_sys::Element> for ScrollContainer {
     fn from(element: web_sys::Element) -> Self {
-        Self(Signal::derive(move || Some(element.clone())))
+        Self(Signal::derive(move || {
+            Some(SendWrapper::new(element.clone()))
+        }))
     }
 }
 
 impl From<Option<web_sys::Element>> for ScrollContainer {
     fn from(element: Option<web_sys::Element>) -> Self {
-        Self(Signal::derive(move || element.clone()))
+        Self(Signal::derive(move || {
+            element.clone().map(SendWrapper::new)
+        }))
     }
 }
 
-impl<T> From<NodeRef<T>> for ScrollContainer
+impl<E> From<NodeRef<E>> for ScrollContainer
 where
-    T: ElementDescriptor + Clone + 'static,
+    E: ElementType,
+    E::Output: 'static,
 {
-    fn from(node_ref: NodeRef<T>) -> Self {
+    fn from(node_ref: NodeRef<E>) -> Self {
         Self(Signal::derive(move || {
             node_ref.get().map(|el| {
                 let el: &web_sys::Element = &el.into_any();

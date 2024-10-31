@@ -5,7 +5,7 @@ macro_rules! renderer_fn {
     ) => {
         #[derive(Clone)]
         pub struct $name<$($ty),*> (
-            Rc<dyn Fn($($arg_ty),*) -> View>,
+            Rc<dyn Fn($($arg_ty),*) -> AnyView<Dom>>,
         )
         where $($clause)*;
 
@@ -25,7 +25,7 @@ macro_rules! renderer_fn {
         impl<$($ty),*> $name <$($ty),*>
         where $($clause)*
         {
-            pub fn run(&self, $($arg_name: $arg_ty),*) -> View {
+            pub fn run(&self, $($arg_name: $arg_ty),*) -> AnyView<Dom> {
                 (self.0)($($arg_name),*)
             }
         }

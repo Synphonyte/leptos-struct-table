@@ -1,6 +1,4 @@
-use std::borrow::Cow;
-
-use leptos::{view, Fragment, IntoView, View};
+use leptos::prelude::*;
 
 #[derive(Default)]
 pub struct NumberRenderOptions {
@@ -9,39 +7,34 @@ pub struct NumberRenderOptions {
 }
 
 /// A value that can be rendered as part of a table, required for types if the [`crate::DefaultTableCellRenderer()`] is used
-pub trait CellValue {
+pub trait CellValue<M: ?Sized> {
     /// Formatting options for this cell value type, needs to implement default and have public named fields,
     /// the empty tuple: () is fine if no formatting options can be accepted.
-    type RenderOptions: Default;
+    type RenderOptions: Default + Clone + Send + Sync + 'static;
 
     /// This is called to actually render the value. The parameter `options` is filled by the `#[table(format(...))]` macro attribute or `Default::default()` if omitted.
-    fn render_value(self, options: &Self::RenderOptions) -> impl IntoView;
+    fn render_value(self, options: Self::RenderOptions) -> impl IntoView;
 }
 
-macro_rules! viewable_identity {
-    ($($ty:ty),* $(,)?) => {
-        $(
-            impl CellValue for $ty {
-                type RenderOptions = ();
+impl<V> CellValue<()> for V
+where
+    V: IntoView,
+{
+    type RenderOptions = ();
 
-                fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
-                    self
-                }
-            }
-        )*
-    };
+    fn render_value(self, _options: Self::RenderOptions) -> impl IntoView {
+        self
+    }
 }
-
-viewable_identity![String, &'static str, Cow<'static, str>, View, Fragment];
 
 macro_rules! viewable_primitive {
   ($($child_type:ty),* $(,)?) => {
     $(
-      impl CellValue for $child_type {
+      impl CellValue<$child_type> for $child_type {
         type RenderOptions = ();
 
         #[inline(always)]
-        fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
+        fn render_value(self, _options: Self::RenderOptions) -> impl IntoView {
             self.to_string()
         }
       }
@@ -79,11 +72,11 @@ viewable_primitive![
 macro_rules! viewable_number_primitive {
   ($($child_type:ty),* $(,)?) => {
     $(
-      impl CellValue for $child_type {
+      impl CellValue<$child_type> for $child_type {
         type RenderOptions = NumberRenderOptions;
 
         #[inline(always)]
-        fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
+        fn render_value(self, options: Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.precision.as_ref() {
             view! {
                 <>{format!("{:.value$}", self)}</>

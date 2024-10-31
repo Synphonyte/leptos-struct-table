@@ -1,7 +1,7 @@
 mod tailwind;
 
 use ::chrono::NaiveDate;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 use tailwind::TailwindClassesPreset;
 

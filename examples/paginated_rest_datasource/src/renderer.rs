@@ -1,5 +1,5 @@
 use crate::models::Link;
-use leptos::*;
+use leptos::prelude::*;
 
 #[component]
 #[allow(unused_variables)]

@@ -1,6 +1,6 @@
 use crate::models::{ArchiveOrgApiResponse, ArchiveOrgCountRespone, Book};
 use gloo_net::http::Request;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::{ColumnSort, PaginatedTableDataProvider};
 use std::collections::VecDeque;
 

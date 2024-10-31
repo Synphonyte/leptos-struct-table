@@ -3,7 +3,7 @@ mod models;
 mod tailwind;
 
 use crate::data_provider::BookDataProvider;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 
 #[component]

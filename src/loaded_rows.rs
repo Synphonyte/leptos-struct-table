@@ -1,7 +1,7 @@
 use std::ops::{Index, Range};
 
 #[derive(Clone)]
-pub enum RowState<T: Clone> {
+pub enum RowState<T: Send + Sync + Clone> {
     /// The row is not yet loaded and a placeholder is displayed if the row is visible in the viewport.
     Placeholder,
     /// The row is loading and a placeholder is displayed if the row is visible in the viewport.
@@ -25,7 +25,7 @@ impl<T: Clone> std::fmt::Debug for RowState<T> {
 
 /// This is basically a cache for rows and used by [`TableContent`] internally to track
 /// which rows are already loaded, which are still loading and which are missing.
-pub struct LoadedRows<T: Clone> {
+pub struct LoadedRows<T: Send + Sync + Clone> {
     rows: Vec<RowState<T>>,
 }
 

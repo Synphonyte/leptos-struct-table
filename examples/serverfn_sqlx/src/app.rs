@@ -1,7 +1,7 @@
 use crate::data_provider::CustomerTableDataProvider;
 use crate::error_template::{AppError, ErrorTemplate};
 use leptos::html::Div;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_meta::*;
 use leptos_router::*;
 use leptos_struct_table::*;

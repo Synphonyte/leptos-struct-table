@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 use std::collections::HashSet;
 
 /// Type of selection together with the `RwSignal` to hold the selection

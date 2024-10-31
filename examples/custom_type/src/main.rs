@@ -3,7 +3,7 @@
 
 use ::chrono::NaiveDate;
 use derive_more::{Deref, DerefMut};
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 use std::rc::Rc;
 

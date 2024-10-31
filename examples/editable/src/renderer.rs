@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 
 /// A renderer that shows an <input> tag and emits the `on_change` event when the <input> is changed.
 #[component]

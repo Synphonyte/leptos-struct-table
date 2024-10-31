@@ -1,7 +1,7 @@
 mod tailwind;
 
 use ::chrono::NaiveDate;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 use tailwind::TailwindClassesPreset;
 
@@ -55,8 +55,8 @@ fn main() {
             },
         ];
 
-        let selected_index = create_rw_signal(None);
-        let (selected_row, set_selected_row) = create_signal(None);
+        let selected_index = RwSignal::new(None);
+        let (selected_row, set_selected_row) = signal(None);
 
         view! {
             <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 float-left">
