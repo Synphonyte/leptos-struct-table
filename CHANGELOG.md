@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.13.1] - 2024-10-31
+
+### Fixes 🐛
+
+- Fixed edge case loading data ranges that are smaller than the chunk size (thanks to @mcbernie).
+
 ## [0.13.0] - 2024-09-05
 
 ### Breaking Change 🛠️
