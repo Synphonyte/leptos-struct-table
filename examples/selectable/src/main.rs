@@ -1,6 +1,6 @@
 mod tailwind;
 
-use chrono::NaiveDate;
+use ::chrono::NaiveDate;
 use leptos::prelude::*;
 use leptos_struct_table::*;
 use tailwind::TailwindClassesPreset;

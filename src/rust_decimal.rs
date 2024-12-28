@@ -22,7 +22,7 @@ pub struct DecimalNumberRenderOptions {
 /// ```
 impl CellValue<Decimal> for Decimal {
     type RenderOptions = DecimalNumberRenderOptions;
-    fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
+    fn render_value(self, options: Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.precision.as_ref() {
             format!("{:.value$}", self)
         } else {

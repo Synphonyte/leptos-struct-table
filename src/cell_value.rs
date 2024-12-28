@@ -1,5 +1,8 @@
 use leptos::prelude::*;
 
+#[doc(hidden)]
+pub type DefaultMarker = ();
+
 #[derive(Default, Clone, Copy)]
 pub struct NumberRenderOptions {
     /// Specifies the number of digits to display after the decimal point
@@ -16,7 +19,7 @@ pub trait CellValue<M: ?Sized> {
     fn render_value(self, options: Self::RenderOptions) -> impl IntoView;
 }
 
-impl<V> CellValue<()> for V
+impl<V> CellValue<DefaultMarker> for V
 where
     V: IntoView,
 {

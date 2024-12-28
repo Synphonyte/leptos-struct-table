@@ -33,7 +33,7 @@ impl Default for Authors {
 impl leptos_struct_table::CellValue for Authors {
     type RenderOptions = ();
     
-    fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
+    fn render_value(self, _options: Self::RenderOptions) -> impl IntoView {
         self.to_string()
     }
 }

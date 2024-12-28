@@ -17,7 +17,7 @@ use leptos::prelude::*;
 impl CellValue<Uuid> for Uuid {
     type RenderOptions = ();
 
-    fn render_value(self, _options: &Self::RenderOptions) -> impl IntoView {
+    fn render_value(self, _options: Self::RenderOptions) -> impl IntoView {
         self.to_string()
     }
 }
