@@ -1,6 +1,6 @@
 mod tailwind;
 
-use ::chrono::NaiveDate;
+use chrono::NaiveDate;
 use leptos::prelude::*;
 use leptos_struct_table::*;
 use tailwind::TailwindClassesPreset;
@@ -66,9 +66,7 @@ fn main() {
                         selection=Selection::Single(selected_index)
                         row_class="select-none"
                         on_selection_change={move |evt: SelectionChangeEvent<Book>| {
-                            set_selected_row.update(|selected_row| {
-                                *selected_row = Some(evt.row);
-                            })
+                            set_selected_row.write().replace(evt.row);
                         }}
                         sorting_mode=SortingMode::SingleColumn
                     />

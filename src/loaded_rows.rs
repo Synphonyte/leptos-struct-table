@@ -12,7 +12,7 @@ pub enum RowState<T: Send + Sync + Clone> {
     Error(String),
 }
 
-impl<T: Clone> std::fmt::Debug for RowState<T> {
+impl<T: Send + Sync + Clone> std::fmt::Debug for RowState<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             RowState::Placeholder => write!(f, "Placeholder"),
@@ -29,7 +29,7 @@ pub struct LoadedRows<T: Send + Sync + Clone> {
     rows: Vec<RowState<T>>,
 }
 
-impl<T: Clone> LoadedRows<T> {
+impl<T: Send + Sync + Clone> LoadedRows<T> {
     pub fn new() -> Self {
         Self { rows: vec![] }
     }
@@ -103,7 +103,7 @@ impl<T: Clone> LoadedRows<T> {
     }
 }
 
-impl<T: Clone> Index<Range<usize>> for LoadedRows<T> {
+impl<T: Sync + Send + Clone> Index<Range<usize>> for LoadedRows<T> {
     type Output = [RowState<T>];
 
     #[inline]
@@ -112,7 +112,7 @@ impl<T: Clone> Index<Range<usize>> for LoadedRows<T> {
     }
 }
 
-impl<T: Clone> Index<usize> for LoadedRows<T> {
+impl<T: Send + Sync + Clone> Index<usize> for LoadedRows<T> {
     type Output = RowState<T>;
 
     #[inline]
