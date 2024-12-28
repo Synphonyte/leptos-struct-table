@@ -63,9 +63,7 @@ fn main() {
         ]);
 
         let on_change = move |evt: ChangeEvent<Book>| {
-            rows.update(|rows| {
-                rows[evt.row_index] = evt.changed_row;
-            });
+            rows.write()[evt.row_index] = evt.changed_row;
         };
 
         view! {

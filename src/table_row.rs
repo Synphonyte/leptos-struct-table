@@ -78,11 +78,10 @@ pub fn get_sorting_for_column(
     col_index: usize,
     sorting: Signal<VecDeque<(usize, ColumnSort)>>,
 ) -> ColumnSort {
-    sorting.with(|sorting| {
-        sorting
-            .into_iter()
-            .find(|(col, _)| *col == col_index)
-            .map(|(_, sort)| *sort)
-            .unwrap_or(ColumnSort::None)
-    })
+    sorting
+        .read()
+        .iter()
+        .find(|(col, _)| *col == col_index)
+        .map(|(_, sort)| *sort)
+        .unwrap_or(ColumnSort::None)
 }

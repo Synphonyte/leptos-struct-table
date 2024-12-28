@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 pub struct NumberRenderOptions {
     /// Specifies the number of digits to display after the decimal point
     pub precision: Option<usize>,

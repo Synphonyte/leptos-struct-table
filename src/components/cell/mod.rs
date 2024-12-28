@@ -12,7 +12,7 @@ pub fn DefaultTableCellRenderer<T, F, M>(
     class: String,
     /// The value to display.
     #[prop(into)]
-    value: MaybeSignal<T>,
+    value: Signal<T>,
     /// Event handler called when the cell is changed. In this default renderer this will never happen.
     on_change: F,
     /// The index of the column. Starts at 0.
@@ -23,6 +23,7 @@ pub fn DefaultTableCellRenderer<T, F, M>(
 where
     T: CellValue<M> + Send + Sync + Clone + 'static,
     F: Fn(T) + 'static,
+    M: 'static,
 {
     view! {
         <td class=class>{move || value.get().render_value(options.clone())}</td>

@@ -1,4 +1,4 @@
-use leptos::prelude::*;
+use leptos::{html::Tbody, prelude::*};
 
 /// Default tbody renderer. Please note that this is **NOT** a `#[component]`.
 ///
@@ -13,7 +13,7 @@ use leptos::prelude::*;
 pub fn DefaultTableBodyRenderer(
     content: impl IntoView,
     class: Signal<String>,
-    node_ref: NodeRef<web_sys::Element>,
+    node_ref: NodeRef<Tbody>,
 ) -> impl IntoView {
     view! {
         <tbody class=class node_ref=node_ref>
