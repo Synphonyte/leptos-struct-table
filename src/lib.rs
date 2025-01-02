@@ -290,7 +290,7 @@ pub struct TemperatureMeasurement {
 //! #[component]
 //! fn ImageTableCellRenderer<F>(
 //!     class: String,
-//!     #[prop(into)] value: MaybeSignal<String>,
+//!     #[prop(into)] value: Signal<String>,
 //!     on_change: F,
 //!     index: usize,
 //! ) -> impl IntoView
@@ -315,7 +315,7 @@ pub struct TemperatureMeasurement {
 //! uses an `<input>`.
 //!
 //! ```
-//! # use leptos::prelude::*;
+//! # use leptos::{prelude::*, logging};
 //! # use leptos_struct_table::*;
 //! #
 //! #[derive(TableRow, Clone, Default, Debug)]
@@ -330,7 +330,7 @@ pub struct TemperatureMeasurement {
 //! #[component]
 //! fn InputCellRenderer<F>(
 //!     class: String,
-//!     #[prop(into)] value: MaybeSignal<String>,
+//!     #[prop(into)] value: Signal<String>,
 //!     on_change: F,
 //!     index: usize,
 //! ) -> impl IntoView

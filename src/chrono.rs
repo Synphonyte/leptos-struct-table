@@ -4,7 +4,7 @@ use crate::*;
 use ::chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 use leptos::prelude::*;
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct RenderChronoOptions {
     /// Specifies a format string, See [`::chrono::format::strftime`] for more information.
     pub string: Option<String>,
@@ -19,7 +19,7 @@ macro_rules! chrono_cell_value_impl {
         impl CellValue<$ty> for $ty {
             type RenderOptions = RenderChronoOptions;
 
-            fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
+            fn render_value(self, options: Self::RenderOptions) -> impl IntoView {
                 if let Some(value) = options.string.as_ref() {
                     self.format(&value).to_string()
                 } else {

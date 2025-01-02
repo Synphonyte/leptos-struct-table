@@ -5,7 +5,7 @@ use ::time::format_description;
 use ::time::{Date, OffsetDateTime, PrimitiveDateTime, Time};
 use leptos::prelude::*;
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct RenderTimeOptions {
     /// Specifies a format string see [the time book](https://time-rs.github.io/book/api/format-description.html).
     pub string: Option<String>,
@@ -26,7 +26,7 @@ pub struct RenderTimeOptions {
 impl CellValue<Date> for Date {
     type RenderOptions = RenderTimeOptions;
 
-    fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
+    fn render_value(self, options: Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
             let format = format_description::parse(value)
                 .expect("Unable to construct a format description given the format string");
@@ -52,7 +52,7 @@ impl CellValue<Date> for Date {
 impl CellValue<Time> for Time {
     type RenderOptions = RenderTimeOptions;
 
-    fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
+    fn render_value(self, options: Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
             let format = format_description::parse(value)
                 .expect("Unable to construct a format description given the format string");
@@ -79,7 +79,7 @@ impl CellValue<Time> for Time {
 impl CellValue<PrimitiveDateTime> for PrimitiveDateTime {
     type RenderOptions = RenderTimeOptions;
 
-    fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
+    fn render_value(self, options: Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
             let format = format_description::parse(value)
                 .expect("Unable to construct a format description given the format string");
@@ -106,7 +106,7 @@ impl CellValue<PrimitiveDateTime> for PrimitiveDateTime {
 impl CellValue<OffsetDateTime> for OffsetDateTime {
     type RenderOptions = RenderTimeOptions;
 
-    fn render_value(self, options: &Self::RenderOptions) -> impl IntoView {
+    fn render_value(self, options: Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
             let format = format_description::parse(value)
                 .expect("Unable to construct a format description given the format string");
