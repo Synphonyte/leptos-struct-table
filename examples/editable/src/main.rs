@@ -21,8 +21,10 @@ pub struct Book {
 }
 
 impl TableDataProvider<Book> for RwSignal<Vec<Book>> {
-    async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Book>, Range<usize>), String> {
-        Ok((self.get_untracked()[range.clone()].to_vec(), range))
+    async fn get_rows(&self, _: Range<usize>) -> Result<(Vec<Book>, Range<usize>), String> {
+        let books = self.get_untracked().to_vec();
+        let len = books.len();
+        Ok((books, 0..len))
     }
 
     async fn row_count(&self) -> Option<usize> {
