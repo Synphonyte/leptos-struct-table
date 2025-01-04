@@ -1,6 +1,5 @@
 use crate::models::Brewery;
 use gloo_net::http::Request;
-use leptos::logging;
 use leptos_struct_table::{ColumnSort, PaginatedTableDataProvider};
 use std::collections::VecDeque;
 

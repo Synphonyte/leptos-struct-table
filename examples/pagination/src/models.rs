@@ -1,8 +1,6 @@
 use crate::tailwind::TailwindClassesPreset;
-use leptos::IntoView;
 use leptos_struct_table::*;
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
 
 #[derive(TableRow, Serialize, Deserialize, Clone, Debug)]
 #[table(sortable, classes_provider = "TailwindClassesPreset")]

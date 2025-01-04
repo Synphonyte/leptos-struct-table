@@ -3,7 +3,6 @@ use gloo_net::http::Request;
 use leptos::prelude::*;
 use leptos_struct_table::{ColumnSort, PaginatedTableDataProvider};
 use std::collections::VecDeque;
-use leptos::logging::error;
 
 pub struct BreweryDataProvider {
     sorting: VecDeque<(usize, ColumnSort)>,
