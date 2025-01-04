@@ -5,7 +5,7 @@ use leptos::prelude::*;
 #[allow(unused_variables)]
 pub fn ObjectLinkTableCellRenderer<F>(
     class: String,
-    #[prop(into)] value: MaybeSignal<Link>,
+    #[prop(into)] value: Signal<Link>,
     on_change: F,
     index: usize,
 ) -> impl IntoView
@@ -17,7 +17,7 @@ where
         value.get_untracked().href,
     );
     view! {
-        <td key=index class=class>
+        <td class=class>
             <a href=link>{value.get_untracked().text}</a>
         </td>
     }

@@ -4,6 +4,7 @@
 use ::chrono::NaiveDate;
 use ::uuid::Uuid;
 use leptos::prelude::*;
+use leptos::web_sys;
 use leptos_struct_table::*;
 
 /// Custom row renderer that adds a link to the end of the row
@@ -22,10 +23,14 @@ pub fn CustomTableRowRenderer(
     // Event handler callback for changes
     on_change: EventHandler<ChangeEvent<Book>>,
 ) -> impl IntoView {
+    let id = row.id.to_string();
+
     view! {
         <tr class=class on:click=move |mouse_event| on_select.run(mouse_event)>
             {row.render_row(index, on_change)}
-            <td><a href=move || format!("/some-path/{}", row.id.to_string())>"Some link"</a></td>
+            <td>
+                <a href=move || format!("/some-path/{}", id)>"Some link"</a>
+            </td>
         </tr>
     }
 }
@@ -101,7 +106,11 @@ fn main() {
 
         view! {
             <table>
-                <TableContent rows=rows row_renderer=CustomTableRowRenderer/>
+                <TableContent
+                    rows=rows
+                    row_renderer=CustomTableRowRenderer
+                    scroll_container="html"
+                />
             </table>
         }
     })

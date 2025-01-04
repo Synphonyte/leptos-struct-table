@@ -45,6 +45,7 @@ fn main() {
                     thead_row_renderer=GRenderer
                     thead_renderer=GRenderer
                     tbody_renderer=SvgTbodyRenderer
+                    scroll_container="html"
                 />
             </svg>
         }

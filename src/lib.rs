@@ -403,7 +403,6 @@ mod reload_controller;
 mod row_reader;
 #[cfg(feature = "rust_decimal")]
 pub mod rust_decimal;
-mod scroll_container;
 mod selection;
 mod sorting;
 mod table_row;
@@ -422,7 +421,6 @@ pub use leptos_struct_table_macro::TableRow;
 pub use loaded_rows::RowState;
 pub use reload_controller::*;
 pub use row_reader::*;
-pub use scroll_container::*;
 pub use selection::*;
 pub use sorting::*;
 pub use table_row::*;

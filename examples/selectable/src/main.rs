@@ -63,6 +63,7 @@ fn main() {
                 <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
                     <TableContent
                         rows=rows
+                        scroll_container="html"
                         selection=Selection::Single(selected_index)
                         row_class="select-none"
                         on_selection_change={move |evt: SelectionChangeEvent<Book>| {

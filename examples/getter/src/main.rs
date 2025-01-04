@@ -89,7 +89,7 @@ fn main() {
 
         view! {
             <table>
-                <TableContent rows />
+                <TableContent rows scroll_container="html" />
             </table>
         }
     })

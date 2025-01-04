@@ -89,7 +89,7 @@ fn main() {
         view! {
             <button on:click=on_switch>{t!(i18n, click_to_change_lang)}</button>
             <table>
-                <TableContent rows=rows />
+                <TableContent rows=rows scroll_container="html" />
             </table>
         }
     })

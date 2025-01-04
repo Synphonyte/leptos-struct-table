@@ -8,7 +8,7 @@ pub fn InputCellRenderer<F>(
     class: String,
     /// The value to display.
     #[prop(into)]
-    value: MaybeSignal<String>,
+    value: Signal<String>,
     /// Event handler called when the cell is changed.
     on_change: F,
     /// The index of the column. Starts at 0.

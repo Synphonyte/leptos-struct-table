@@ -1,4 +1,5 @@
-use leptos::{html::Tbody, prelude::*};
+use leptos::prelude::*;
+use crate::BodyRef;
 
 /// Default tbody renderer. Please note that this is **NOT** a `#[component]`.
 ///
@@ -13,10 +14,10 @@ use leptos::{html::Tbody, prelude::*};
 pub fn DefaultTableBodyRenderer(
     content: impl IntoView,
     class: Signal<String>,
-    node_ref: NodeRef<Tbody>,
+    body_ref: BodyRef,
 ) -> impl IntoView {
     view! {
-        <tbody class=class node_ref=node_ref>
+        <tbody class=class use:body_ref>
             {content}
         </tbody>
     }

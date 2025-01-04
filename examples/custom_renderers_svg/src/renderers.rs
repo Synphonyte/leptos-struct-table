@@ -1,6 +1,5 @@
-use leptos::html::AnyElement;
 use leptos::prelude::*;
-use leptos::svg::G;
+use leptos::web_sys;
 use leptos_struct_table::*;
 
 const ROW_HEIGHT: usize = 30;
@@ -14,14 +13,11 @@ wrapper_render_fn!(
 
 #[allow(non_snake_case)]
 pub fn SvgTbodyRenderer(
-    content: Fragment,
+    content: impl IntoView,
     class: Signal<String>,
-    node_ref: NodeRef<AnyElement>,
+    body_ref: BodyRef,
 ) -> impl IntoView {
-    let tbody_ref = create_node_ref::<G>();
-    tbody_ref.on_load(move |e| node_ref.load(&e.into_any()));
-
-    view! { <g class=class node_ref=tbody_ref>{content}</g> }
+    view! { <g class=class use:body_ref>{content}</g> }
 }
 
 #[allow(unused_variables, non_snake_case)]
@@ -78,8 +74,8 @@ pub fn SvgErrorRowRenderer(err: String, index: usize, _col_count: usize) -> impl
 #[allow(non_snake_case, unstable_name_collisions)]
 pub fn SvgLoadingRowRenderer(
     class: Signal<String>,
-    _get_cell_class: Callback<usize, String>,
-    get_inner_cell_class: Callback<usize, String>,
+    _get_cell_class: Callback<(usize,), String>,
+    get_inner_cell_class: Callback<(usize,), String>,
     index: usize,
     _col_count: usize,
 ) -> impl IntoView {
@@ -87,7 +83,7 @@ pub fn SvgLoadingRowRenderer(
 
     view! {
         <g class=class transform=transform>
-            <text x="0" y=ROW_HEIGHT_HALF class=get_inner_cell_class.call(0) dominant-baseline="central">
+            <text x="0" y=ROW_HEIGHT_HALF class=get_inner_cell_class.run((0,)) dominant-baseline="central">
                 Loading...
             </text>
         </g>
@@ -143,12 +139,12 @@ where
 #[allow(unused_variables)]
 pub fn SvgTextCellRenderer<T, F>(
     class: String,
-    #[prop(into)] value: MaybeSignal<T>,
+    #[prop(into)] value: Signal<T>,
     on_change: F,
     index: usize,
 ) -> impl IntoView
 where
-    T: IntoView + Clone + 'static,
+    T: IntoView + Clone + Send + Sync + 'static,
     F: Fn(T) + 'static,
 {
     let x = x_from_index(index);
@@ -164,7 +160,7 @@ where
 #[allow(unused_variables)]
 pub fn SvgPathCellRenderer<F>(
     #[prop(into)] class: String,
-    #[prop(into)] value: MaybeSignal<String>,
+    #[prop(into)] value: Signal<String>,
     on_change: F,
     index: usize,
 ) -> impl IntoView

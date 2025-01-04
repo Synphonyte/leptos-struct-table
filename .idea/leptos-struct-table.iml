@@ -21,6 +21,7 @@
       <sourceFolder url="file://$MODULE_DIR$/examples/pagination/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples/serverfn_sqlx/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/examples/i18n/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/examples/custom_row_renderer/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/examples/simple/target" />
       <excludeFolder url="file://$MODULE_DIR$/leptos-struct-table-macro/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
@@ -56,6 +57,7 @@
       <excludeFolder url="file://$MODULE_DIR$/examples/pagination/target" />
       <excludeFolder url="file://$MODULE_DIR$/examples/serverfn_sqlx/target" />
       <excludeFolder url="file://$MODULE_DIR$/examples/i18n/target" />
+      <excludeFolder url="file://$MODULE_DIR$/examples/custom_row_renderer/target" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

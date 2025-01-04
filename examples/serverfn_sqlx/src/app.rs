@@ -1,41 +1,37 @@
 use crate::data_provider::CustomerTableDataProvider;
-use crate::error_template::{AppError, ErrorTemplate};
-use leptos::html::Div;
 use leptos::prelude::*;
 use leptos_meta::*;
-use leptos_router::*;
+use leptos_router::components::{FlatRoutes, Route, Router, RoutingProgress};
+use leptos_router::path;
 use leptos_struct_table::*;
+use std::time::Duration;
 
 #[component]
 pub fn App() -> impl IntoView {
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
+    let (is_routing, set_is_routing) = signal(false);
 
     view! {
-        <Stylesheet id="leptos" href="/pkg/serverfn-sqlx.css"/>
+        <Stylesheet id="leptos" href="/pkg/serverfn-sqlx.css" />
+        <Title text="Welcome to Leptos Struct Table" />
 
-        // sets the document title
-        <Title text="Welcome to Leptos Struct Table"/>
-
-        // content for this welcome page
-        <Router fallback=|| {
-            let mut outside_errors = Errors::default();
-            outside_errors.insert_with_default_key(AppError::NotFound);
-            view! { <ErrorTemplate outside_errors/> }.into_view()
-        }>
+        <Router set_is_routing>
+            <div class="routing-progress">
+                <RoutingProgress is_routing max_time=Duration::from_millis(250) />
+            </div>
             <main>
-                <Routes>
-                    <Route path="" view=HomePage/>
-                </Routes>
+                <FlatRoutes fallback=|| "Not Found">
+                    <Route path=path!("") view=HomePage />
+                </FlatRoutes>
             </main>
         </Router>
     }
 }
 
-/// Renders the home page of your application.
 #[component]
 fn HomePage() -> impl IntoView {
-    let scroll_container = create_node_ref::<Div>();
+    let scroll_container = NodeRef::new();
 
     let rows = CustomerTableDataProvider::default();
 
@@ -69,10 +65,7 @@ fn HomePage() -> impl IntoView {
             </div>
             <div node_ref=scroll_container class="overflow-auto grow min-h-0">
                 <table class="table-fixed text-sm text-left text-gray-500 dark:text-gray-400 w-full">
-                    <TableContent
-                        rows
-                        scroll_container
-                    />
+                    <TableContent rows scroll_container />
                 </table>
             </div>
         </div>

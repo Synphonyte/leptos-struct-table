@@ -6,21 +6,23 @@ use crate::{
     ChangeEvent, ColumnSort, DefaultErrorRowRenderer, DefaultLoadingRowRenderer,
     DefaultRowPlaceholderRenderer, DefaultTableBodyRenderer, DefaultTableHeadRenderer,
     DefaultTableHeadRowRenderer, DefaultTableRowRenderer, DisplayStrategy, EventHandler,
-    ReloadController, RowReader, ScrollContainer, SelectionChangeEvent, SortingMode,
-    TableClassesProvider, TableDataProvider, TableHeadEvent,
+    ReloadController, RowReader, SelectionChangeEvent, SortingMode, TableClassesProvider,
+    TableDataProvider, TableHeadEvent,
 };
-use leptos::html::Tbody;
 use leptos::prelude::*;
 use leptos::tachys::view::any_view::AnyView;
 use leptos::task::spawn_local;
+use leptos_use::core::IntoElementMaybeSignal;
 use leptos_use::{
     use_debounce_fn, use_element_size_with_options, use_scroll_with_options, UseElementSizeOptions,
     UseElementSizeReturn, UseScrollOptions, UseScrollReturn,
 };
+use std::cell::RefCell;
 use std::collections::{HashSet, VecDeque};
 use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::ops::Range;
+use std::rc::Rc;
 use std::sync::Arc;
 
 const MAX_DISPLAY_ROW_COUNT: usize = 500;
@@ -47,8 +49,10 @@ renderer_fn!(
     WrapperRendererFn(view: AnyView, class: Signal<String>)
 );
 
+pub type BodyRef = Arc<dyn Fn(web_sys::Element, ())>;
+
 renderer_fn!(
-    TbodyRendererFn(view: AnyView, class: Signal<String>, node_ref: NodeRef<Tbody>)
+    TbodyRendererFn(view: AnyView, class: Signal<String>, body_ref: BodyRef)
 );
 
 renderer_fn!(
@@ -57,19 +61,18 @@ renderer_fn!(
 );
 
 renderer_fn!(
-    LoadingRowRendererFn(class: Signal<String>, get_cell_class: Callback<usize, String>, get_cell_inner_class: Callback<usize, String>, index: usize, col_count: usize)
+    LoadingRowRendererFn(class: Signal<String>, get_cell_class: Callback<(usize,), String>, get_cell_inner_class: Callback<(usize,), String>, index: usize, col_count: usize)
     default DefaultLoadingRowRenderer
 );
 
 /// Render the content of a table. This is the main component of this crate.
 #[component]
-pub fn TableContent<Row, DataP, Err, ClsP>(
+pub fn TableContent<Row, DataP, Err, ClsP, ScrollEl, ScrollM>(
     /// The data to be rendered in this table.
     /// This must implement [`TableDataProvider`] or [`PaginatedTableDataProvider`].
     rows: DataP,
-    /// The container element which has scrolling capabilities. By default this is the `body` element.
-    #[prop(optional, into)]
-    scroll_container: ScrollContainer,
+    /// The container element which has scrolling capabilities.
+    scroll_container: ScrollEl,
     /// Event handler for when a row is edited.
     /// Check out the [editable example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/editable/src/main.rs).
     #[prop(optional, into)]
@@ -177,16 +180,18 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     #[prop(optional)]
     row_reader: RowReader<Row>,
 
-    #[prop(optional)] _marker: PhantomData<Err>,
+    #[prop(optional)] _marker: PhantomData<(Err, ScrollM)>,
 ) -> impl IntoView
 where
     Row: TableRow<ClassesProvider = ClsP> + Clone + Send + Sync + 'static,
-    DataP: TableDataProvider<Row, Err> + Send + Sync + 'static,
+    DataP: TableDataProvider<Row, Err> + 'static,
     Err: Debug,
     ClsP: TableClassesProvider + Send + Sync + Copy + 'static,
+    ScrollEl: IntoElementMaybeSignal<web_sys::Element, ScrollM>,
+    ScrollM: ?Sized,
 {
     let on_change = StoredValue::new(on_change);
-    let rows = StoredValue::new(rows);
+    let rows = Rc::new(RefCell::new(rows));
 
     let class_provider = ClsP::new();
 
@@ -217,14 +222,16 @@ where
     };
 
     let load_row_count = {
+        let rows = Rc::clone(&rows);
         let set_known_row_count = set_known_row_count.clone();
 
         move || {
             spawn_local({
+                let rows = Rc::clone(&rows);
                 let set_known_row_count = set_known_row_count.clone();
 
                 async move {
-                    let row_count = rows.read_value().row_count().await;
+                    let row_count = rows.borrow().row_count().await;
 
                     // check if this component was disposed of
                     if sorting.try_with_untracked(|_| {}).is_none() {
@@ -249,7 +256,7 @@ where
         move |clear_row_count: bool| {
             selection.clear();
             first_selected_index.set(None);
-
+            // TODO
             loaded_rows.write().clear();
 
             if clear_row_count {
@@ -270,21 +277,26 @@ where
 
     Effect::new({
         let clear = clear.clone();
+        let rows = Rc::clone(&rows);
 
         move || {
-            let sorting = sorting.get();
-            if let Some(mut rows) = rows.try_write_value() {
+            let sorting = sorting.read();
+            if let Ok(mut rows) = rows.try_borrow_mut() {
                 rows.set_sorting(&sorting);
                 clear(false);
             };
         }
     });
 
-    Effect::new(move || {
-        // triggered when `ReloadController::reload()` is called
-        reload_controller.track();
-        rows.read_value().track();
-        clear(true);
+    Effect::new({
+        let rows = Rc::clone(&rows);
+
+        move || {
+            // triggered when `ReloadController::reload()` is called
+            reload_controller.track();
+            rows.borrow().track();
+            clear(true);
+        }
     });
 
     let selected_indices = match selection {
@@ -298,6 +310,8 @@ where
         Selection::Multiple(selected_indices) => selected_indices.into(),
     };
 
+    let scroll_container = scroll_container.into_element_maybe_signal();
+
     let UseScrollReturn { y, set_y, .. } = use_scroll_with_options(
         scroll_container,
         UseScrollOptions::default().throttle(100.0),
@@ -308,9 +322,13 @@ where
         UseElementSizeOptions::default().box_(web_sys::ResizeObserverBoxOptions::ContentBox),
     );
 
-    if let DisplayStrategy::Virtualization | DisplayStrategy::Pagination { .. } = display_strategy {
-        load_row_count();
-    }
+    Effect::new(move || {
+        if let DisplayStrategy::Virtualization | DisplayStrategy::Pagination { .. } =
+            display_strategy
+        {
+            load_row_count();
+        }
+    });
 
     let (average_row_height, set_average_row_height) = signal(20.0);
 
@@ -357,12 +375,12 @@ where
         .into()
     };
 
-    let tbody_ref = NodeRef::new();
+    let tbody_el = RwSignal::new_local(None::<web_sys::Element>);
 
     let compute_average_row_height = use_debounce_fn(
         move || {
             compute_average_row_height_from_loaded(
-                tbody_ref,
+                tbody_el,
                 display_range,
                 y,
                 &set_y,
@@ -374,7 +392,7 @@ where
         50.0,
     );
 
-    Effect::new(move |_| {
+    Effect::new(move || {
         let first_visible_row_index = first_visible_row_index.get();
         let visible_row_count = visible_row_count.get().min(MAX_DISPLAY_ROW_COUNT);
 
@@ -452,13 +470,14 @@ where
             for missing_range in loading_ranges {
                 let compute_average_row_height = compute_average_row_height.clone();
                 spawn_local({
+                    let rows = Rc::clone(&rows);
                     let set_known_row_count = set_known_row_count.clone();
 
                     async move {
                         let latest_reload_count = reload_count.get_untracked();
 
                         let result = rows
-                            .read_value()
+                            .borrow()
                             .get_rows(missing_range.clone())
                             .await
                             .map_err(|err| format!("{err:?}"));
@@ -581,11 +600,11 @@ where
                                         Signal::derive(move || {
                                             class_provider.row(i, false, row_class.read().as_str())
                                         }),
-                                        Callback::new(move |col_index: usize| {
+                                        Callback::new(move |(col_index,): (usize,)| {
                                             class_provider
                                                 .loading_cell(i, col_index, loading_cell_class.read().as_str())
                                         }),
-                                        Callback::new(move |col_index: usize| {
+                                        Callback::new(move |(col_index,): (usize,)| {
                                             class_provider
                                                 .loading_cell_inner(
                                                     i,
@@ -606,7 +625,11 @@ where
         }.into_any()
     };
 
-    let tbody = tbody_renderer.run(tbody_content, tbody_class, tbody_ref);
+    let tbody_directive = Arc::new(move |el: web_sys::Element, _: ()| {
+        tbody_el.set(Some(el));
+    });
+
+    let tbody = tbody_renderer.run(tbody_content, tbody_class, tbody_directive);
 
     view! {
         {thead_renderer
@@ -617,7 +640,7 @@ where
 }
 
 fn compute_average_row_height_from_loaded<Row, ClsP>(
-    tbody_ref: NodeRef<Tbody>,
+    tbody_ref: RwSignal<Option<web_sys::Element>, LocalStorage>,
     display_range: ReadSignal<Range<usize>>,
     y: Signal<f64>,
     set_y: &impl Fn(f64),
@@ -744,7 +767,7 @@ fn update_selection(
                     first_selected_index.set(Some(i));
                 }
             } else {
-                indices.clear();
+                HashSet::clear(&mut *indices);
                 indices.insert(i);
                 first_selected_index.set(Some(i));
             }

@@ -67,9 +67,10 @@ fn main() {
         };
 
         view! {
-            <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 w-[50%]".to_string()>
+            <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 w-[50%]"
+                .to_string()>
                 <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
-                    <TableContent rows on_change/>
+                    <TableContent rows on_change scroll_container="html" />
                 </table>
             </div>
 
