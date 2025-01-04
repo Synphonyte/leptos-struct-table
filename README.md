@@ -39,20 +39,19 @@ pub struct Person {
     age: u32,
 }
 
-fn main() {
-    mount_to_body(|| {
-        let rows = vec![
-            Person { id: 1, name: "John".to_string(), age: 32 },
-            Person { id: 2, name: "Jane".to_string(), age: 28 },
-            Person { id: 3, name: "Bob".to_string(), age: 45 },
-        ];
+#[component]
+fn Demo() -> impl IntoView {
+    let rows = vec![
+        Person { id: 1, name: "John".to_string(), age: 32 },
+        Person { id: 2, name: "Jane".to_string(), age: 28 },
+        Person { id: 3, name: "Bob".to_string(), age: 45 },
+    ];
 
-        view! {
-            <table>
-                <TableContent rows />
-            </table>
-        }
-    });
+    view! {
+        <table>
+            <TableContent rows scroll_container="html" />
+        </table>
+    }
 }
 ```
 
@@ -324,7 +323,7 @@ pub fn App() -> impl IntoView {
 
     view! {
         <table>
-            <TableContent rows on_change />
+            <TableContent rows on_change scroll_container="html" />
         </table>
     }
 }
