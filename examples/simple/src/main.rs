@@ -77,7 +77,7 @@ fn main() {
 
         view! {
             <table>
-                <TableContent rows=rows />
+                <TableContent rows=rows scroll_container="html" />
             </table>
         }
     })

@@ -1,5 +1,5 @@
-use leptos::prelude::*;
 use crate::BodyRef;
+use leptos::prelude::*;
 
 /// Default tbody renderer. Please note that this is **NOT** a `#[component]`.
 ///
