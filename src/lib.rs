@@ -278,7 +278,7 @@ pub struct TemperatureMeasurement {
 //! # use leptos::prelude::*;
 //! # use leptos_struct_table::*;
 //! #
-//! #[derive(TableRow, Clone)]
+//! #[derive(TableRow)]
 //! pub struct Book {
 //!     title: String,
 //!     #[table(renderer = "ImageTableCellRenderer")]
@@ -287,14 +287,12 @@ pub struct TemperatureMeasurement {
 //!
 //! // Easy cell renderer that just displays an image from an URL.
 //! #[component]
-//! fn ImageTableCellRenderer<F>(
+//! fn ImageTableCellRenderer(
 //!     class: String,
-//!     #[prop(into)] value: Signal<String>,
-//!     on_change: F,
+//!     value: Signal<String>,
+//!     row: RwSignal<Book>,
 //!     index: usize,
 //! ) -> impl IntoView
-//! where
-//!     F: Fn(String) + 'static,
 //! {
 //!     view! {
 //!         <td class=class>
@@ -309,9 +307,8 @@ pub struct TemperatureMeasurement {
 //!
 //! ## Editable Cells
 //!
-//! You might have noticed the type parameter `F` in the custom cell renderer above. This can be used
-//! to emit an event when the cell is changed. In the simplest case you can use a cell renderer that
-//! uses an `<input>`.
+//! You might have noticed the prop `row` in the custom cell renderer above. This can be used
+//! to edit the data. Simply use the `RwSignal` to access the row and change the fields.
 //!
 //! ```
 //! # use leptos::{prelude::*, logging};
@@ -325,20 +322,20 @@ pub struct TemperatureMeasurement {
 //!     title: String,
 //! }
 //!
-//! // Easy input cell renderer that emits `on_change` when the input is changed.
 //! #[component]
-//! fn InputCellRenderer<F>(
+//! fn InputCellRenderer(
 //!     class: String,
-//!     #[prop(into)] value: Signal<String>,
-//!     on_change: F,
+//!     value: Signal<String>,
+//!     row: RwSignal<Book>,
 //!     index: usize,
-//! ) -> impl IntoView
-//! where
-//!     F: Fn(String) + 'static,
-//! {
+//! ) -> impl IntoView {
+//!     let on_change = move |evt| {
+//!         row.write().title = event_target_value(&evt);
+//!     };
+//!
 //!     view! {
 //!         <td class=class>
-//!             <input type="text" value=value on:change=move |evt| { on_change(event_target_value(&evt)); } />
+//!             <input type="text" value=value on:change=on_change />
 //!         </td>
 //!     }
 //! }
@@ -350,7 +347,7 @@ pub struct TemperatureMeasurement {
 //!     let rows = vec![Book::default(), Book::default()];
 //!
 //!     let on_change = move |evt: ChangeEvent<Book>| {
-//!         logging::log!("Changed row at index {}:\n{:#?}", evt.row_index, evt.changed_row);
+//!         logging::log!("Changed row at index {}:\n{:#?}", evt.row_index, evt.changed_row.get_untracked());
 //!     };
 //!
 //!     view! {
@@ -361,7 +358,7 @@ pub struct TemperatureMeasurement {
 //! }
 //! ```
 //!
-//! Please have a look at the [editable example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/editable/src/main.rs) for fully working example.
+//! Please have a look at the [editable example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/editable/src/main.rs) for a fully working example.
 //!
 //! # Pagination / Virtualization / InfiniteScroll
 //!

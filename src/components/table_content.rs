@@ -30,14 +30,13 @@ const MAX_DISPLAY_ROW_COUNT: usize = 500;
 renderer_fn!(
     RowRendererFn<Row>(
         class: Signal<String>,
-        row: Row,
+        row: RwSignal<Row>,
         index: usize,
         selected: Signal<bool>,
-        on_select: EventHandler<web_sys::MouseEvent>,
-        on_change: EventHandler<ChangeEvent<Row>>
+        on_select: EventHandler<web_sys::MouseEvent>
     )
     default DefaultTableRowRenderer
-    where Row: TableRow + Clone + 'static
+    where Row: TableRow + 'static
 );
 
 renderer_fn!(
@@ -256,8 +255,7 @@ where
         move |clear_row_count: bool| {
             selection.clear();
             first_selected_index.set(None);
-            // TODO
-            loaded_rows.write().clear();
+            LoadedRows::<Row>::clear(&mut loaded_rows.write());
 
             if clear_row_count {
                 let reload = row_count.get_untracked().is_some();
@@ -570,31 +568,43 @@ where
                                 let selected_signal = Signal::derive(move || {
                                     selected_indices.read().contains(&i)
                                 });
+
                                 let class_signal = Signal::derive(move || {
-                                    class_provider.row(i, selected_signal.get(), row_class.read().as_str())
+                                    class_provider
+                                        .row(i, selected_signal.get(), row_class.read().as_str())
                                 });
+
                                 let on_select = {
                                     let on_selection_change = on_selection_change.clone();
                                     let row = row.clone();
                                     move |evt: web_sys::MouseEvent| {
                                         update_selection(evt, selection, first_selected_index, i);
+
                                         let selection_change_event = SelectionChangeEvent {
-                                            row: row.clone(),
+                                            row: row.into(),
                                             row_index: i,
                                             selected: selected_signal.get_untracked(),
                                         };
+
                                         on_selection_change.run(selection_change_event);
                                     }
                                 };
+
+                                Effect::watch(
+                                    move || { row.track() },
+                                    move |_, _, _| {
+                                        let on_change = on_change.get_value();
+
+                                        on_change
+                                            .run(ChangeEvent {
+                                                row_index: i,
+                                                changed_row: row.into(),
+                                            });
+                                    },
+                                    false,
+                                );
                                 row_renderer
-                                    .run(
-                                        class_signal,
-                                        row,
-                                        i,
-                                        selected_signal,
-                                        on_select.into(),
-                                        on_change.get_value(),
-                                    )
+                                    .run(class_signal, row, i, selected_signal, on_select.into())
                             }
                             RowState::Error(err) => {
                                 error_row_renderer.run(err, i, Row::COLUMN_COUNT)
@@ -607,7 +617,11 @@ where
                                         }),
                                         Callback::new(move |(col_index,): (usize,)| {
                                             class_provider
-                                                .loading_cell(i, col_index, loading_cell_class.read().as_str())
+                                                .loading_cell(
+                                                    i,
+                                                    col_index,
+                                                    loading_cell_class.read().as_str(),
+                                                )
                                         }),
                                         Callback::new(move |(col_index,): (usize,)| {
                                             class_provider
@@ -627,7 +641,8 @@ where
             />
 
             {row_placeholder_renderer.run(placeholder_height_after.into())}
-        }.into_any()
+        }
+        .into_any()
     };
 
     let tbody_directive = Arc::new(move |el: web_sys::Element, _: ()| {
@@ -637,8 +652,7 @@ where
     let tbody = tbody_renderer.run(tbody_content, tbody_class, tbody_directive);
 
     view! {
-        {thead_renderer
-            .run(thead_row_renderer.run(thead_content, thead_row_class), thead_class)}
+        {thead_renderer.run(thead_row_renderer.run(thead_content, thead_row_class), thead_class)}
 
         {tbody}
     }

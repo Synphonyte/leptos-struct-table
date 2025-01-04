@@ -1,13 +1,13 @@
-use crate::{ChangeEvent, ColumnSort, EventHandler, TableClassesProvider, TableHeadEvent};
+use crate::{ColumnSort, TableClassesProvider, TableHeadEvent};
 use leptos::prelude::*;
 use std::collections::VecDeque;
 
 /// This trait has to implemented in order for [`TableContent`] to be able to render rows and the head row of the table.
-/// Usually this is done by `#[derive(TableRow, Clone)]`.
+/// Usually this is done by `#[derive(TableRow)]`.
 ///
 /// Please see the [simple example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs)
 /// for how to use.
-pub trait TableRow: Clone {
+pub trait TableRow: Sized {
     type ClassesProvider: TableClassesProvider + Copy;
 
     /// How many columns this row has (i.e. the number of fields in the struct)
@@ -17,7 +17,7 @@ pub trait TableRow: Clone {
     /// This produces the children that go into the `row_renderer` given to [`TableContent`].
     ///
     /// This render function has to render exactly one root element.
-    fn render_row(self, index: usize, on_change: EventHandler<ChangeEvent<Self>>) -> impl IntoView;
+    fn render_row(row: RwSignal<Self>, index: usize) -> impl IntoView;
 
     /// Render the head row of the table.
     fn render_head_row<F>(
@@ -36,7 +36,7 @@ pub trait TableRow: Clone {
     /// # use leptos_struct_table::*;
     /// # use leptos::prelude::*;
     /// #
-    /// #[derive(TableRow, Clone)]
+    /// #[derive(TableRow)]
     /// struct Person {
     ///     #[table(skip)]
     ///     id: i64,            // -> ignored
