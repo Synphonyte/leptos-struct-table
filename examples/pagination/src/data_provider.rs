@@ -1,14 +1,14 @@
-use crate::models::{ArchiveOrgApiResponse, ArchiveOrgCountRespone, Book};
+use crate::models::Brewery;
 use gloo_net::http::Request;
 use leptos::logging;
 use leptos_struct_table::{ColumnSort, PaginatedTableDataProvider};
 use std::collections::VecDeque;
 
-pub struct BookDataProvider {
+pub struct BreweryDataProvider {
     sorting: VecDeque<(usize, ColumnSort)>,
 }
 
-impl Default for BookDataProvider {
+impl Default for BreweryDataProvider {
     fn default() -> Self {
         Self {
             sorting: VecDeque::new(),
@@ -16,13 +16,13 @@ impl Default for BookDataProvider {
     }
 }
 
-impl BookDataProvider {
+impl BreweryDataProvider {
     fn url_sort_param_for_column(&self, column: usize) -> &'static str {
         match column {
-            0 => "identifierSorter",
-            1 => "titleSorter",
-            2 => "creatorSorter",
-            3 => "publicdate",
+            0 => "name",
+            1 => "brewery_type",
+            2 => "city",
+            3 => "country",
             _ => "",
         }
     }
@@ -36,7 +36,7 @@ impl BookDataProvider {
             ColumnSort::None => return "".to_string(),
         };
 
-        format!("&sort%5B%5D={}+{}", col, dir)
+        format!("sort={}:{}", col, dir)
     }
 
     fn get_url(&self, page_index: usize) -> String {
@@ -44,26 +44,26 @@ impl BookDataProvider {
         for pair in &self.sorting {
             sort.push_str(&self.url_sort_param_for_sort_pair(pair));
         }
-
+        // this api is terrible at sorting - removed the parameter for now
         format!(
-                "https://archive.org/advancedsearch.php?q=creator%3A%28Lewis%29&fl%5B%5D=creator&fl%5B%5D=identifier&fl%5B%5D=publicdate&fl%5B%5D=title{sort}&rows={}&page={}&output=json&callback=",
-                Self::PAGE_ROW_COUNT,
+                "https://api.openbrewerydb.org/v1/breweries?{sort}&page={}&per_page={}",
                 page_index + 1,
+                Self::PAGE_ROW_COUNT,
             )
     }
 }
 
-impl PaginatedTableDataProvider<Book> for BookDataProvider {
-    const PAGE_ROW_COUNT: usize = 50;
+impl PaginatedTableDataProvider<Brewery> for BreweryDataProvider {
+    const PAGE_ROW_COUNT: usize = 200;
 
-    async fn get_page(&self, page_index: usize) -> Result<Vec<Book>, String> {
+    async fn get_page(&self, page_index: usize) -> Result<Vec<Brewery>, String> {
         if page_index >= 10000 / Self::PAGE_ROW_COUNT {
             return Ok(vec![]);
         }
 
         let url = self.get_url(page_index);
 
-        let resp: ArchiveOrgApiResponse = Request::get(&url)
+        let resp: Vec<Brewery> = Request::get(&url)
             .send()
             .await
             .map_err(|e| e.to_string())?
@@ -71,25 +71,21 @@ impl PaginatedTableDataProvider<Book> for BookDataProvider {
             .await
             .map_err(|e| e.to_string())?;
 
-        match resp {
-            ArchiveOrgApiResponse::Err { error } => Err(error),
-            ArchiveOrgApiResponse::Ok { response } => Ok(response.docs),
-        }
+        Ok(resp)
     }
 
     async fn row_count(&self) -> Option<usize> {
-        let resp: Option<ArchiveOrgCountRespone> = Request::get("https://archive.org/advancedsearch.php?q=creator%3A(Lewis)&fl[]=creator&fl[]=identifier&fl[]=publicdate&rows=0&page=0&output=json&callback=")
+        let resp: Vec<Brewery> = Request::get("https://api.openbrewerydb.org/v1/breweries?per_page=200")
             .send()
             .await
-            .map_err(|err| logging::error!("Failed to load count: {:?}", err))
+            .map_err(|e| e.to_string())
             .ok()?
             .json()
             .await
-            .map_err(|err| logging::error!("Failed to parse count response: {:?}", err))
-            .ok();
+            .map_err(|e| e.to_string())
+            .ok()?;
 
-        // This API only allows to display up to 10000 results
-        resp.map(|r| r.response.num_found.min(10000))
+        Some(resp.len())
     }
 
     fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {

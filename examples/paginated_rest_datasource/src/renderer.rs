@@ -12,13 +12,11 @@ pub fn ObjectLinkTableCellRenderer<F>(
 where
     F: Fn(Link) + 'static,
 {
-    let link = format!(
-        "https://archive.org/advancedsearch.php?q=identifier%3D{}&output=json&callback=",
-        value.get_untracked().href,
-    );
     view! {
         <td class=class>
-            <a href=link>{value.get_untracked().text}</a>
+            <Show when=move || !value.get_untracked().href.is_empty() fallback=move || view! { <span>{value.get_untracked().text}</span> }>
+                <a href=value.get_untracked().href target="_blank">{value.get_untracked().text}</a>
+            </Show>
         </td>
     }
 }

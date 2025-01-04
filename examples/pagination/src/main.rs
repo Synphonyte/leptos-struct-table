@@ -2,13 +2,13 @@ mod data_provider;
 mod models;
 mod tailwind;
 
-use crate::data_provider::BookDataProvider;
+use crate::data_provider::BreweryDataProvider;
 use leptos::prelude::*;
 use leptos_struct_table::*;
 
 #[component]
 pub fn App() -> impl IntoView {
-    let rows = BookDataProvider::default();
+    let rows = BreweryDataProvider::default();
 
     let pagination_controller = PaginationController::default();
 
@@ -18,6 +18,7 @@ pub fn App() -> impl IntoView {
                 <TableContent
                     rows=rows
                     scroll_container="html"
+                    sorting_mode=SortingMode::SingleColumn
                     display_strategy=DisplayStrategy::Pagination {
                         controller: pagination_controller,
                         row_count: 10,

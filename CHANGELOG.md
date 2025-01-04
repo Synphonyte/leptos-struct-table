@@ -1,5 +1,9 @@
 # Changelog
 
+## [Unreleased]
+
+- Fixed broken API in `paginated_rest_datasource` and `pagination`
+
 ## [0.14.0-beta1] - 2025-01-03
 
 ### Breaking Changes 🛠️

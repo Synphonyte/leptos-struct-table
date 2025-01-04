@@ -2,14 +2,14 @@ mod data_provider;
 mod models;
 mod renderer;
 
-use crate::data_provider::BookDataProvider;
+use crate::data_provider::BreweryDataProvider;
 use leptos::prelude::*;
 use leptos_struct_table::*;
 use leptos_use::use_debounce_fn_with_arg;
 
 #[component]
 pub fn App() -> impl IntoView {
-    let rows = BookDataProvider::default();
+    let rows = BreweryDataProvider::default();
 
     let reload_controller = ReloadController::default();
 
@@ -48,6 +48,7 @@ pub fn App() -> impl IntoView {
                     <TableContent
                         rows=rows
                         scroll_container=container
+                        sorting_mode=SortingMode::SingleColumn
                         loading_cell_inner_class="loading-skeleton"
                         reload_controller=reload_controller
                         on_row_count=move |count| set_count.set(count)
