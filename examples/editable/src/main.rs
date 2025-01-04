@@ -65,7 +65,7 @@ fn main() {
         ]);
 
         let on_change = move |evt: ChangeEvent<Book>| {
-            rows.write()[evt.row_index] = evt.changed_row;
+            rows.write()[evt.row_index] = evt.changed_row.get_untracked();
         };
 
         view! {

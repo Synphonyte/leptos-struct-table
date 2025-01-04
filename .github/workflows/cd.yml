@@ -1,4 +1,4 @@
-name: CI
+name: CD
 
 on:
   push:
@@ -12,7 +12,7 @@ jobs:
     name: Cargo Checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/rust_toolchain/
       - name: Check formatting
         run: cargo fmt --check
@@ -44,7 +44,7 @@ jobs:
           - simple
           - tailwind
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/rust_toolchain/
       - name: Build example ${{ matrix.example }}
         run: |
@@ -57,7 +57,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ cargo_checks, test_examples ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: ./.github/actions/rust_toolchain/
       - name: Publish crate leptos-struct-table
         uses: katyo/publish-crates@v2

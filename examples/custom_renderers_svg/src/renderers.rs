@@ -1,3 +1,4 @@
+use crate::Form;
 use leptos::prelude::*;
 use leptos::web_sys;
 use leptos_struct_table::*;
@@ -21,17 +22,13 @@ pub fn SvgTbodyRenderer(
 }
 
 #[allow(unused_variables, non_snake_case)]
-pub fn SvgRowRenderer<Row>(
+pub fn SvgRowRenderer(
     class: Signal<String>,
-    row: Row,
+    row: RwSignal<Form>,
     index: usize,
     selected: Signal<bool>,
     on_select: EventHandler<web_sys::MouseEvent>,
-    on_change: EventHandler<ChangeEvent<Row>>,
-) -> impl IntoView
-where
-    Row: TableRow + Clone + 'static,
-{
+) -> impl IntoView {
     let transform = y_transform_from_index(index);
 
     view! {
@@ -49,7 +46,7 @@ where
                 stroke="black"
                 opacity="0.1"
             ></line>
-            {row.render_row(index, on_change)}
+            {TableRow::render_row(row, index)}
         </g>
     }
 }
@@ -137,15 +134,14 @@ where
 
 #[component]
 #[allow(unused_variables)]
-pub fn SvgTextCellRenderer<T, F>(
+pub fn SvgTextCellRenderer<T>(
     class: String,
-    #[prop(into)] value: Signal<T>,
-    on_change: F,
+    value: Signal<T>,
+    row: RwSignal<Form>,
     index: usize,
 ) -> impl IntoView
 where
     T: IntoView + Clone + Send + Sync + 'static,
-    F: Fn(T) + 'static,
 {
     let x = x_from_index(index);
 
@@ -158,15 +154,12 @@ where
 
 #[component]
 #[allow(unused_variables)]
-pub fn SvgPathCellRenderer<F>(
+pub fn SvgPathCellRenderer(
     #[prop(into)] class: String,
-    #[prop(into)] value: Signal<String>,
-    on_change: F,
+    value: Signal<String>,
+    row: RwSignal<Form>,
     index: usize,
-) -> impl IntoView
-where
-    F: Fn(String) + 'static,
-{
+) -> impl IntoView {
     let transform = transform_from_index(index, 3);
 
     view! { <path transform=transform class=class d=value></path> }

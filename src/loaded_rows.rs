@@ -1,18 +1,29 @@
+use leptos::prelude::*;
 use std::ops::{Index, Range};
 
-#[derive(Clone)]
-pub enum RowState<T: Send + Sync + Clone> {
+pub enum RowState<T: Send + Sync + 'static> {
     /// The row is not yet loaded and a placeholder is displayed if the row is visible in the viewport.
     Placeholder,
     /// The row is loading and a placeholder is displayed if the row is visible in the viewport.
     Loading,
     /// The row has been loaded.
-    Loaded(T),
+    Loaded(RwSignal<T>),
     /// The row failed to load. This error is shown in the row if it's visible in the viewport.
     Error(String),
 }
 
-impl<T: Send + Sync + Clone> std::fmt::Debug for RowState<T> {
+impl<T: Send + Sync + 'static> Clone for RowState<T> {
+    fn clone(&self) -> Self {
+        match self {
+            RowState::Placeholder => RowState::Placeholder,
+            RowState::Loading => RowState::Loading,
+            RowState::Loaded(signal) => RowState::Loaded(*signal),
+            RowState::Error(error) => RowState::Error(error.clone()),
+        }
+    }
+}
+
+impl<T: Send + Sync + 'static> std::fmt::Debug for RowState<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             RowState::Placeholder => write!(f, "Placeholder"),
@@ -25,11 +36,11 @@ impl<T: Send + Sync + Clone> std::fmt::Debug for RowState<T> {
 
 /// This is basically a cache for rows and used by [`TableContent`] internally to track
 /// which rows are already loaded, which are still loading and which are missing.
-pub struct LoadedRows<T: Send + Sync + Clone> {
+pub struct LoadedRows<T: Send + Sync + 'static> {
     rows: Vec<RowState<T>>,
 }
 
-impl<T: Send + Sync + Clone> LoadedRows<T> {
+impl<T: Send + Sync + 'static> LoadedRows<T> {
     pub fn new() -> Self {
         Self { rows: vec![] }
     }
@@ -66,7 +77,7 @@ impl<T: Send + Sync + Clone> LoadedRows<T> {
                 }
 
                 for (self_row, loaded_row) in self.rows[range].iter_mut().zip(rows) {
-                    *self_row = RowState::Loaded(loaded_row);
+                    *self_row = RowState::Loaded(RwSignal::new(loaded_row));
                 }
             }
             Err(error) => {
@@ -103,7 +114,7 @@ impl<T: Send + Sync + Clone> LoadedRows<T> {
     }
 }
 
-impl<T: Sync + Send + Clone> Index<Range<usize>> for LoadedRows<T> {
+impl<T: Sync + Send> Index<Range<usize>> for LoadedRows<T> {
     type Output = [RowState<T>];
 
     #[inline]
@@ -112,7 +123,7 @@ impl<T: Sync + Send + Clone> Index<Range<usize>> for LoadedRows<T> {
     }
 }
 
-impl<T: Send + Sync + Clone> Index<usize> for LoadedRows<T> {
+impl<T: Send + Sync> Index<usize> for LoadedRows<T> {
     type Output = RowState<T>;
 
     #[inline]

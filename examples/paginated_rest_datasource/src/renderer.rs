@@ -1,17 +1,14 @@
-use crate::models::Link;
+use crate::models::{Brewery, Link};
 use leptos::prelude::*;
 
 #[component]
 #[allow(unused_variables)]
-pub fn ObjectLinkTableCellRenderer<F>(
+pub fn ObjectLinkTableCellRenderer(
     class: String,
     #[prop(into)] value: Signal<Link>,
-    on_change: F,
+    row: RwSignal<Brewery>,
     index: usize,
-) -> impl IntoView
-where
-    F: Fn(Link) + 'static,
-{
+) -> impl IntoView {
     view! {
         <td class=class>
             <Show when=move || !value.get_untracked().href.is_empty() fallback=move || view! { <span>{value.get_untracked().text}</span> }>

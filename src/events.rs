@@ -1,27 +1,42 @@
 use leptos::ev::MouseEvent;
+use leptos::prelude::*;
 use std::sync::Arc;
 
 /// The event provided to the `on_change` prop of the table component
-#[derive(Debug, Clone)]
-pub struct ChangeEvent<Row: Clone> {
+#[derive(Debug)]
+pub struct ChangeEvent<Row: Send + Sync + 'static> {
     /// The index of the table row that contains the cell that was changed. Starts at 0.
     pub row_index: usize,
-    /// The index of the table column that contains the cell that was changed. Starts at 0.
-    pub col_index: usize,
     /// The the row that was changed.
-    pub changed_row: Row,
+    pub changed_row: Signal<Row>,
 }
 
+impl<Row: Send + Sync + 'static> Clone for ChangeEvent<Row> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl<Row: Send + Sync + 'static> Copy for ChangeEvent<Row> {}
+
 /// The event provided to the `on_selection_change` prop of the table component
-#[derive(Debug, Clone)]
-pub struct SelectionChangeEvent<Row: Clone> {
+#[derive(Debug)]
+pub struct SelectionChangeEvent<Row: Send + Sync + 'static> {
     /// `true` is the row was selected, `false` if it was de-selected.
     pub selected: bool,
     /// The index of the row that was de-/selected.
     pub row_index: usize,
     /// The row that was de-/selected.
-    pub row: Row,
+    pub row: Signal<Row>,
 }
+
+impl<Row: Send + Sync + 'static> Clone for SelectionChangeEvent<Row> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl<Row: Send + Sync + 'static> Copy for SelectionChangeEvent<Row> {}
 
 /// Event emitted when a table head cell is clicked.
 #[derive(Debug)]
