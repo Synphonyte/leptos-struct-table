@@ -18,3 +18,10 @@ pub struct Brewery {
 
     pub country: String,
 }
+
+#[derive(Deserialize, Debug)]
+pub struct MetaResponse {
+    pub total: String,
+    pub page: String,
+    pub per_page: String,
+}

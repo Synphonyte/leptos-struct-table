@@ -1,4 +1,4 @@
-use crate::models::Brewery;
+use crate::models::{Brewery, MetaResponse};
 use gloo_net::http::Request;
 use leptos::logging;
 use leptos_struct_table::{ColumnSort, PaginatedTableDataProvider};
@@ -75,7 +75,7 @@ impl PaginatedTableDataProvider<Brewery> for BreweryDataProvider {
     }
 
     async fn row_count(&self) -> Option<usize> {
-        let resp: Vec<Brewery> = Request::get("https://api.openbrewerydb.org/v1/breweries?per_page=200")
+        let resp: Option<MetaResponse> = Request::get("https://api.openbrewerydb.org/v1/breweries/meta")
             .send()
             .await
             .map_err(|e| e.to_string())
@@ -85,7 +85,9 @@ impl PaginatedTableDataProvider<Brewery> for BreweryDataProvider {
             .map_err(|e| e.to_string())
             .ok()?;
 
-        Some(resp.len())
+        let count = resp.map(|r| r.total)?.parse::<usize>().ok()?;
+
+        Some(count)
     }
 
     fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
