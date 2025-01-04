@@ -1,6 +1,6 @@
 use crate::wrapper_render_fn;
 use crate::{ColumnSort, TableHeadEvent};
-use leptos::*;
+use leptos::prelude::*;
 
 wrapper_render_fn!(
     /// thead

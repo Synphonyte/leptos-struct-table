@@ -1,5 +1,5 @@
 use crate::classes::ClassesPreset;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 use serde::{Deserialize, Serialize};
 #[cfg(feature = "ssr")]

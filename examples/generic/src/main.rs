@@ -1,8 +1,8 @@
 //! Generic showcase example.
 
-use ::uuid::Uuid;
 use ::chrono::NaiveDate;
-use leptos::*;
+use ::uuid::Uuid;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 
 /// This generates the component BookTable
@@ -13,7 +13,7 @@ where
     // necessary trait bounds. `IntoView` is only necessary because we require it in
     // our custom renderer below, otherwise you could remove it here.
     // If you also make the table sortable then you might have to add `PartialOrd` as well.
-    T: IntoView + Clone + 'static,
+    T: IntoView + Clone + Send + Sync + 'static,
 {
     /// Id of the entry.
     pub id: Uuid,
@@ -41,12 +41,12 @@ where
 #[allow(unused_variables)]
 pub fn CustomDataRenderer<T, F>(
     class: String,
-    #[prop(into)] value: MaybeSignal<T>,
+    #[prop(into)] value: Signal<T>,
     on_change: F,
     index: usize,
 ) -> impl IntoView
 where
-    T: IntoView + Clone + 'static,
+    T: IntoView + Clone + Send + Sync + 'static,
     F: Fn(T) + 'static,
 {
     view! {
@@ -98,7 +98,7 @@ fn main() {
 
         view! {
             <table>
-                <TableContent rows />
+                <TableContent rows scroll_container="html" />
             </table>
         }
     })

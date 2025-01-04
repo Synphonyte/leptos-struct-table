@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 
 /// A renderer that shows an <input> tag and emits the `on_change` event when the <input> is changed.
 #[component]
@@ -8,7 +8,7 @@ pub fn InputCellRenderer<F>(
     class: String,
     /// The value to display.
     #[prop(into)]
-    value: MaybeSignal<String>,
+    value: Signal<String>,
     /// Event handler called when the cell is changed.
     on_change: F,
     /// The index of the column. Starts at 0.

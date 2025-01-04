@@ -1,7 +1,7 @@
 mod tailwind;
 
 use ::chrono::NaiveDate;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 use tailwind::TailwindClassesPreset;
 
@@ -55,20 +55,19 @@ fn main() {
             },
         ];
 
-        let selected_index = create_rw_signal(None);
-        let (selected_row, set_selected_row) = create_signal(None);
+        let selected_index = RwSignal::new(None);
+        let (selected_row, set_selected_row) = signal(None);
 
         view! {
             <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 float-left">
                 <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
                     <TableContent
                         rows=rows
+                        scroll_container="html"
                         selection=Selection::Single(selected_index)
                         row_class="select-none"
                         on_selection_change={move |evt: SelectionChangeEvent<Book>| {
-                            set_selected_row.update(|selected_row| {
-                                *selected_row = Some(evt.row);
-                            })
+                            set_selected_row.write().replace(evt.row);
                         }}
                         sorting_mode=SortingMode::SingleColumn
                     />

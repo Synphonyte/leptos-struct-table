@@ -1,5 +1,5 @@
 use leptos::ev::MouseEvent;
-use std::rc::Rc;
+use std::sync::Arc;
 
 /// The event provided to the `on_change` prop of the table component
 #[derive(Debug, Clone)]
@@ -33,7 +33,7 @@ pub struct TableHeadEvent {
     pub mouse_event: MouseEvent,
 }
 
-macro_rules! impl_default_rc_fn {
+macro_rules! impl_default_arc_fn {
     (
         $(#[$meta:meta])*
         $name:ident<$($ty:ident),*>($($arg_name:ident: $arg_ty:ty),*)
@@ -42,21 +42,21 @@ macro_rules! impl_default_rc_fn {
     ) => {
         $(#[$meta])*
         #[derive(Clone)]
-        pub struct $name<$($ty),*>(Rc<dyn Fn($($arg_ty),*) $(-> $ret_ty)?>);
+        pub struct $name<$($ty),*>(Arc<dyn Fn($($arg_ty),*) $(-> $ret_ty)? + Send + Sync>);
 
         impl<$($ty),*> Default for $name<$($ty),*> {
             fn default() -> Self {
                 #[allow(unused_variables)]
-                Self(Rc::new(|$($arg_name: $arg_ty),*| {
+                Self(Arc::new(|$($arg_name: $arg_ty),*| {
                     $($default_return)?
                 }))
             }
         }
 
         impl<F, $($ty),*> From<F> for $name<$($ty),*>
-            where F: Fn($($arg_ty),*) $(-> $ret_ty)? + 'static
+            where F: Fn($($arg_ty),*) $(-> $ret_ty)? + Send + Sync + 'static
         {
-            fn from(f: F) -> Self { Self(Rc::new(f)) }
+            fn from(f: F) -> Self { Self(Arc::new(f)) }
         }
 
         impl<$($ty),*> $name<$($ty),*> {
@@ -67,10 +67,10 @@ macro_rules! impl_default_rc_fn {
     }
 }
 
-impl_default_rc_fn!(
+impl_default_arc_fn!(
     /// New type wrapper of a closure that takes a parameter `T`. This allows the event handler props
     /// to be optional while being able to take a simple closure.
     EventHandler<T>(event: T)
 );
 
-pub(crate) use impl_default_rc_fn;
+pub(crate) use impl_default_arc_fn;

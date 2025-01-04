@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 use std::collections::HashSet;
 
 /// Type of selection together with the `RwSignal` to hold the selection
@@ -26,9 +26,7 @@ impl Selection {
                 selected_index.set(None);
             }
             Selection::Multiple(selected_indices) => {
-                selected_indices.update(|selected_indices| {
-                    selected_indices.clear();
-                });
+                selected_indices.write().clear();
             }
         }
     }

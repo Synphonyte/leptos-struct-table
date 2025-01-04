@@ -6,12 +6,13 @@ use crate::{
     ChangeEvent, ColumnSort, DefaultErrorRowRenderer, DefaultLoadingRowRenderer,
     DefaultRowPlaceholderRenderer, DefaultTableBodyRenderer, DefaultTableHeadRenderer,
     DefaultTableHeadRowRenderer, DefaultTableRowRenderer, DisplayStrategy, EventHandler,
-    ReloadController, RowReader, ScrollContainer, SelectionChangeEvent, SortingMode,
-    TableClassesProvider, TableDataProvider, TableHeadEvent,
+    ReloadController, RowReader, SelectionChangeEvent, SortingMode, TableClassesProvider,
+    TableDataProvider, TableHeadEvent,
 };
-use leptos::html::AnyElement;
-use leptos::leptos_dom::is_browser;
-use leptos::*;
+use leptos::prelude::*;
+use leptos::tachys::view::any_view::AnyView;
+use leptos::task::spawn_local;
+use leptos_use::core::IntoElementMaybeSignal;
 use leptos_use::{
     use_debounce_fn, use_element_size_with_options, use_scroll_with_options, UseElementSizeOptions,
     UseElementSizeReturn, UseScrollOptions, UseScrollReturn,
@@ -22,6 +23,7 @@ use std::fmt::Debug;
 use std::marker::PhantomData;
 use std::ops::Range;
 use std::rc::Rc;
+use std::sync::Arc;
 
 const MAX_DISPLAY_ROW_COUNT: usize = 500;
 
@@ -44,11 +46,13 @@ renderer_fn!(
 );
 
 renderer_fn!(
-    WrapperRendererFn(view: View, class: Signal<String>)
+    WrapperRendererFn(view: AnyView, class: Signal<String>)
 );
 
+pub type BodyRef = Arc<dyn Fn(web_sys::Element, ())>;
+
 renderer_fn!(
-    TbodyRendererFn(view: Fragment, class: Signal<String>, node_ref: NodeRef<AnyElement>)
+    TbodyRendererFn(view: AnyView, class: Signal<String>, body_ref: BodyRef)
 );
 
 renderer_fn!(
@@ -57,19 +61,18 @@ renderer_fn!(
 );
 
 renderer_fn!(
-    LoadingRowRendererFn(class: Signal<String>, get_cell_class: Callback<usize, String>, get_cell_inner_class: Callback<usize, String>, index: usize, col_count: usize)
+    LoadingRowRendererFn(class: Signal<String>, get_cell_class: Callback<(usize,), String>, get_cell_inner_class: Callback<(usize,), String>, index: usize, col_count: usize)
     default DefaultLoadingRowRenderer
 );
 
 /// Render the content of a table. This is the main component of this crate.
 #[component]
-pub fn TableContent<Row, DataP, Err, ClsP>(
+pub fn TableContent<Row, DataP, Err, ClsP, ScrollEl, ScrollM>(
     /// The data to be rendered in this table.
     /// This must implement [`TableDataProvider`] or [`PaginatedTableDataProvider`].
     rows: DataP,
-    /// The container element which has scrolling capabilities. By default this is the `body` element.
-    #[prop(optional, into)]
-    scroll_container: ScrollContainer,
+    /// The container element which has scrolling capabilities.
+    scroll_container: ScrollEl,
     /// Event handler for when a row is edited.
     /// Check out the [editable example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/editable/src/main.rs).
     #[prop(optional, into)]
@@ -120,26 +123,26 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     row_placeholder_renderer: RowPlaceholderRendererFn,
     /// Additional classes to add to rows
     #[prop(optional, into)]
-    row_class: MaybeSignal<String>,
+    row_class: Signal<String>,
     /// Additional classes to add to the thead
     #[prop(optional, into)]
-    thead_class: MaybeSignal<String>,
+    thead_class: Signal<String>,
     /// Additional classes to add to the row inside the thead
     #[prop(optional, into)]
-    thead_row_class: MaybeSignal<String>,
+    thead_row_class: Signal<String>,
     /// Additional classes to add to the tbody
     #[prop(optional, into)]
-    tbody_class: MaybeSignal<String>,
+    tbody_class: Signal<String>,
     /// Additional classes to add to the cell inside a row that is being loaded
     #[prop(optional, into)]
-    loading_cell_class: MaybeSignal<String>,
+    loading_cell_class: Signal<String>,
     /// Additional classes to add to the inner element inside a cell that is inside a row that is being loaded
     #[prop(optional, into)]
-    loading_cell_inner_class: MaybeSignal<String>,
+    loading_cell_inner_class: Signal<String>,
     /// The sorting to apply to the table.
     /// For this to work you have add `#[table(sortable)]` to your struct.
     /// Please see the [simple example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs).
-    #[prop(default = create_rw_signal(VecDeque::new()), into)]
+    #[prop(default = RwSignal::new(VecDeque::new()), into)]
     sorting: RwSignal<VecDeque<(usize, ColumnSort)>>,
     /// The sorting mode to use. Defaults to `MultiColumn`. Please note that
     /// this to have any effect you have to add the macro attribute `#[table(sortable)]`
@@ -177,15 +180,17 @@ pub fn TableContent<Row, DataP, Err, ClsP>(
     #[prop(optional)]
     row_reader: RowReader<Row>,
 
-    #[prop(optional)] _marker: PhantomData<Err>,
+    #[prop(optional)] _marker: PhantomData<(Err, ScrollM)>,
 ) -> impl IntoView
 where
-    Row: TableRow<ClassesProvider = ClsP> + Clone + 'static,
+    Row: TableRow<ClassesProvider = ClsP> + Clone + Send + Sync + 'static,
     DataP: TableDataProvider<Row, Err> + 'static,
     Err: Debug,
-    ClsP: TableClassesProvider + Copy + 'static,
+    ClsP: TableClassesProvider + Send + Sync + Copy + 'static,
+    ScrollEl: IntoElementMaybeSignal<web_sys::Element, ScrollM>,
+    ScrollM: ?Sized,
 {
-    let on_change = store_value(on_change);
+    let on_change = StoredValue::new(on_change);
     let rows = Rc::new(RefCell::new(rows));
 
     let class_provider = ClsP::new();
@@ -197,21 +202,21 @@ where
     let thead_row_class = Signal::derive(move || class_provider.thead_row(&thead_row_class.get()));
     let tbody_class = Signal::derive(move || class_provider.tbody(&tbody_class.get()));
 
-    let loaded_rows = create_rw_signal(LoadedRows::<Row>::new());
+    let loaded_rows = RwSignal::new(LoadedRows::<Row>::new());
 
     let _ = row_reader
         .get_loaded_rows
         .replace(Box::new(move |index: usize| {
-            loaded_rows.with(|loaded_rows| loaded_rows[index].clone())
+            loaded_rows.read()[index].clone()
         }));
 
-    let first_selected_index = create_rw_signal(None::<usize>);
+    let first_selected_index = RwSignal::new(None::<usize>);
 
-    let (row_count, set_row_count) = create_signal(None::<usize>);
+    let (row_count, set_row_count) = signal(None::<usize>);
 
     let set_known_row_count = move |row_count: usize| {
         set_row_count.set(Some(row_count));
-        loaded_rows.update(|loaded_rows| loaded_rows.resize(row_count));
+        loaded_rows.write().resize(row_count);
         on_row_count.run(row_count);
         display_strategy.set_row_count(row_count);
     };
@@ -238,23 +243,21 @@ where
                     }
 
                     // force update to trigger sorting effect below
-                    sorting.update(|_| {});
+                    sorting.notify();
                 }
             })
         }
     };
 
-    let (reload_count, set_reload_count) = create_signal(0_usize);
+    let (reload_count, set_reload_count) = signal(0_usize);
     let clear = {
         let load_row_count = load_row_count.clone();
 
         move |clear_row_count: bool| {
             selection.clear();
             first_selected_index.set(None);
-
-            loaded_rows.update(|loaded_rows| {
-                loaded_rows.clear();
-            });
+            // TODO
+            loaded_rows.write().clear();
 
             if clear_row_count {
                 let reload = row_count.get_untracked().is_some();
@@ -269,15 +272,15 @@ where
     };
 
     let on_head_click = move |event: TableHeadEvent| {
-        sorting.update(move |sorting| sorting_mode.update_sorting_from_event(sorting, event));
+        sorting_mode.update_sorting_from_event(&mut sorting.write(), event);
     };
 
-    create_effect({
-        let rows = Rc::clone(&rows);
+    Effect::new({
         let clear = clear.clone();
+        let rows = Rc::clone(&rows);
 
-        move |_| {
-            let sorting = sorting.get();
+        move || {
+            let sorting = sorting.read();
             if let Ok(mut rows) = rows.try_borrow_mut() {
                 rows.set_sorting(&sorting);
                 clear(false);
@@ -285,10 +288,10 @@ where
         }
     });
 
-    create_effect({
+    Effect::new({
         let rows = Rc::clone(&rows);
 
-        move |_| {
+        move || {
             // triggered when `ReloadController::reload()` is called
             reload_controller.track();
             rows.borrow().track();
@@ -307,6 +310,8 @@ where
         Selection::Multiple(selected_indices) => selected_indices.into(),
     };
 
+    let scroll_container = scroll_container.into_element_maybe_signal();
+
     let UseScrollReturn { y, set_y, .. } = use_scroll_with_options(
         scroll_container,
         UseScrollOptions::default().throttle(100.0),
@@ -317,51 +322,48 @@ where
         UseElementSizeOptions::default().box_(web_sys::ResizeObserverBoxOptions::ContentBox),
     );
 
-    if is_browser()
-        && matches!(
-            display_strategy,
-            DisplayStrategy::Virtualization | DisplayStrategy::Pagination { .. }
-        )
-    {
-        load_row_count();
-    }
+    Effect::new(move || {
+        if let DisplayStrategy::Virtualization | DisplayStrategy::Pagination { .. } =
+            display_strategy
+        {
+            load_row_count();
+        }
+    });
 
-    let (average_row_height, set_average_row_height) = create_signal(20.0);
+    let (average_row_height, set_average_row_height) = signal(20.0);
 
     let first_visible_row_index = if let DisplayStrategy::Pagination {
         controller,
         row_count,
     } = display_strategy
     {
-        create_memo(move |_| controller.current_page.get() * row_count)
+        Memo::new(move |_| controller.current_page.get() * row_count)
     } else {
-        create_memo(move |_| (y.get() / average_row_height.get()).floor() as usize)
+        Memo::new(move |_| (y.get() / average_row_height.get()).floor() as usize)
     };
     let visible_row_count = match display_strategy {
         DisplayStrategy::Pagination { row_count, .. } => Signal::derive(move || row_count),
 
         DisplayStrategy::Virtualization | DisplayStrategy::InfiniteScroll => {
-            create_memo(move |_| {
-                ((height.get() / average_row_height.get()).ceil() as usize).max(20)
-            })
-            .into()
+            Memo::new(move |_| ((height.get() / average_row_height.get()).ceil() as usize).max(20))
+                .into()
         }
     };
 
-    let (display_range, set_display_range) = create_signal(0..0);
+    let (display_range, set_display_range) = signal(0..0);
 
     let placeholder_height_before =
         if matches!(display_strategy, DisplayStrategy::Pagination { .. }) {
             Signal::derive(move || 0.0)
         } else {
-            create_memo(move |_| display_range.get().start as f64 * average_row_height.get()).into()
+            Memo::new(move |_| display_range.get().start as f64 * average_row_height.get()).into()
         };
 
     let placeholder_height_after = if matches!(display_strategy, DisplayStrategy::Pagination { .. })
     {
         Signal::derive(move || 0.0)
     } else {
-        create_memo(move |_| {
+        Memo::new(move |_| {
             let row_count_after = if let Some(row_count) = row_count.get() {
                 (row_count.saturating_sub(display_range.get().end)) as f64
             } else {
@@ -373,12 +375,12 @@ where
         .into()
     };
 
-    let tbody_ref = create_node_ref::<AnyElement>();
+    let tbody_el = RwSignal::new_local(None::<web_sys::Element>);
 
     let compute_average_row_height = use_debounce_fn(
         move || {
             compute_average_row_height_from_loaded(
-                tbody_ref,
+                tbody_el,
                 display_range,
                 y,
                 &set_y,
@@ -390,7 +392,7 @@ where
         50.0,
     );
 
-    create_effect(move |_| {
+    Effect::new(move || {
         let first_visible_row_index = first_visible_row_index.get();
         let visible_row_count = visible_row_count.get().min(MAX_DISPLAY_ROW_COUNT);
 
@@ -450,7 +452,7 @@ where
                 }
             }
 
-            loaded_rows.update(|loaded_rows| loaded_rows.write_loading(missing_range.clone()));
+            loaded_rows.write().write_loading(missing_range.clone());
 
             let mut loading_ranges = vec![];
             if let Some(chunk_size) = DataP::CHUNK_SIZE {
@@ -502,10 +504,7 @@ where
                                     }
                                 }
                             }
-                            loaded_rows.update(|loaded_rows| {
-                                loaded_rows.write_loaded(result, missing_range)
-                            });
-
+                            loaded_rows.write().write_loaded(result, missing_range);
                             compute_average_row_height();
                         }
                     }
@@ -514,7 +513,7 @@ where
         }
     });
 
-    let thead_content = Row::render_head_row(sorting.into(), on_head_click).into_view();
+    let thead_content = Row::render_head_row(sorting.into(), on_head_click).into_any();
 
     let tbody_content = {
         let row_renderer = row_renderer.clone();
@@ -527,16 +526,29 @@ where
 
             <For
                 each=move || {
-                    with!(
-                        | loaded_rows, display_range | { let iter = loaded_rows[display_range
-                        .clone()].iter().cloned().enumerate().map(| (i, row) | (i + display_range
-                        .start, row)); if let Some(loading_row_display_limit) =
-                        loading_row_display_limit { let mut loading_row_count = 0; iter.filter(| (_,
-                        row) | { if matches!(row, RowState::Loading | RowState::Placeholder) {
-                        loading_row_count += 1; loading_row_count <= loading_row_display_limit }
-                        else { true } }).collect::< Vec < _ >> () } else { iter.collect::< Vec < _
-                        >> () } }
-                    )
+                    let loaded_rows = loaded_rows.read();
+                    let display_range = display_range.read();
+
+                    let iter = loaded_rows[display_range.clone()]
+                        .iter()
+                        .cloned()
+                        .enumerate()
+                        .map(|(i, row)| (i + display_range.start, row));
+
+                    if let Some(loading_row_display_limit) = loading_row_display_limit {
+                        let mut loading_row_count = 0;
+                        iter.filter(|(_, row)| {
+                                if matches!(row, RowState::Loading | RowState::Placeholder) {
+                                    loading_row_count += 1;
+                                    loading_row_count <= loading_row_display_limit
+                                } else {
+                                    true
+                                }
+                            })
+                            .collect::<Vec<_>>()
+                    } else {
+                        iter.collect::<Vec<_>>()
+                    }
                 }
 
                 key=|(idx, row)| {
@@ -556,10 +568,10 @@ where
                         match row {
                             RowState::Loaded(row) => {
                                 let selected_signal = Signal::derive(move || {
-                                    selected_indices.get().contains(&i)
+                                    selected_indices.read().contains(&i)
                                 });
                                 let class_signal = Signal::derive(move || {
-                                    class_provider.row(i, selected_signal.get(), &row_class.get())
+                                    class_provider.row(i, selected_signal.get(), row_class.read().as_str())
                                 });
                                 let on_select = {
                                     let on_selection_change = on_selection_change.clone();
@@ -591,18 +603,18 @@ where
                                 loading_row_renderer
                                     .run(
                                         Signal::derive(move || {
-                                            class_provider.row(i, false, &row_class.get())
+                                            class_provider.row(i, false, row_class.read().as_str())
                                         }),
-                                        Callback::new(move |col_index: usize| {
+                                        Callback::new(move |(col_index,): (usize,)| {
                                             class_provider
-                                                .loading_cell(i, col_index, &loading_cell_class.get())
+                                                .loading_cell(i, col_index, loading_cell_class.read().as_str())
                                         }),
-                                        Callback::new(move |col_index: usize| {
+                                        Callback::new(move |(col_index,): (usize,)| {
                                             class_provider
                                                 .loading_cell_inner(
                                                     i,
                                                     col_index,
-                                                    &loading_cell_inner_class.get(),
+                                                    loading_cell_inner_class.read().as_str(),
                                                 )
                                         }),
                                         i,
@@ -615,21 +627,25 @@ where
             />
 
             {row_placeholder_renderer.run(placeholder_height_after.into())}
-        }
+        }.into_any()
     };
 
-    let tbody = tbody_renderer.run(tbody_content, tbody_class, tbody_ref);
+    let tbody_directive = Arc::new(move |el: web_sys::Element, _: ()| {
+        tbody_el.set(Some(el));
+    });
+
+    let tbody = tbody_renderer.run(tbody_content, tbody_class, tbody_directive);
 
     view! {
         {thead_renderer
-            .run(thead_row_renderer.run(thead_content, thead_row_class).into_view(), thead_class)}
+            .run(thead_row_renderer.run(thead_content, thead_row_class), thead_class)}
 
         {tbody}
     }
 }
 
 fn compute_average_row_height_from_loaded<Row, ClsP>(
-    tbody_ref: NodeRef<AnyElement>,
+    tbody_ref: RwSignal<Option<web_sys::Element>, LocalStorage>,
     display_range: ReadSignal<Range<usize>>,
     y: Signal<f64>,
     set_y: &impl Fn(f64),
@@ -637,7 +653,7 @@ fn compute_average_row_height_from_loaded<Row, ClsP>(
     placeholder_height_before: Signal<f64>,
     loaded_rows: RwSignal<LoadedRows<Row>>,
 ) where
-    Row: TableRow<ClassesProvider = ClsP> + Clone + 'static,
+    Row: TableRow<ClassesProvider = ClsP> + Send + Sync + Clone + 'static,
 {
     if let Some(el) = tbody_ref.get_untracked() {
         let el: &web_sys::Element = &el;
@@ -726,41 +742,40 @@ fn update_selection(
             }
         }
         Selection::Multiple(selected_indices) => {
-            selected_indices.update(|selected_indices| {
-                let (meta_pressed, shift_pressed) = get_keyboard_modifiers(&evt);
+            let mut indices = selected_indices.write();
+            let (meta_pressed, shift_pressed) = get_keyboard_modifiers(&evt);
 
-                if meta_pressed {
-                    if selected_indices.contains(&i) {
-                        selected_indices.remove(&i);
-                    } else {
-                        selected_indices.insert(i);
-                    }
-                    match selected_indices.len() {
-                        0 => first_selected_index.set(None),
-                        1 => {
-                            first_selected_index.set(Some(i));
-                        }
-                        _ => {
-                            // do nothing
-                        }
-                    }
-                } else if shift_pressed {
-                    if let Some(first_selected_index) = first_selected_index.get() {
-                        let min = first_selected_index.min(i);
-                        let max = first_selected_index.max(i);
-                        for i in min..=max {
-                            selected_indices.insert(i);
-                        }
-                    } else {
-                        selected_indices.insert(i);
+            if meta_pressed {
+                if indices.contains(&i) {
+                    indices.remove(&i);
+                } else {
+                    indices.insert(i);
+                }
+                match indices.len() {
+                    0 => first_selected_index.set(None),
+                    1 => {
                         first_selected_index.set(Some(i));
                     }
+                    _ => {
+                        // do nothing
+                    }
+                }
+            } else if shift_pressed {
+                if let Some(first_selected_index) = first_selected_index.get() {
+                    let min = first_selected_index.min(i);
+                    let max = first_selected_index.max(i);
+                    for i in min..=max {
+                        indices.insert(i);
+                    }
                 } else {
-                    selected_indices.clear();
-                    selected_indices.insert(i);
+                    indices.insert(i);
                     first_selected_index.set(Some(i));
                 }
-            });
+            } else {
+                HashSet::clear(&mut *indices);
+                indices.insert(i);
+                first_selected_index.set(Some(i));
+            }
         }
     }
 }

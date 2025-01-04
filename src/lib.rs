@@ -18,7 +18,7 @@
 //! # Usage
 //!
 //! ```
-//! use leptos::*;
+//! use leptos::prelude::*;
 //! use leptos_struct_table::*;
 //!
 //! #[derive(TableRow, Clone)]
@@ -145,7 +145,7 @@
 Example:
 
 ```
-# use leptos::*;
+# use leptos::prelude::*;
 # use leptos_struct_table::*;
 # use ::chrono::{NaiveDate, NaiveDateTime, NaiveTime};
 #
@@ -176,7 +176,7 @@ pub struct TemperatureMeasurement {
 //! Example:
 //!
 //! ```
-//! # use leptos::*;
+//! # use leptos::prelude::*;
 //! # use leptos_struct_table::*;
 //! #
 //! #[derive(TableRow, Clone)]
@@ -196,7 +196,7 @@ pub struct TemperatureMeasurement {
 //! Let's start with [`FieldGetter`] and see an example:
 //!
 //! ```
-//! # use leptos::*;
+//! # use leptos::prelude::*;
 //! # use leptos_struct_table::*;
 //! # use serde::{Deserialize, Serialize};
 //! #
@@ -222,7 +222,7 @@ pub struct TemperatureMeasurement {
 //! To provide maximum flexibility you can use the `getter` attribute.
 //!
 //! ```
-//! # use leptos::*;
+//! # use leptos::prelude::*;
 //! # use leptos_struct_table::*;
 //! #
 //! #[derive(TableRow, Clone)]
@@ -276,7 +276,7 @@ pub struct TemperatureMeasurement {
 //! Example:
 //!
 //! ```
-//! # use leptos::*;
+//! # use leptos::prelude::*;
 //! # use leptos_struct_table::*;
 //! #
 //! #[derive(TableRow, Clone)]
@@ -290,7 +290,7 @@ pub struct TemperatureMeasurement {
 //! #[component]
 //! fn ImageTableCellRenderer<F>(
 //!     class: String,
-//!     #[prop(into)] value: MaybeSignal<String>,
+//!     #[prop(into)] value: Signal<String>,
 //!     on_change: F,
 //!     index: usize,
 //! ) -> impl IntoView
@@ -315,7 +315,7 @@ pub struct TemperatureMeasurement {
 //! uses an `<input>`.
 //!
 //! ```
-//! # use leptos::*;
+//! # use leptos::{prelude::*, logging};
 //! # use leptos_struct_table::*;
 //! #
 //! #[derive(TableRow, Clone, Default, Debug)]
@@ -330,7 +330,7 @@ pub struct TemperatureMeasurement {
 //! #[component]
 //! fn InputCellRenderer<F>(
 //!     class: String,
-//!     #[prop(into)] value: MaybeSignal<String>,
+//!     #[prop(into)] value: Signal<String>,
 //!     on_change: F,
 //!     index: usize,
 //! ) -> impl IntoView
@@ -403,7 +403,6 @@ mod reload_controller;
 mod row_reader;
 #[cfg(feature = "rust_decimal")]
 pub mod rust_decimal;
-mod scroll_container;
 mod selection;
 mod sorting;
 mod table_row;
@@ -422,7 +421,6 @@ pub use leptos_struct_table_macro::TableRow;
 pub use loaded_rows::RowState;
 pub use reload_controller::*;
 pub use row_reader::*;
-pub use scroll_container::*;
 pub use selection::*;
 pub use sorting::*;
 pub use table_row::*;

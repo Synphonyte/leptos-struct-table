@@ -1,5 +1,5 @@
-use leptos::html::{AnyElement, Tbody};
-use leptos::*;
+use leptos::prelude::*;
+use crate::BodyRef;
 
 /// Default tbody renderer. Please note that this is **NOT** a `#[component]`.
 ///
@@ -12,12 +12,13 @@ use leptos::*;
 /// This render function has to render exactly one root element.
 #[allow(non_snake_case)]
 pub fn DefaultTableBodyRenderer(
-    content: Fragment,
+    content: impl IntoView,
     class: Signal<String>,
-    node_ref: NodeRef<AnyElement>,
+    body_ref: BodyRef,
 ) -> impl IntoView {
-    let tbody_ref = create_node_ref::<Tbody>();
-    tbody_ref.on_load(move |e| node_ref.load(&e.into_any()));
-
-    view! { <tbody class=class node_ref=tbody_ref>{content}</tbody> }
+    view! {
+        <tbody class=class use:body_ref>
+            {content}
+        </tbody>
+    }
 }

@@ -29,7 +29,7 @@ macro_rules! wrapper_render_fn {
         /// * `class` - The class attribute that is passed to the root element
         $(#[$additional_doc])*
         #[allow(non_snake_case)]
-        pub fn $name(content: View, class: Signal<String>) -> impl IntoView {
+        pub fn $name(content: AnyView, class: Signal<String>) -> impl IntoView {
             view! {
                 <$tag class=class>
                     {content}

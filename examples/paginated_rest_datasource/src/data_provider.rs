@@ -1,8 +1,9 @@
 use crate::models::{ArchiveOrgApiResponse, ArchiveOrgCountRespone, Book};
 use gloo_net::http::Request;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::{ColumnSort, PaginatedTableDataProvider};
 use std::collections::VecDeque;
+use leptos::logging::error;
 
 pub struct BookDataProvider {
     sorting: VecDeque<(usize, ColumnSort)>,
@@ -84,11 +85,11 @@ impl PaginatedTableDataProvider<Book> for BookDataProvider {
         let resp: Option<ArchiveOrgCountRespone> = Request::get("https://archive.org/advancedsearch.php?q=creator%3A(Lewis)&fl[]=creator&fl[]=identifier&fl[]=publicdate&rows=0&page=0&output=json&callback=")
             .send()
             .await
-            .map_err(|err| logging::error!("Failed to load count: {:?}", err))
+            .map_err(|err| error!("Failed to load count: {:?}", err))
             .ok()?
             .json()
             .await
-            .map_err(|err| logging::error!("Failed to parse count response: {:?}", err))
+            .map_err(|err| error!("Failed to parse count response: {:?}", err))
             .ok();
 
         // This API only allows to display up to 10000 results

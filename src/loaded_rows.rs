@@ -1,7 +1,7 @@
 use std::ops::{Index, Range};
 
 #[derive(Clone)]
-pub enum RowState<T: Clone> {
+pub enum RowState<T: Send + Sync + Clone> {
     /// The row is not yet loaded and a placeholder is displayed if the row is visible in the viewport.
     Placeholder,
     /// The row is loading and a placeholder is displayed if the row is visible in the viewport.
@@ -12,7 +12,7 @@ pub enum RowState<T: Clone> {
     Error(String),
 }
 
-impl<T: Clone> std::fmt::Debug for RowState<T> {
+impl<T: Send + Sync + Clone> std::fmt::Debug for RowState<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             RowState::Placeholder => write!(f, "Placeholder"),
@@ -25,11 +25,11 @@ impl<T: Clone> std::fmt::Debug for RowState<T> {
 
 /// This is basically a cache for rows and used by [`TableContent`] internally to track
 /// which rows are already loaded, which are still loading and which are missing.
-pub struct LoadedRows<T: Clone> {
+pub struct LoadedRows<T: Send + Sync + Clone> {
     rows: Vec<RowState<T>>,
 }
 
-impl<T: Clone> LoadedRows<T> {
+impl<T: Send + Sync + Clone> LoadedRows<T> {
     pub fn new() -> Self {
         Self { rows: vec![] }
     }
@@ -103,7 +103,7 @@ impl<T: Clone> LoadedRows<T> {
     }
 }
 
-impl<T: Clone> Index<Range<usize>> for LoadedRows<T> {
+impl<T: Sync + Send + Clone> Index<Range<usize>> for LoadedRows<T> {
     type Output = [RowState<T>];
 
     #[inline]
@@ -112,7 +112,7 @@ impl<T: Clone> Index<Range<usize>> for LoadedRows<T> {
     }
 }
 
-impl<T: Clone> Index<usize> for LoadedRows<T> {
+impl<T: Send + Sync + Clone> Index<usize> for LoadedRows<T> {
     type Output = RowState<T>;
 
     #[inline]

@@ -3,8 +3,7 @@ mod models;
 mod renderer;
 
 use crate::data_provider::BookDataProvider;
-use leptos::html::Div;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 use leptos_use::use_debounce_fn_with_arg;
 
@@ -18,9 +17,9 @@ pub fn App() -> impl IntoView {
         reload_controller.reload();
     };
 
-    let container = create_node_ref::<Div>();
+    let container = NodeRef::new();
 
-    let (count, set_count) = create_signal(0);
+    let (count, set_count) = signal(0);
 
     let on_input = use_debounce_fn_with_arg(move |value| rows.search.set(value), 300.0);
 

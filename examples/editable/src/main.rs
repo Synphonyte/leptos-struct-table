@@ -3,7 +3,7 @@ mod tailwind;
 
 use crate::renderer::*;
 use ::chrono::NaiveDate;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 use std::ops::Range;
 use tailwind::TailwindClassesPreset;
@@ -21,8 +21,10 @@ pub struct Book {
 }
 
 impl TableDataProvider<Book> for RwSignal<Vec<Book>> {
-    async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Book>, Range<usize>), String> {
-        Ok((self.get_untracked()[range.clone()].to_vec(), range))
+    async fn get_rows(&self, _: Range<usize>) -> Result<(Vec<Book>, Range<usize>), String> {
+        let books = self.get_untracked().to_vec();
+        let len = books.len();
+        Ok((books, 0..len))
     }
 
     async fn row_count(&self) -> Option<usize> {
@@ -35,7 +37,7 @@ fn main() {
     console_error_panic_hook::set_once();
 
     mount_to_body(|| {
-        let rows = create_rw_signal(vec![
+        let rows = RwSignal::new(vec![
             Book {
                 id: 1,
                 title: "The Great Gatsby".to_string(),
@@ -63,15 +65,14 @@ fn main() {
         ]);
 
         let on_change = move |evt: ChangeEvent<Book>| {
-            rows.update(|rows| {
-                rows[evt.row_index] = evt.changed_row;
-            });
+            rows.write()[evt.row_index] = evt.changed_row;
         };
 
         view! {
-            <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 w-[50%]".to_string()>
+            <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 w-[50%]"
+                .to_string()>
                 <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
-                    <TableContent rows on_change/>
+                    <TableContent rows on_change scroll_container="html" />
                 </table>
             </div>
 

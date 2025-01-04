@@ -2,7 +2,7 @@ mod renderers;
 
 use renderers::*;
 
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 
 // This generates the component BookTable
@@ -45,6 +45,7 @@ fn main() {
                     thead_row_renderer=GRenderer
                     thead_renderer=GRenderer
                     tbody_renderer=SvgTbodyRenderer
+                    scroll_container="html"
                 />
             </svg>
         }

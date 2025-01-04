@@ -1,7 +1,7 @@
 mod tailwind;
 
 use ::chrono::NaiveDate;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 use tailwind::TailwindClassesPreset;
 
@@ -58,7 +58,7 @@ fn main() {
         view! {
             <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 float-left".to_string()>
                 <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
-                    <TableContent rows=rows />
+                    <TableContent rows=rows scroll_container="html" />
                 </table>
             </div>
         }

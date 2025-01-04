@@ -1,5 +1,5 @@
 use ::chrono::NaiveDate;
-use leptos::*;
+use leptos::prelude::*;
 use leptos_struct_table::*;
 
 // This generates the component BookTable
@@ -51,7 +51,7 @@ fn main() {
         view! {
             <div class="container".to_string()>
                 <table class="table-hover">
-                    <TableContent rows />
+                    <TableContent rows scroll_container="html" />
                 </table>
             </div>
         }
