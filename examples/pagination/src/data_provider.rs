@@ -44,7 +44,7 @@ impl BreweryDataProvider {
         for pair in &self.sorting {
             sort.push_str(&self.url_sort_param_for_sort_pair(pair));
         }
-        // this api is terrible at sorting - removed the parameter for now
+
         format!(
                 "https://api.openbrewerydb.org/v1/breweries?{sort}&page={}&per_page={}",
                 page_index + 1,
