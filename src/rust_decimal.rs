@@ -3,7 +3,7 @@ use crate::*;
 use ::rust_decimal::Decimal;
 use leptos::prelude::*;
 
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct DecimalNumberRenderOptions {
     /// Specifies the number of digits to display after the decimal point
     pub precision: Option<usize>,
