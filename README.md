@@ -413,4 +413,5 @@ All contributions are welcome. Please open an issue or a pull request if you hav
 | <= 0.2        | 0.3                       |
 | 0.3           | 0.4                       |
 | 0.4, 0.5, 0.6 | 0.5                       |
-| 0.7 – 0.12    | 0.6                       |
+| 0.7 – 0.13    | 0.6                       |
+| 0.14          | 0.7                       |

@@ -1,10 +1,18 @@
 # Changelog
 
-## [0.14.0-beta1] - 2024-09-06
+## [0.14.0-beta1] - 2025-01-03
 
-### Breaking Change 🛠️
+### Breaking Changes 🛠️
 
-- Updated dependency leptos-use to version 0.14.0-beta and leptos 0.7.0-beta
+- Updated dependencies leptos-use to version 0.15 and leptos 0.7
+- The prop `scroll_container` of `<TableContent>` is now required. If you don't care about scrolling you can use `scroll_container="html"`.
+- Some smaller stuff that the compiler should tell you about. Please also refer to the updated examples.
+
+### Known Issues
+
+- The virtualized scrolling is not perfectly smooth yet.
+- Editing doesn't work quite yet.
+- The examples `paginated_rest_datasource` and `pagination` are not working yet because the previously used external REST API changed.
 
 ## [0.13.1] - 2024-10-31
 
