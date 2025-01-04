@@ -14,6 +14,13 @@
 - Editing doesn't work quite yet.
 - The examples `paginated_rest_datasource` and `pagination` are not working yet because the previously used external REST API changed.
 
+### Thanks to contributor
+
+Thanks to @kstep for his many contributions to this release.
+
+### Special thanks to our sponsor
+- @spencewenski
+
 ## [0.13.1] - 2024-10-31
 
 ### Fixes 🐛
