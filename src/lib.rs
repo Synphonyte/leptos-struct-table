@@ -107,6 +107,7 @@
 //! - **`impl_vec_data_provider`** - If given, then [`TableDataProvider`] is automatically implemented for `Vec<ThisStruct>` to allow
 //!    for easy local data use. See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) for more information.
 //! - **`row_type`** - Specifies the type of the rows in the table. Defaults to the struct that this is applied to. See the [custom_type example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/custom_type/src/main.rs) for more information.
+//! - **`i18n`** - Allows to specify the i18n scope for all fields of the struct as well as the `i18n` module path which defaults to `crate::i18n`. See [I18n](#i18n) for more information.
 //!
 //! ## Field attributes
 //!
@@ -124,6 +125,7 @@
 //!  - **`format`** - Quick way to customize the formatting of cells without having to create a custom renderer. See [Formatting](#formatting) below for more information.
 //! - **`getter`** - Specifies a method that returns the value of the field instead of accessing the field directly when rendering.
 //! - **`none_value`** - Specifies a display value for `Option` types when they are `None`. Defaults to empty string
+//! - **`i18n`** - Overrides the i18n key for the field. See [I18n](#i18n) for more information.
 //!
 //! ### Formatting
 //!
@@ -376,10 +378,12 @@ pub struct TemperatureMeasurement {
 //! # I18n
 //!
 //! To translate the column titles of the table using `leptos-i18n` you can enable the `"i18n"`
-//! feature. The field names of the struct are used as keys.
+//! feature. The field names of the struct are used as keys by default and can be customized using the `i18n` attribute.
 //!
 //! Please have a look at the
-//! [i18n example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/i18n).
+//! [i18n example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/i18n)
+//! and at the sections [Struct attributes](#struct-attributes) and
+//! [Field attributes](#field-attributes) for more information.
 //!
 //! # Contribution
 //!
