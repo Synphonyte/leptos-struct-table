@@ -6,8 +6,10 @@ use std::rc::Rc;
 /// loading and caching automatically.
 #[derive(Clone)]
 pub struct RowReader<Row: Send + Sync + 'static> {
-    pub(crate) get_loaded_rows: Rc<RefCell<Box<dyn Fn(usize) -> RowState<Row>>>>,
+    pub(crate) get_loaded_rows: LoadedRowsGetter<Row>,
 }
+
+pub type LoadedRowsGetter<Row> = Rc<RefCell<Box<dyn Fn(usize) -> RowState<Row>>>>;
 
 impl<Row: Send + Sync + 'static> Default for RowReader<Row> {
     fn default() -> Self {

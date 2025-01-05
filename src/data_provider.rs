@@ -143,7 +143,7 @@ where
 
 /// Return `vec[range.start..range.end]` where `range` is clamped to the length of `vec`.
 pub fn get_vec_range_clamped<T: Clone>(
-    vec: &Vec<T>,
+    vec: &[T],
     range: Range<usize>,
 ) -> (Vec<T>, Range<usize>) {
     if vec.is_empty() {

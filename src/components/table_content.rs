@@ -1,3 +1,5 @@
+#![allow(clippy::await_holding_refcell_ref)]
+
 use crate::components::renderer_fn::renderer_fn;
 use crate::loaded_rows::{LoadedRows, RowState};
 use crate::selection::Selection;
@@ -230,6 +232,7 @@ where
                 let set_known_row_count = set_known_row_count.clone();
 
                 async move {
+                    // TODO: can we avoid this?
                     let row_count = rows.borrow().row_count().await;
 
                     // check if this component was disposed of
@@ -298,7 +301,7 @@ where
     });
 
     let selected_indices = match selection {
-        Selection::None => Signal::derive(|| HashSet::new()),
+        Selection::None => Signal::stored(HashSet::new()),
         Selection::Single(selected_index) => Signal::derive(move || {
             selected_index
                 .get()
@@ -479,6 +482,7 @@ where
                     async move {
                         let latest_reload_count = reload_count.get_untracked();
 
+                        // TODO: can we avoid this?
                         let result = rows
                             .borrow()
                             .get_rows(missing_range.clone())
@@ -520,7 +524,7 @@ where
         let on_selection_change = on_selection_change.clone();
 
         view! {
-            {row_placeholder_renderer.run(placeholder_height_before.into())}
+            {row_placeholder_renderer.run(placeholder_height_before)}
 
             <For
                 each=move || {
@@ -576,7 +580,7 @@ where
 
                                 let on_select = {
                                     let on_selection_change = on_selection_change.clone();
-                                    let row = row.clone();
+
                                     move |evt: web_sys::MouseEvent| {
                                         update_selection(evt, selection, first_selected_index, i);
 
@@ -640,7 +644,7 @@ where
                 }
             />
 
-            {row_placeholder_renderer.run(placeholder_height_after.into())}
+            {row_placeholder_renderer.run(placeholder_height_after)}
         }
         .into_any()
     };
@@ -683,10 +687,8 @@ fn compute_average_row_height_from_loaded<Row, ClsP>(
                             loading_row_start_index = Some(i);
                         }
                         loading_row_end_index = Some(i);
-                    } else {
-                        if loading_row_end_index.is_some() {
-                            break;
-                        }
+                    } else if loading_row_end_index.is_some() {
+                        break;
                     }
                 }
 

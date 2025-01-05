@@ -98,6 +98,7 @@
 //!    You can specify two sorting modes with the prop `sorting_mode` on the `TableContent` component:
 //!    - `sorting_mode=SortingMode::MultiColumn` (the default) allows the table to be sorted by multiple columns ordered by priority.
 //!    - `sorting_mode=SortingMode::SingleColumn"` allows the table to be sorted by a single column. Clicking on another column will simply replace the sorting column.
+//!
 //!    See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) and the
 //!    [selectable example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/selectable/src/main.rs) for more information.
 //! - **`classes_provider`** - Specifies the name of the class provider. Used to quickly customize all of the classes that are applied to the table.
