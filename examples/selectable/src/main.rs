@@ -75,6 +75,8 @@ fn main() {
             </div>
 
             { move || selected_row.get().map(|selected_row| {
+                let selected_row = selected_row.get();
+
                 view! {
                     <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 float-left px-5 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-400">
                         <pre>

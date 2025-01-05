@@ -39,15 +39,14 @@ where
 
 #[component]
 #[allow(unused_variables)]
-pub fn CustomDataRenderer<T, F>(
+pub fn CustomDataRenderer<T>(
     class: String,
     #[prop(into)] value: Signal<T>,
-    on_change: F,
+    row: RwSignal<Book<T>>,
     index: usize,
 ) -> impl IntoView
 where
     T: IntoView + Clone + Send + Sync + 'static,
-    F: Fn(T) + 'static,
 {
     view! {
         <td class=class>{value}</td>
