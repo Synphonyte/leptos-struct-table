@@ -13,7 +13,7 @@ repository = "https://github.com/Synphonyte/leptos-struct-table"
 
 [dependencies]
 leptos = { version = "0.7.0" }
-leptos-struct-table-macro = { version = "0.13.0", path = "../leptos-struct-table-macro" }
+leptos-struct-table-macro = { version = "0.13.0-beta1" }
 leptos-use = { version = "0.15.2" }
 rust_decimal = { version = "1.35", optional = true }
 chrono = { version = "0.4", optional = true }
