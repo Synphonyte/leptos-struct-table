@@ -1,8 +1,17 @@
 # Changelog
 
-## [Unreleased]
+## [0.14.0-beta2] - 2025-01-05
 
-- Fixed broken API in `paginated_rest_datasource` and `pagination`
+### Breaking Changes 🛠️
+
+- row and cell renderers now take a `RwSignal<Row>` which also makes it possible to edit the data much more easily.
+
+### Fix 🐛
+
+- Fixed broken API in examples `paginated_rest_datasource` and `pagination`
+
+### Special thanks to our sponsor
+- @spencewenski
 
 ## [0.14.0-beta1] - 2025-01-03
 
