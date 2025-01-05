@@ -1,0 +1,31 @@
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "**"
+      - "!/*.md"
+      - "!/**.md"
+  workflow_dispatch:
+
+name: Tests
+
+permissions: write-all
+
+jobs:
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          profile: minimal
+          override: true
+          components: rustfmt, clippy, rust-src
+      - name: Cache
+        uses: Swatinem/rust-cache@v2
+
+      - name: Run tests (general)
+        run: cargo test --features chrono,uuid,rust_decimal,time
