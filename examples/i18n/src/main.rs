@@ -9,7 +9,8 @@ leptos_i18n::load_locales!();
 
 /// This generates the component BookTable
 #[derive(TableRow, Clone)]
-#[table(sortable, impl_vec_data_provider)]
+// You don't have to specify the i18n scope but it probably will save you some typing
+#[table(sortable, impl_vec_data_provider, i18n(scope = "book_table"))]
 pub struct Book {
     /// Id of the entry.
     #[table(i18n(skip))]

@@ -1,8 +1,10 @@
 {
-  "title": "Titel",
-  "author": "Autor",
-  "publish_date": "Veröffentlichungsdatum",
-  "read_date": "Lesedatum",
-  "description": "Beschreibung",
+  "book_table": {
+    "title": "Titel",
+    "author": "Autor",
+    "publish_date": "Veröffentlichungsdatum",
+    "read_date": "Lesedatum",
+    "description": "Beschreibung"
+  },
   "click_to_change_lang": "Klicken um Sprache zu ändern"
 }
