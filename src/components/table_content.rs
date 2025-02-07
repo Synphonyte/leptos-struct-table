@@ -1,3 +1,5 @@
+// leptos-struct-table/src/components/table_content.rs
+
 #![allow(clippy::await_holding_refcell_ref)]
 
 use crate::components::renderer_fn::renderer_fn;
@@ -167,7 +169,7 @@ pub fn TableContent<Row, DataP, Err, ClsP, ScrollEl, ScrollM>(
     /// Can be one of
     /// - `Virtualization`
     /// - `InfiniteScroll`
-    /// - `Pagination`  
+    /// - `Pagination`
     ///
     /// Please check [`DisplayStrategy`] to see explanations of all available options.
     #[prop(optional)]
@@ -394,36 +396,54 @@ where
     );
 
     Effect::new(move || {
-        let first_visible_row_index = first_visible_row_index.get();
-        let visible_row_count = visible_row_count.get().min(MAX_DISPLAY_ROW_COUNT);
-
         // with this a reload triggers this effect
         reload_count.track();
 
-        if visible_row_count == 0 {
+        // 1. Get all values *atomically* within a single .with() call
+        let (first_visible, visible_count, row_count_opt) = loaded_rows.with(|_| {
+            (
+                first_visible_row_index.get(),
+                visible_row_count.get(),
+                row_count.get(),
+            )
+        });
+
+        let visible_count = visible_count.min(MAX_DISPLAY_ROW_COUNT);
+
+        if visible_count == 0 {
             return;
         }
 
-        let mut start = first_visible_row_index.saturating_sub(visible_row_count * 2);
+        let mut start = first_visible.saturating_sub(visible_count * 2);
+        let mut end = start + visible_count * 5;
 
-        let mut end = start + visible_row_count * 5;
+        if let Some(row_count) = row_count_opt {
+            // Clamp end to row_count if we know it
+            end = end.min(row_count);
+
+            // Ensure start is within valid bounds *after* clamping end
+            start = start.min(end);  // Crucial: prevent start > end
+        } else {
+            //If total number of rows is unknown, we don't clamp,
+            // but limit to MAX_DISPLAY_ROW_COUNT
+            if !matches!(display_strategy, DisplayStrategy::Pagination { .. }) {
+                end = end.min(start + MAX_DISPLAY_ROW_COUNT);
+            }
+        }
 
         if let Some(chunk_size) = DataP::CHUNK_SIZE {
-            start /= chunk_size;
-            start *= chunk_size;
-
-            end /= chunk_size;
-            end += 1;
-            end *= chunk_size;
+            start = (start / chunk_size) * chunk_size;
+            end = ((end + chunk_size - 1) / chunk_size) * chunk_size; // Round end *up* to nearest chunk size
         }
 
-        if let Some(row_count) = row_count.get() {
-            end = end.min(row_count);
-        }
+        let range = start..end;
 
-        if !matches!(display_strategy, DisplayStrategy::Pagination { .. }) {
-            end = end.min(start + MAX_DISPLAY_ROW_COUNT);
-        }
+        set_display_range.set(match display_strategy {
+            DisplayStrategy::Virtualization | DisplayStrategy::InfiniteScroll => range.clone(),
+            DisplayStrategy::Pagination { row_count, .. } => {
+                first_visible..(first_visible + row_count).min(end)
+            }
+        });
 
         loaded_rows.update_untracked(|loaded_rows| {
             if end > loaded_rows.len() {
@@ -431,26 +451,19 @@ where
             }
         });
 
-        let range = start..end;
-
-        set_display_range.set(match display_strategy {
-            DisplayStrategy::Virtualization | DisplayStrategy::InfiniteScroll => range.clone(),
-            DisplayStrategy::Pagination { row_count, .. } => {
-                first_visible_row_index..(first_visible_row_index + row_count).min(end)
-            }
-        });
-
         let missing_range =
             loaded_rows.with_untracked(|loaded_rows| loaded_rows.missing_range(range.clone()));
 
         if let Some(missing_range) = missing_range {
-            let mut end = missing_range.end;
-            if let Some(row_count) = row_count.get() {
-                end = end.min(row_count);
+            // Ensure missing_range is valid *after* all calculations
+            let missing_start = missing_range.start.min(missing_range.end);
+            let missing_end = missing_range.end;  // Already correct
 
-                if end <= missing_range.start {
-                    return;
-                }
+            let missing_range = missing_start..missing_end;
+
+            if missing_range.is_empty() {
+                // Don't proceed with empty ranges
+                return;
             }
 
             loaded_rows.write().write_loading(missing_range.clone());
@@ -497,12 +510,16 @@ where
 
                             if let Ok((_, loaded_range)) = &result {
                                 if loaded_range.end < missing_range.end {
-                                    if let Some(row_count) = row_count.get_untracked() {
-                                        if loaded_range.end < row_count {
+                                    match row_count_opt { // Use pre-fetched value!
+                                        Some(row_count) => {
+                                            if loaded_range.end < row_count {
+                                                set_known_row_count(loaded_range.end);
+                                            }
+                                        },
+                                        None => {
                                             set_known_row_count(loaded_range.end);
-                                        }
-                                    } else {
-                                        set_known_row_count(loaded_range.end);
+                                        },
+
                                     }
                                 }
                             }
