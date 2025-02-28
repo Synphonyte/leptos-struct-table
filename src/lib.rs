@@ -73,7 +73,7 @@
 //!
 //! # Data Providers
 //!
-//! As shown in the inital usage example, when you add `#[table(impl_vec_data_provider)]` to your struct,
+//! As shown in the initial usage example, when you add `#[table(impl_vec_data_provider)]` to your struct,
 //! the table will automatically generate a data provider for you. You can then directly pass a `Vec<T>` to the `rows` prop.
 //! Internally this implements the trait [`TableDataProvider`] for `Vec<T>`.
 //!
@@ -112,9 +112,9 @@
 //!
 //! These attributes can be applied to any field in the struct.
 //!
-//! - **`class`** - Specifies the classes that are applied to each cell (head and body) in the field's column. Can be used in conjuction with `classes_provider` to customize the classes.
-//! - **`head_class`** - Specifies the classes that are applied to the header cell in the field's column. Can be used in conjuction with `classes_provider` to customize the classes.
-//! - **`cell_class`** - Specifies the classes that are applied to the body cells in the field's column. Can be used in conjuction with `classes_provider` to customize the classes.
+//! - **`class`** - Specifies the classes that are applied to each cell (head and body) in the field's column. Can be used in conjunction with `classes_provider` to customize the classes.
+//! - **`head_class`** - Specifies the classes that are applied to the header cell in the field's column. Can be used in conjunction with `classes_provider` to customize the classes.
+//! - **`cell_class`** - Specifies the classes that are applied to the body cells in the field's column. Can be used in conjunction with `classes_provider` to customize the classes.
 //! - **`skip`** - Specifies that the field should be skipped. This is useful for fields that are not displayed in the table.
 //! - **`skip_sort`** - Only applies if `sortable` is set on the struct. Specifies that the field should not be used for sorting. Clicking it's header will not do anything.
 //! - **`skip_header`** - Makes the title of the field not be displayed in the head row.
@@ -170,7 +170,7 @@ pub struct TemperatureMeasurement {
 //! # Classes Customization
 //!
 //! Classes can be easily customized by using the `classes_provider` attribute on the struct.
-//! You can specify any type that implementats the trait [`TableClassesProvider`]. Please see the documentation for that trait for more information.
+//! You can specify any type that implements the trait [`TableClassesProvider`]. Please see the documentation for that trait for more information.
 //! You can also look at [`TailwindClassesPreset`] for an example how this can be implemented.
 //!
 //! Example:
@@ -243,7 +243,7 @@ pub struct TemperatureMeasurement {
 //! ## When to use `FieldGetter` vs `getter` attribute
 //!
 //! A field of type `FieldGetter<T>` is a virtual field that doesn't really exist on the struct.
-//! Internally `FieldGetter` is just a new-typed `PhatomData` and thus is removed during compilation.
+//! Internally `FieldGetter` is just a new-typed `PhantomData` and thus is removed during compilation.
 //! Hence it doesn't increase memory usage. That means you should use it for purely derived data.
 //!
 //! The `getter` attribute should be used on a field that actually exists on the struct but whose
