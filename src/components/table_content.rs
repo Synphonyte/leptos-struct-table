@@ -188,10 +188,10 @@ pub fn TableContent<Row, DataP, Err, ClsP, ScrollEl, ScrollM>(
 where
     Row: TableRow<ClassesProvider = ClsP> + Clone + Send + Sync + 'static,
     DataP: TableDataProvider<Row, Err> + 'static,
-    Err: Debug,
+    Err: Debug + 'static,
     ClsP: TableClassesProvider + Send + Sync + Copy + 'static,
-    ScrollEl: IntoElementMaybeSignal<web_sys::Element, ScrollM>,
-    ScrollM: ?Sized,
+    ScrollEl: IntoElementMaybeSignal<web_sys::Element, ScrollM> + 'static,
+    ScrollM: ?Sized + 'static,
 {
     let on_change = StoredValue::new(on_change);
     let rows = Rc::new(RefCell::new(rows));
