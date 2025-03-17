@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.14.0-beta3] - 2025-03-17
+
+### Fix 🐛
+
+- Fixed keeping track of the query params so the frontend doesn't crash (thanks to @holg).
+
+### Changes 🔥
+
+- Made compatibility table much more prominent (thanks to @cramhead).
+- Adapted to allow --cfg erase_components usage (thanks to @Zagitta).
+
+### Special thanks to our sponsor
+- @spencewenski
+
+
 ## [0.14.0-beta2] - 2025-01-05
 
 ### Breaking Changes 🛠️

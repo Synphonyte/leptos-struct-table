@@ -422,7 +422,7 @@ where
             end = end.min(row_count);
 
             // Ensure start is within valid bounds *after* clamping end
-            start = start.min(end);  // Crucial: prevent start > end
+            start = start.min(end); // Crucial: prevent start > end
         } else {
             //If total number of rows is unknown, we don't clamp,
             // but limit to MAX_DISPLAY_ROW_COUNT
@@ -457,7 +457,7 @@ where
         if let Some(missing_range) = missing_range {
             // Ensure missing_range is valid *after* all calculations
             let missing_start = missing_range.start.min(missing_range.end);
-            let missing_end = missing_range.end;  // Already correct
+            let missing_end = missing_range.end; // Already correct
 
             let missing_range = missing_start..missing_end;
 
@@ -510,16 +510,16 @@ where
 
                             if let Ok((_, loaded_range)) = &result {
                                 if loaded_range.end < missing_range.end {
-                                    match row_count_opt { // Use pre-fetched value!
+                                    match row_count_opt {
+                                        // Use pre-fetched value!
                                         Some(row_count) => {
                                             if loaded_range.end < row_count {
                                                 set_known_row_count(loaded_range.end);
                                             }
-                                        },
+                                        }
                                         None => {
                                             set_known_row_count(loaded_range.end);
-                                        },
-
+                                        }
                                     }
                                 }
                             }
