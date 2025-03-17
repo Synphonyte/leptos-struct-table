@@ -91,7 +91,7 @@ for a working project with SSR.
 
 ## Data Providers
 
-As shown in the inital usage example, when you add `#[table(impl_vec_data_provider)]` to your struct,
+As shown in the initial usage example, when you add `#[table(impl_vec_data_provider)]` to your struct,
 the table will automatically generate a data provider for you. You can then directly pass a `Vec<T>` to the `rows` prop.
 Internally this implements the trait [`TableDataProvider`] for `Vec<T>`.
 
@@ -114,17 +114,17 @@ The `#[table(...)]` attribute can be used to customize the generated component. 
 These attributes can be applied to the struct itself.
 
 - **`sortable`** - Specifies that the table should be sortable. This makes the header titles clickable to control sorting.
-   You can specify two sorting modes with the prop `sorting_mode` on the `TableContent` component:
-   - `sorting_mode=SortingMode::MultiColumn` (the default) allows the table to be sorted by multiple columns ordered by priority.
-   - `sorting_mode=SortingMode::SingleColumn"` allows the table to be sorted by a single column. Clicking on another column will simply replace the sorting column.
+  You can specify two sorting modes with the prop `sorting_mode` on the `TableContent` component:
+  - `sorting_mode=SortingMode::MultiColumn` (the default) allows the table to be sorted by multiple columns ordered by priority.
+  - `sorting_mode=SortingMode::SingleColumn"` allows the table to be sorted by a single column. Clicking on another column will simply replace the sorting column.
 
-   See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) and the
-   [selectable example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/selectable/src/main.rs) for more information.
+  See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) and the
+  [selectable example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/selectable/src/main.rs) for more information.
 - **`classes_provider`** - Specifies the name of the class provider. Used to quickly customize all of the classes that are applied to the table.
-   For convenience sensible presets for major CSS frameworks are provided. See [`TableClassesProvider`] and [tailwind example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/tailwind/src/main.rs) for more information.
+  For convenience sensible presets for major CSS frameworks are provided. See [`TableClassesProvider`] and [tailwind example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/tailwind/src/main.rs) for more information.
 - **`head_cell_renderer`** - Specifies the name of the header cell renderer component. Used to customize the rendering of header cells. Defaults to [`DefaultTableHeaderRenderer`]. See the [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs) for more information.
 - **`impl_vec_data_provider`** - If given, then [`TableDataProvider`] is automatically implemented for `Vec<ThisStruct>` to allow
-   for easy local data use. See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) for more information.
+  for easy local data use. See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) for more information.
 - **`row_type`** - Specifies the type of the rows in the table. Defaults to the struct that this is applied to. See the [custom_type example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/custom_type/src/main.rs) for more information.
 - **`i18n`** - Allows to specify the i18n scope for all fields of the struct as well as the `i18n` module path which defaults to `crate::i18n`. See [I18n](#i18n) for more information.
 
@@ -132,15 +132,15 @@ These attributes can be applied to the struct itself.
 
 These attributes can be applied to any field in the struct.
 
-- **`class`** - Specifies the classes that are applied to each cell (head and body) in the field's column. Can be used in conjuction with `classes_provider` to customize the classes.
-- **`head_class`** - Specifies the classes that are applied to the header cell in the field's column. Can be used in conjuction with `classes_provider` to customize the classes.
-- **`cell_class`** - Specifies the classes that are applied to the body cells in the field's column. Can be used in conjuction with `classes_provider` to customize the classes.
+- **`class`** - Specifies the classes that are applied to each cell (head and body) in the field's column. Can be used in conjunction with `classes_provider` to customize the classes.
+- **`head_class`** - Specifies the classes that are applied to the header cell in the field's column. Can be used in conjunction with `classes_provider` to customize the classes.
+- **`cell_class`** - Specifies the classes that are applied to the body cells in the field's column. Can be used in conjunction with `classes_provider` to customize the classes.
 - **`skip`** - Specifies that the field should be skipped. This is useful for fields that are not displayed in the table.
 - **`skip_sort`** - Only applies if `sortable` is set on the struct. Specifies that the field should not be used for sorting. Clicking it's header will not do anything.
 - **`skip_header`** - Makes the title of the field not be displayed in the head row.
 - **`title`** - Specifies the title that is displayed in the header cell. Defaults to the field name converted to title case (`this_field` becomes `"This Field"`).
 - **`renderer`** - Specifies the name of the cell renderer component. Used to customize the rendering of cells.
-   Defaults to [`DefaultTableCellRenderer`].
+  Defaults to [`DefaultTableCellRenderer`].
  - **`format`** - Quick way to customize the formatting of cells without having to create a custom renderer. See [Formatting](#formatting) below for more information.
 - **`getter`** - Specifies a method that returns the value of the field instead of accessing the field directly when rendering.
 - **`none_value`** - Specifies a display value for `Option` types when they are `None`. Defaults to empty string
@@ -165,7 +165,7 @@ See:
 ## Classes Customization
 
 Classes can be easily customized by using the `classes_provider` attribute on the struct.
-You can specify any type that implementats the trait [`TableClassesProvider`]. Please see the documentation for that trait for more information.
+You can specify any type that implements the trait [`TableClassesProvider`]. Please see the documentation for that trait for more information.
 You can also look at [`TailwindClassesPreset`] for an example how this can be implemented.
 
 Example:
@@ -228,7 +228,7 @@ impl Book {
 ### When to use `FieldGetter` vs `getter` attribute
 
 A field of type `FieldGetter<T>` is a virtual field that doesn't really exist on the struct.
-Internally `FieldGetter` is just a new-typed `PhatomData` and thus is removed during compilation.
+Internally `FieldGetter` is just a new-typed `PhantomData` and thus is removed during compilation.
 Hence it doesn't increase memory usage. That means you should use it for purely derived data.
 
 The `getter` attribute should be used on a field that actually exists on the struct but whose
@@ -242,7 +242,7 @@ To implement a custom renderer please have a look at the default renderers liste
 
 On the struct level you can use this attribute:
 - **`thead_cell_renderer`** - Defaults to [`DefaultTableHeaderCellRenderer`] which renders `<th><span>Title</span></th>`
-   together with sorting functionality (if enabled).
+  together with sorting functionality (if enabled).
 
 As props of the [`TableContent`] component you can use the following:
 - **`thead_renderer`** - Defaults to [`DefaultTableHeadRenderer`] which just renders the tag `thead`.
@@ -366,4 +366,4 @@ and at the sections [Struct attributes](#struct-attributes) and
 
 All contributions are welcome. Please open an issue or a pull request if you have any ideas or problems.
 
-<!-- cargo-rdme end -->                 |
+<!-- cargo-rdme end -->

@@ -433,7 +433,7 @@ where
 
         if let Some(chunk_size) = DataP::CHUNK_SIZE {
             start = (start / chunk_size) * chunk_size;
-            end = ((end + chunk_size - 1) / chunk_size) * chunk_size; // Round end *up* to nearest chunk size
+            end = end.div_ceil(chunk_size) * chunk_size; // Round end *up* to nearest chunk size
         }
 
         let range = start..end;

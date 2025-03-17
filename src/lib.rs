@@ -45,6 +45,16 @@
 //! }
 //! ```
 //!
+//! # Leptos Compatibility
+//!
+//! | Crate version | Compatible Leptos version |
+//! |---------------|---------------------------|
+//! | <= 0.2        | 0.3                       |
+//! | 0.3           | 0.4                       |
+//! | 0.4, 0.5, 0.6 | 0.5                       |
+//! | 0.7 – 0.12    | 0.6                       |
+//! | 0.14.0-beta2  | 0.7                       |
+//!
 //! # Server-Side Rendering
 //!
 //! To use this with Leptos' server-side rendering, you can have to add `leptos-use` as a dependency to your `Cargo.toml` and
@@ -95,17 +105,17 @@
 //! These attributes can be applied to the struct itself.
 //!
 //! - **`sortable`** - Specifies that the table should be sortable. This makes the header titles clickable to control sorting.
-//!    You can specify two sorting modes with the prop `sorting_mode` on the `TableContent` component:
-//!    - `sorting_mode=SortingMode::MultiColumn` (the default) allows the table to be sorted by multiple columns ordered by priority.
-//!    - `sorting_mode=SortingMode::SingleColumn"` allows the table to be sorted by a single column. Clicking on another column will simply replace the sorting column.
+//!   You can specify two sorting modes with the prop `sorting_mode` on the `TableContent` component:
+//!   - `sorting_mode=SortingMode::MultiColumn` (the default) allows the table to be sorted by multiple columns ordered by priority.
+//!   - `sorting_mode=SortingMode::SingleColumn"` allows the table to be sorted by a single column. Clicking on another column will simply replace the sorting column.
 //!
-//!    See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) and the
-//!    [selectable example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/selectable/src/main.rs) for more information.
+//!   See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) and the
+//!   [selectable example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/selectable/src/main.rs) for more information.
 //! - **`classes_provider`** - Specifies the name of the class provider. Used to quickly customize all of the classes that are applied to the table.
-//!    For convenience sensible presets for major CSS frameworks are provided. See [`TableClassesProvider`] and [tailwind example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/tailwind/src/main.rs) for more information.
+//!   For convenience sensible presets for major CSS frameworks are provided. See [`TableClassesProvider`] and [tailwind example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/tailwind/src/main.rs) for more information.
 //! - **`head_cell_renderer`** - Specifies the name of the header cell renderer component. Used to customize the rendering of header cells. Defaults to [`DefaultTableHeaderRenderer`]. See the [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs) for more information.
 //! - **`impl_vec_data_provider`** - If given, then [`TableDataProvider`] is automatically implemented for `Vec<ThisStruct>` to allow
-//!    for easy local data use. See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) for more information.
+//!   for easy local data use. See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) for more information.
 //! - **`row_type`** - Specifies the type of the rows in the table. Defaults to the struct that this is applied to. See the [custom_type example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/custom_type/src/main.rs) for more information.
 //! - **`i18n`** - Allows to specify the i18n scope for all fields of the struct as well as the `i18n` module path which defaults to `crate::i18n`. See [I18n](#i18n) for more information.
 //!
@@ -121,7 +131,7 @@
 //! - **`skip_header`** - Makes the title of the field not be displayed in the head row.
 //! - **`title`** - Specifies the title that is displayed in the header cell. Defaults to the field name converted to title case (`this_field` becomes `"This Field"`).
 //! - **`renderer`** - Specifies the name of the cell renderer component. Used to customize the rendering of cells.
-//!    Defaults to [`DefaultTableCellRenderer`].
+//!   Defaults to [`DefaultTableCellRenderer`].
 //!  - **`format`** - Quick way to customize the formatting of cells without having to create a custom renderer. See [Formatting](#formatting) below for more information.
 //! - **`getter`** - Specifies a method that returns the value of the field instead of accessing the field directly when rendering.
 //! - **`none_value`** - Specifies a display value for `Option` types when they are `None`. Defaults to empty string
@@ -259,7 +269,7 @@ pub struct TemperatureMeasurement {
 //!
 //! On the struct level you can use this attribute:
 //! - **`thead_cell_renderer`** - Defaults to [`DefaultTableHeaderCellRenderer`] which renders `<th><span>Title</span></th>`
-//!    together with sorting functionality (if enabled).
+//!   together with sorting functionality (if enabled).
 //!
 //! As props of the [`TableContent`] component you can use the following:
 //! - **`thead_renderer`** - Defaults to [`DefaultTableHeadRenderer`] which just renders the tag `thead`.
