@@ -63,6 +63,8 @@ fn Demo() -> impl IntoView {
 | 0.4, 0.5, 0.6 | 0.5                       |
 | 0.7 – 0.12    | 0.6                       |
 | 0.14.0-beta2  | 0.7                       |
+| 0.15.0-beta1  | 0.8                       |
+FIXME: use same version
 
 ## Server-Side Rendering
 
