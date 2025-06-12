@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.15.0] - 2025-06-12
+
+### Breaking Change 🛠️
+
+- Updated to Leptos 0.8
+
 ## [0.14.0-beta3] - 2025-03-17
 
 ### Fix 🐛

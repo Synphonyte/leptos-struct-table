@@ -7,15 +7,15 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-axum = { version = "0.7", optional = true }
+axum = { version = "0.8", optional = true }
 console_error_panic_hook = "0.1"
 http = "1"
 leptos = { version = "0.8" }
 leptos-struct-table = { path = "../.." }
-leptos-use = { version = "0.15" }
-leptos_axum = { version = "0.7", optional = true }
-leptos_meta = { version = "0.7" }
-leptos_router = { version = "0.7" }
+leptos-use = { version = "0.16" }
+leptos_axum = { version = "0.8", optional = true }
+leptos_meta = { version = "0.8" }
+leptos_router = { version = "0.8" }
 serde = { version = "1.0.197", features = ["derive"] }
 sqlx = { version = "0.8", optional = true, features = [
     "sqlite",

@@ -31,7 +31,7 @@ pub struct CustomerQuery {
 }
 
 #[server]
-pub async fn list_customers(query: CustomerQuery) -> Result<Vec<Customer>, ServerFnError<String>> {
+pub async fn list_customers(query: CustomerQuery) -> Result<Vec<Customer>, ServerFnError> {
     use crate::database::get_db;
 
     let CustomerQuery { sort, range, name } = query;
@@ -60,17 +60,17 @@ pub async fn list_customers(query: CustomerQuery) -> Result<Vec<Customer>, Serve
         .build_query_as::<Customer>()
         .fetch_all(get_db())
         .await
-        .map_err(|e| ServerFnError::WrappedServerError(format!("{e:?}")))
+        .map_err(|e| ServerFnError::new(format!("{e:?}")))
 }
 
 #[server]
-pub async fn customer_count() -> Result<usize, ServerFnError<String>> {
+pub async fn customer_count() -> Result<usize, ServerFnError> {
     use crate::database::get_db;
 
     let count: i64 = sqlx::query("SELECT COUNT(*) FROM customers")
         .fetch_one(get_db())
         .await
-        .map_err(|err| ServerFnError::WrappedServerError(format!("{err:?}")))?
+        .map_err(|err| ServerFnError::new(format!("{err:?}")))?
         .get(0);
 
     Ok(count as usize)
