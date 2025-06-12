@@ -6,6 +6,9 @@
 
 - Updated to Leptos 0.8
 
+### Special thanks to our sponsor
+- @benwis
+
 ## [0.14.0-beta3] - 2025-03-17
 
 ### Fix 🐛
