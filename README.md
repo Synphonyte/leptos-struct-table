@@ -65,7 +65,6 @@ fn Demo() -> impl IntoView {
 | 0.14.0-beta   | 0.7                       |
 | 0.15          | 0.8                       |
 
-
 ## Server-Side Rendering
 
 To use this with Leptos' server-side rendering, you can have to add `leptos-use` as a dependency to your `Cargo.toml` and
