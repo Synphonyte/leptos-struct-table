@@ -41,7 +41,7 @@ pub trait TableDataProvider<Row, Err: Debug = String> {
     async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Row>, Range<usize>), Err>;
 
     /// Refresh data dependant side effects without reloading the data.
-    /// This method is called right after get_page.
+    /// This method is called right after get_rows.
     #[allow(unused_variables)]
     fn refresh(&self, rows: Vec<RwSignal<Row>>) {
         // By default, do nothing.
