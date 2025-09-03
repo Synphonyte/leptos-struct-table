@@ -1,4 +1,4 @@
-use crate::{ColumnSort, TableClassesProvider};
+use leptos_struct_table::{ColumnSort, TableClassesProvider};
 
 #[derive(Clone, Copy)]
 pub struct TailwindClassesPreset;

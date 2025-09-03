@@ -1,8 +1,8 @@
 mod tailwind;
 
-use ::chrono::NaiveDate;
+use chrono::NaiveDate;
 use leptos::prelude::*;
-use leptos_struct_table::*;
+use leptos_struct_table::{ColumnSort, TableContent, TableDataProvider, TableRow};
 use tailwind::TailwindClassesPreset;
 
 // This generates the component BookTable
@@ -56,7 +56,7 @@ fn main() {
         ];
 
         view! {
-            <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 float-left".to_string()>
+            <div class="float-left m-10 rounded-md border dark:border-gray-700 overflow-clip">
                 <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
                     <TableContent rows=rows scroll_container="html" />
                 </table>

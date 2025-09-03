@@ -18,7 +18,7 @@ impl SortingMode {
         sorting: &mut VecDeque<(usize, ColumnSort)>,
         event: TableHeadEvent,
     ) {
-        let (i, (_, mut sort)) = sorting
+        let (i, &(_, mut sort)) = sorting
             .iter()
             .enumerate()
             .find(|(_, (col_index, _))| col_index == &event.index)
