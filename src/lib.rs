@@ -412,6 +412,7 @@ mod display_strategy;
 mod events;
 mod loaded_rows;
 mod reload_controller;
+mod refresh_controller;
 mod row_reader;
 #[cfg(feature = "rust_decimal")]
 pub mod rust_decimal;
@@ -432,6 +433,7 @@ pub use events::*;
 pub use leptos_struct_table_macro::TableRow;
 pub use loaded_rows::RowState;
 pub use reload_controller::*;
+pub use refresh_controller::*;
 pub use row_reader::*;
 pub use selection::*;
 pub use sorting::*;
