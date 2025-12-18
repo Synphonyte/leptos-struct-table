@@ -508,18 +508,18 @@ where
                                 return;
                             }
 
-                            if let Ok((_, loaded_range)) = &result {
-                                if loaded_range.end < missing_range.end {
-                                    match row_count_opt {
-                                        // Use pre-fetched value!
-                                        Some(row_count) => {
-                                            if loaded_range.end < row_count {
-                                                set_known_row_count(loaded_range.end);
-                                            }
-                                        }
-                                        None => {
+                            if let Ok((_, loaded_range)) = &result
+                                && loaded_range.end < missing_range.end
+                            {
+                                match row_count_opt {
+                                    // Use pre-fetched value!
+                                    Some(row_count) => {
+                                        if loaded_range.end < row_count {
                                             set_known_row_count(loaded_range.end);
                                         }
+                                    }
+                                    None => {
+                                        set_known_row_count(loaded_range.end);
                                     }
                                 }
                             }

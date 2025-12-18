@@ -1,5 +1,5 @@
-use crate::table_row::TableRow;
 use crate::EventHandler;
+use crate::table_row::TableRow;
 use leptos::prelude::*;
 
 /// The default table row renderer. Uses the `<tr>` element. Please note that this

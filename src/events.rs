@@ -48,44 +48,30 @@ pub struct TableHeadEvent {
     pub mouse_event: MouseEvent,
 }
 
-macro_rules! impl_default_arc_fn {
-    (
-        $(#[$meta:meta])*
-        $name:ident<$($ty:ident),*>($($arg_name:ident: $arg_ty:ty),*)
-        $(-> $ret_ty:ty)?
-        $({ default $default_return:expr })?
-    ) => {
-        $(#[$meta])*
-        #[derive(Clone)]
-        pub struct $name<$($ty),*>(Arc<dyn Fn($($arg_ty),*) $(-> $ret_ty)? + Send + Sync>);
+/// New type wrapper of a closure that takes a parameter `T`. This allows the event handler props
+/// to be optional while being able to take a simple closure.
+#[derive(Clone)]
+pub struct EventHandler<T>(Arc<dyn Fn(T) + Send + Sync>);
 
-        impl<$($ty),*> Default for $name<$($ty),*> {
-            fn default() -> Self {
-                #[allow(unused_variables)]
-                Self(Arc::new(|$($arg_name: $arg_ty),*| {
-                    $($default_return)?
-                }))
-            }
-        }
-
-        impl<F, $($ty),*> From<F> for $name<$($ty),*>
-            where F: Fn($($arg_ty),*) $(-> $ret_ty)? + Send + Sync + 'static
-        {
-            fn from(f: F) -> Self { Self(Arc::new(f)) }
-        }
-
-        impl<$($ty),*> $name<$($ty),*> {
-            pub fn run(&self, $($arg_name: $arg_ty),*) $(-> $ret_ty)? {
-                (self.0)($($arg_name),*)
-            }
-        }
+impl<T> Default for EventHandler<T> {
+    fn default() -> Self {
+        #[allow(unused_variables)]
+        Self(Arc::new(|event: T| {}))
     }
 }
 
-impl_default_arc_fn!(
-    /// New type wrapper of a closure that takes a parameter `T`. This allows the event handler props
-    /// to be optional while being able to take a simple closure.
-    EventHandler<T>(event: T)
-);
+impl<F, T> From<F> for EventHandler<T>
+where
+    F: Fn(T) + Send + Sync + 'static,
+{
+    fn from(f: F) -> Self {
+        Self(Arc::new(f))
+    }
+}
 
-pub(crate) use impl_default_arc_fn;
+impl<T> EventHandler<T> {
+    #[inline]
+    pub fn run(&self, event: T) {
+        (self.0)(event)
+    }
+}
