@@ -18,8 +18,8 @@ use leptos::tachys::view::any_view::AnyView;
 use leptos::task::spawn_local;
 use leptos_use::core::IntoElementMaybeSignal;
 use leptos_use::{
-    use_debounce_fn, use_element_size_with_options, use_scroll_with_options, UseElementSizeOptions,
-    UseElementSizeReturn, UseScrollOptions, UseScrollReturn,
+    UseElementSizeOptions, UseElementSizeReturn, UseScrollOptions, UseScrollReturn,
+    use_debounce_fn, use_element_size_with_options, use_scroll_with_options,
 };
 use std::cell::RefCell;
 use std::collections::{HashSet, VecDeque};
@@ -191,7 +191,7 @@ where
     Err: Debug + 'static,
     ClsP: TableClassesProvider + Send + Sync + Copy + 'static,
     ScrollEl: IntoElementMaybeSignal<web_sys::Element, ScrollM> + 'static,
-    ScrollM: ?Sized + 'static,
+    ScrollM: 'static,
 {
     let on_change = StoredValue::new(on_change);
     let rows = Rc::new(RefCell::new(rows));

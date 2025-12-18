@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.16.0] - 2025-12-18
+
+### Breaking Changes 🛠️
+
+- Updated dependencies `leptos-use` to version 0.17
+
+### Special thanks to our sponsor
+- @benwis
+
 ## [0.15.0] - 2025-06-12
 
 ### Breaking Change 🛠️
