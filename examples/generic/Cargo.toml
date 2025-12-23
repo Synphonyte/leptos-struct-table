@@ -7,7 +7,7 @@ edition = "2021"
 leptos = { version = "0.8", features = ["csr"] }
 leptos-struct-table = { path = "../..", features = ["chrono", "uuid"] }
 chrono = { version = "0.4" }
-uuid = { version = "1.8", features = ["v4"] }
+uuid = { version = "1.19", features = ["v4", "js"] }
 console_error_panic_hook = "0.1"
 console_log = "1"
 log = "0.4"
@@ -15,5 +15,5 @@ getrandom = { version = "0.2", features = ["js"] }
 
 [dev-dependencies]
 wasm-bindgen = "0.2"
-wasm-bindgen-test = "0.3.0"
+wasm-bindgen-test = "0.3"
 web-sys = "0.3"
