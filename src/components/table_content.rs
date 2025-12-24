@@ -10,7 +10,7 @@ use crate::{
     ChangeEvent, ColumnSort, DefaultErrorRowRenderer, DefaultLoadingRowRenderer,
     DefaultRowPlaceholderRenderer, DefaultTableBodyRenderer, DefaultTableHeadRenderer,
     DefaultTableHeadRowRenderer, DefaultTableRowRenderer, DisplayStrategy, EventHandler,
-    ReloadController, RowReader, SelectionChangeEvent, SortingMode, TableClassesProvider,
+    ReloadController, RefreshController, RowReader, SelectionChangeEvent, SortingMode, TableClassesProvider,
     TableDataProvider, TableHeadEvent,
 };
 use leptos::prelude::*;
@@ -165,6 +165,9 @@ pub fn TableContent<Row, DataP, Err, ClsP, ScrollEl, ScrollM>(
     /// for how to use.
     #[prop(optional)]
     reload_controller: ReloadController,
+    /// Allow to manually trigger a refresh.
+    #[prop(optional)]
+    refresh_controller: RefreshController,
     /// The display strategy to use when rendering the table.
     /// Can be one of
     /// - `Virtualization`
@@ -299,6 +302,33 @@ where
             reload_controller.track();
             rows.borrow().track();
             clear(true);
+        }
+    });
+
+    let extract_rows = move || {
+        let len = loaded_rows.read().len();
+        loaded_rows
+            .read()[0..len]
+            .iter()
+            .filter_map(|r| {
+                if let RowState::Loaded(val) = r {
+                    Some(val)
+                }else{
+                    None
+                }
+            })
+            .copied()
+            .collect::<Vec<_>>()
+    };
+
+    Effect::new({
+        let rows = Rc::clone(&rows);
+
+        move || {
+            // triggered when 'RefreshController::refresh()' is called
+            refresh_controller.track();
+            let data = extract_rows();
+            rows.borrow().refresh(data);
         }
     });
 
@@ -525,6 +555,8 @@ where
                             }
                             loaded_rows.write().write_loaded(result, missing_range);
                             compute_average_row_height();
+                            let data = extract_rows();
+                            rows.borrow().refresh(data);
                         }
                     }
                 });
