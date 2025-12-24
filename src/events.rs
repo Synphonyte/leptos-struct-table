@@ -40,10 +40,10 @@ impl<Row: Send + Sync + 'static> Copy for SelectionChangeEvent<Row> {}
 
 /// Event emitted when a table head cell is clicked.
 #[derive(Debug)]
-pub struct TableHeadEvent {
+pub struct TableHeadEvent<Column> {
     /// The index of the column. Starts at 0 for the first column.
     /// The order of the columns is the same as the order of the fields in the struct.
-    pub index: usize,
+    pub index: Column,
     /// The mouse event that triggered the event.
     pub mouse_event: MouseEvent,
 }
