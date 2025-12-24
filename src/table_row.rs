@@ -2,12 +2,14 @@ use crate::{ColumnSort, TableClassesProvider, TableHeadEvent};
 use leptos::prelude::*;
 use std::collections::VecDeque;
 
+pub trait Column {}
+
 /// This trait has to implemented in order for [`TableContent`] to be able to render rows and the head row of the table.
 /// Usually this is done by `#[derive(TableRow)]`.
 ///
 /// Please see the [simple example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs)
 /// for how to use.
-pub trait TableRow: Sized {
+pub trait TableRow<Column: Copy + Send + Sync + 'static>: Sized {
     type ClassesProvider: TableClassesProvider + Copy;
 
     /// How many columns this row has (i.e. the number of fields in the struct)
@@ -21,14 +23,14 @@ pub trait TableRow: Sized {
 
     /// Render the head row of the table.
     fn render_head_row<F>(
-        sorting: Signal<VecDeque<(usize, ColumnSort)>>,
+        sorting: Signal<VecDeque<(Column, ColumnSort)>>,
         on_head_click: F,
     ) -> impl IntoView
     where
-        F: Fn(TableHeadEvent) + Clone + 'static;
+        F: Fn(TableHeadEvent<Column>) + Clone + 'static;
 
     /// The name of the column (= struct field name) at the given index. This can be used to implement
-    /// sorting in a database. It takes the `#[table(skip)]` attributes into account. `col_index`
+    /// sorting in a database. It takes the `#[table(skip)]` attributes into account. By default, `col_index`
     /// refers to the index of the field in the struct while ignoring skipped ones.
     ///
     /// For example:
@@ -52,12 +54,17 @@ pub trait TableRow: Sized {
     /// assert_eq!(Person::col_name(0), "name");
     /// assert_eq!(Person::col_name(1), "age");
     /// ```
-    fn col_name(col_index: usize) -> &'static str;
+    ///
+    /// Alternatively, cold_index can be of another type, configured via
+    fn col_name(col_index: Column) -> &'static str;
 
     /// Converts the given sorting to an SQL statement.
     /// Return `None` when there is nothing to be sorted otherwise `Some("ORDER BY ...")`.
     /// Uses [`Self::col_name`] to get the column names for sorting.
-    fn sorting_to_sql(sorting: &VecDeque<(usize, ColumnSort)>) -> Option<String> {
+    fn sorting_to_sql(sorting: &VecDeque<(Column, ColumnSort)>) -> Option<String>
+    where
+        Column: Send + Sync + 'static,
+    {
         let mut sort = vec![];
 
         for (col, col_sort) in sorting {
@@ -74,10 +81,13 @@ pub trait TableRow: Sized {
     }
 }
 
-pub fn get_sorting_for_column(
-    col_index: usize,
-    sorting: Signal<VecDeque<(usize, ColumnSort)>>,
-) -> ColumnSort {
+pub fn get_sorting_for_column<Column>(
+    col_index: Column,
+    sorting: Signal<VecDeque<(Column, ColumnSort)>>,
+) -> ColumnSort
+where
+    Column: Eq + Send + Sync + 'static,
+{
     sorting
         .read()
         .iter()

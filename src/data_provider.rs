@@ -17,7 +17,7 @@ use std::ops::Range;
 /// The first is a more convenient way of connecting to a paginated data source and the second is
 /// more convenient if you know you're always going to return exactly the requested range (except maybe
 /// at the end of the data).
-pub trait TableDataProvider<Row, Err: Debug = String> {
+pub trait TableDataProvider<Row, Column, Err: Debug = String> {
     /// If Some(...), data will be loaded in chunks of this size. This is useful for paginated data sources.
     /// If you have such a paginated data source, you probably want to implement `PaginatedTableDataProvider`
     /// instead of this trait.
@@ -51,7 +51,7 @@ pub trait TableDataProvider<Row, Err: Debug = String> {
     /// will sort by name first and then by age.
     /// Please note that after calling this method, data will be reloaded through [`get_rows`](TableDataProvider::get_rows).
     #[allow(unused_variables)]
-    fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
+    fn set_sorting(&mut self, sorting: &VecDeque<(Column, ColumnSort)>) {
         // by default do nothing
     }
 
@@ -71,7 +71,7 @@ pub trait TableDataProvider<Row, Err: Debug = String> {
 /// > You do not have implement this trait if you're using pagination and you vice versa if you're not using pagination
 /// > you can still implement this trait. And in case if you use this trait together with pagination the
 /// > display row count can be different from the `PAGE_ROW_COUNT`.
-pub trait PaginatedTableDataProvider<Row, Err: Debug = String> {
+pub trait PaginatedTableDataProvider<Row, Column, Err: Debug = String> {
     /// How many rows per page
     const PAGE_ROW_COUNT: usize;
 
@@ -99,7 +99,7 @@ pub trait PaginatedTableDataProvider<Row, Err: Debug = String> {
 
     /// Same as [`TableDataProvider::set_sorting`]
     #[allow(unused_variables)]
-    fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
+    fn set_sorting(&mut self, sorting: &VecDeque<(Column, ColumnSort)>) {
         // by default do nothing
     }
 
@@ -109,9 +109,9 @@ pub trait PaginatedTableDataProvider<Row, Err: Debug = String> {
     }
 }
 
-impl<Row, Err, D> TableDataProvider<Row, Err> for D
+impl<Row, Column, Err, D> TableDataProvider<Row, Column, Err> for D
 where
-    D: PaginatedTableDataProvider<Row, Err>,
+    D: PaginatedTableDataProvider<Row, Column, Err>,
     Err: Debug,
 {
     const CHUNK_SIZE: Option<usize> = Some(D::PAGE_ROW_COUNT);
@@ -129,15 +129,15 @@ where
     }
 
     async fn row_count(&self) -> Option<usize> {
-        PaginatedTableDataProvider::<Row, Err>::row_count(self).await
+        PaginatedTableDataProvider::<Row, Column, Err>::row_count(self).await
     }
 
-    fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
-        PaginatedTableDataProvider::<Row, Err>::set_sorting(self, sorting)
+    fn set_sorting(&mut self, sorting: &VecDeque<(Column, ColumnSort)>) {
+        PaginatedTableDataProvider::<Row, Column, Err>::set_sorting(self, sorting)
     }
 
     fn track(&self) {
-        PaginatedTableDataProvider::<Row, Err>::track(self)
+        PaginatedTableDataProvider::<Row, Column, Err>::track(self)
     }
 }
 
