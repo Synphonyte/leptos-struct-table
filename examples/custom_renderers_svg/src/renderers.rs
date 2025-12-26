@@ -2,6 +2,8 @@ use crate::Form;
 use leptos::prelude::*;
 use leptos::web_sys;
 use leptos_struct_table::*;
+use std::marker::PhantomData;
+
 
 const ROW_HEIGHT: usize = 30;
 const ROW_HEIGHT_HALF: usize = ROW_HEIGHT / 2;
@@ -28,6 +30,7 @@ pub fn SvgRowRenderer(
     index: usize,
     selected: Signal<bool>,
     on_select: EventHandler<web_sys::MouseEvent>,
+    _phantom: PhantomData<usize>
 ) -> impl IntoView {
     let transform = y_transform_from_index(index);
 
@@ -108,7 +111,7 @@ pub fn SvgHeadCellRenderer<F>(
     children: Children,
 ) -> impl IntoView
 where
-    F: Fn(TableHeadEvent) + 'static,
+    F: Fn(TableHeadEvent<usize>) + 'static,
 {
     let style = default_th_sorting_style(sort_priority, sort_direction);
 

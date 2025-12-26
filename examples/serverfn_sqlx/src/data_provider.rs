@@ -82,7 +82,7 @@ pub struct CustomerTableDataProvider {
     pub name: RwSignal<String>,
 }
 
-impl TableDataProvider<Customer> for CustomerTableDataProvider {
+impl TableDataProvider<Customer, usize> for CustomerTableDataProvider {
     async fn get_rows(&self, range: Range<usize>) -> Result<(Vec<Customer>, Range<usize>), String> {
         list_customers(CustomerQuery {
             name: self.name.get_untracked().trim().to_string(),
