@@ -10,7 +10,8 @@ use tailwind::TailwindClassesPreset;
 #[table(
     sortable,
     classes_provider = "TailwindClassesPreset",
-    impl_vec_data_provider
+    impl_vec_data_provider,
+    column_index_type = "Enum"
 )]
 pub struct Book {
     pub id: u32,

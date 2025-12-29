@@ -127,6 +127,8 @@ These attributes can be applied to the struct itself.
 - **`impl_vec_data_provider`** - If given, then [`TableDataProvider`] is automatically implemented for `Vec<ThisStruct>` to allow
   for easy local data use. See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) for more information.
 - **`row_type`** - Specifies the type of the rows in the table. Defaults to the struct that this is applied to. See the [custom_type example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/custom_type/src/main.rs) for more information.
+- **`column_index_type`** - A type by which the columns are indexed, "usize" is the default. "enum" will generate an enum with the row-struct's field names as variants. See the [column_index_type example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/column_index_type/src/main.rs) for more information.
+
 - **`i18n`** - Allows to specify the i18n scope for all fields of the struct as well as the `i18n` module path which defaults to `crate::i18n`. See [I18n](#i18n) for more information.
 
 ### Field attributes
@@ -340,6 +342,57 @@ pub fn App() -> impl IntoView {
 ```
 
 Please have a look at the [editable example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/editable/src/main.rs) for a fully working example.
+
+
+# Column index type
+Configured via the table annotation on a TableRow struct.
+
+```rust
+#[table(columne_index_type = value)]
+```
+
+Current supported column index type **values**: `"usize"` or `"Enum"`.\
+The column type is used to refer to columns in various places, some of which listed below:
+ - Custom cell renderers via [`DefaultTableCellRendererProps#index`]
+ - Custom header cell renderers via [`DefaultTableHeaderCellRendererProps#index`]
+ - Head events via [`TableHeadEvent#index`]
+ - In [`TableRow#col_name`] as `col_index` parameter type.
+ - In [`get_sorting_for_column`] in both parameters.
+
+## usize column index type
+This is the default index type.
+
+It can be set explicitely:
+```rust
+#[derive(TableRow, Clone, Default, Debug)]
+#[table(impl_vec_data_provider, column_index_type = "usize")]
+pub struct Book {
+    id: u32, // index = 0
+    #[table(skip)]
+    content: String, // no index (skipped)
+    title: String, // index = 1
+}
+```
+Usize indexes start at 0 at the first relevant struct field. Fields marked `skip` do not have an index.
+
+## Enum column index type
+
+Used as follows:
+```rust
+#[derive(TableRow, Clone, Default, Debug)]
+#[table(impl_vec_data_provider, column_index_type = "Enum")]
+// Proc-macro `table` generates enum "{struct_name}Column", in this case: BookColumn
+pub struct Book {
+    id: u32, // index = BookColumn::Id
+    #[table(skip)]
+    content: String, // no index (skipped)
+    title: String, // index = BookColumn::Title
+}
+```
+
+Fields are converted to UpperCammelCase for their generated enum variant.
+See the [column_index_type example](./examples/column_index_type/src/main.rs) for more information.
+
 
 ## Pagination / Virtualization / InfiniteScroll
 

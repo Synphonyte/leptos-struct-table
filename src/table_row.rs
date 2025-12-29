@@ -2,9 +2,7 @@ use crate::{ColumnSort, TableClassesProvider, TableHeadEvent};
 use leptos::prelude::*;
 use std::collections::VecDeque;
 
-pub trait Column {}
-
-/// This trait has to implemented in order for [`TableContent`] to be able to render rows and the head row of the table.
+/// This trait has to be implemented in order for [`TableContent`] to be able to render rows and the head row of the table.
 /// Usually this is done by `#[derive(TableRow)]`.
 ///
 /// Please see the [simple example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs)
@@ -30,32 +28,7 @@ pub trait TableRow<Column: Copy + Send + Sync + 'static>: Sized {
         F: Fn(TableHeadEvent<Column>) + Clone + 'static;
 
     /// The name of the column (= struct field name) at the given index. This can be used to implement
-    /// sorting in a database. It takes the `#[table(skip)]` attributes into account. By default, `col_index`
-    /// refers to the index of the field in the struct while ignoring skipped ones.
-    ///
-    /// For example:
-    /// ```
-    /// # use leptos_struct_table::*;
-    /// # use leptos::prelude::*;
-    /// #
-    /// #[derive(TableRow)]
-    /// struct Person {
-    ///     #[table(skip)]
-    ///     id: i64,            // -> ignored
-    ///
-    ///     name: String,       // -> col_index = 0
-    ///
-    ///     #[table(skip)]
-    ///     internal: usize,    // -> ignored
-    ///
-    ///     age: u16,           // -> col_index = 1
-    /// }
-    ///
-    /// assert_eq!(Person::col_name(0), "name");
-    /// assert_eq!(Person::col_name(1), "age");
-    /// ```
-    ///
-    /// Alternatively, cold_index can be of another type, configured via
+    /// sorting in a database. Information on column indexes is available at: the [Column index type](crate#column-index-type) section.
     fn col_name(col_index: Column) -> &'static str;
 
     /// Converts the given sorting to an SQL statement.
