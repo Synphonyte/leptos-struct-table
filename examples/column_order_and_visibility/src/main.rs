@@ -13,7 +13,7 @@ use web_sys::DragEvent;
 #[table(
     sortable,
     impl_vec_data_provider,
-    column_index_type = "Enum",
+    column_index_type = "enum",
     classes_provider = "TailwindClassesPreset"
 )]
 pub struct Book {

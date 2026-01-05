@@ -11,7 +11,7 @@ use tailwind::TailwindClassesPreset;
     sortable,
     classes_provider = "TailwindClassesPreset",
     impl_vec_data_provider,
-    column_index_type = "Enum"
+    column_index_type = "enum"
 )]
 pub struct Book {
     pub id: u32,

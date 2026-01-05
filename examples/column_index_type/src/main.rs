@@ -59,7 +59,7 @@ pub fn ColorCellRenderer(
 
 /// This generates the component BookTable
 #[derive(TableRow, Clone)]
-#[table(sortable, impl_vec_data_provider, column_index_type = "Enum")]
+#[table(sortable, impl_vec_data_provider, column_index_type = "enum")]
 pub struct Book {
     /// Title of the book.
     pub title: String,

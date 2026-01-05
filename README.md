@@ -351,7 +351,7 @@ Configured via the table annotation on a TableRow struct.
 #[table(columne_index_type = value)]
 ```
 
-Current supported column index type **values**: `"usize"` or `"Enum"`.\
+Current supported column index type **values**: `"usize"` or `"enum"`.\
 The column type is used to refer to columns in various places, some of which listed below:
  - Custom cell renderers via [`DefaultTableCellRendererProps#index`]
  - Custom header cell renderers via [`DefaultTableHeaderCellRendererProps#index`]
@@ -380,7 +380,7 @@ Usize indexes start at 0 at the first relevant struct field. Fields marked `skip
 Used as follows:
 ```rust
 #[derive(TableRow, Clone, Default, Debug)]
-#[table(impl_vec_data_provider, column_index_type = "Enum")]
+#[table(impl_vec_data_provider, column_index_type = "enum")]
 // Proc-macro `table` generates enum "{struct_name}Column", in this case: BookColumn
 pub struct Book {
     id: u32, // index = BookColumn::Id
