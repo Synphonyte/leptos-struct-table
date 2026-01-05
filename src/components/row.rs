@@ -1,5 +1,3 @@
-use std::marker::PhantomData;
-
 use crate::EventHandler;
 use crate::table_row::TableRow;
 use leptos::prelude::*;
@@ -18,7 +16,8 @@ pub fn DefaultTableRowRenderer<Row, Column>(
     selected: Signal<bool>,
     // Event handler callback when this row is selected
     on_select: EventHandler<web_sys::MouseEvent>,
-    _phantom: PhantomData<Column>,
+    // Specifies which and where to render columns
+    columns: RwSignal<Vec<Column>>,
 ) -> impl IntoView
 where
     Row: TableRow<Column> + 'static,
@@ -26,7 +25,7 @@ where
 {
     view! {
         <tr class=class on:click=move |mouse_event| on_select.run(mouse_event)>
-            {TableRow::render_row(row, index)}
+            {TableRow::render_row(row, index, columns)}
         </tr>
     }
 }

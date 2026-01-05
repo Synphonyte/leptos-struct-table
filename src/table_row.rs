@@ -1,4 +1,4 @@
-use crate::{ColumnSort, TableClassesProvider, TableHeadEvent};
+use crate::{ColumnSort, DragManager, TableClassesProvider, TableHeadEvent};
 use leptos::prelude::*;
 use std::collections::VecDeque;
 
@@ -17,15 +17,24 @@ pub trait TableRow<Column: Copy + Send + Sync + 'static>: Sized {
     /// This produces the children that go into the `row_renderer` given to [`TableContent`].
     ///
     /// This render function has to render exactly one root element.
-    fn render_row(row: RwSignal<Self>, index: usize) -> impl IntoView;
+    fn render_row(
+        row: RwSignal<Self>,
+        index: usize,
+        columns: RwSignal<Vec<Column>>,
+    ) -> impl IntoView;
 
     /// Render the head row of the table.
     fn render_head_row<F>(
         sorting: Signal<VecDeque<(Column, ColumnSort)>>,
         on_head_click: F,
+        drag_handlers: DragManager<Column>,
+        columns: RwSignal<Vec<Column>>,
     ) -> impl IntoView
     where
-        F: Fn(TableHeadEvent<Column>) + Clone + 'static;
+        F: Fn(TableHeadEvent<Column>) + Send + Clone + 'static;
+
+    /// All columns this row can show in their default order.
+    fn columns() -> &'static [Column];
 
     /// The name of the column (= struct field name) at the given index. This can be used to implement
     /// sorting in a database. Information on column indexes is available at: the [Column index type](crate#column-index-type) section.

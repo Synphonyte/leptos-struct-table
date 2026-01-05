@@ -9,9 +9,9 @@ use crate::table_row::TableRow;
 use crate::{
     ChangeEvent, ColumnSort, DefaultErrorRowRenderer, DefaultLoadingRowRenderer,
     DefaultRowPlaceholderRenderer, DefaultTableBodyRenderer, DefaultTableHeadRenderer,
-    DefaultTableHeadRowRenderer, DefaultTableRowRenderer, DisplayStrategy, EventHandler,
-    ReloadController, RowReader, SelectionChangeEvent, SortingMode, TableClassesProvider,
-    TableDataProvider, TableHeadEvent,
+    DefaultTableHeadRowRenderer, DefaultTableRowRenderer, DisplayStrategy, DragHandler,
+    DragManager, EventHandler, ReloadController, RowReader, SelectionChangeEvent, SortingMode,
+    TableClassesProvider, TableDataProvider, TableHeadEvent,
 };
 use leptos::prelude::*;
 use leptos::tachys::view::any_view::AnyView;
@@ -38,7 +38,7 @@ renderer_fn!(
         index: usize,
         selected: Signal<bool>,
         on_select: EventHandler<web_sys::MouseEvent>,
-        _phantom: PhantomData<Column>
+        columns: RwSignal<Vec<Column>>
     )
     default DefaultTableRowRenderer
     where
@@ -155,6 +155,10 @@ pub fn TableContent<Row, Column, DataP, Err, ClsP, ScrollEl, ScrollM>(
     /// to your struct.
     #[prop(optional)]
     sorting_mode: SortingMode,
+    /// The to-be rendered columns and their order.
+    /// Used for hiding and ordering columns.
+    #[prop(default = RwSignal::new(Row::columns().into()), into)]
+    columns: RwSignal<Vec<Column>>,
     /// This is called once the number of rows is known.
     /// It will only be executed if [`TableDataProvider::row_count`] returns `Some(...)`.
     ///
@@ -162,6 +166,10 @@ pub fn TableContent<Row, Column, DataP, Err, ClsP, ScrollEl, ScrollM>(
     /// for how to use.
     #[prop(optional, into)]
     on_row_count: EventHandler<usize>,
+    /// Drag and drop handlers for head cells, works with [DefaultTableHeadRenderer].
+    /// A possible use-case is reordering columns.
+    #[prop(optional)]
+    drag_handler: Option<Arc<dyn DragHandler<Column> + Send + Sync + 'static>>,
     /// Allows to manually trigger a reload.
     ///
     /// See the [paginated_rest_datasource example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/paginated_rest_datasource/src/main.rs)
@@ -189,7 +197,7 @@ pub fn TableContent<Row, Column, DataP, Err, ClsP, ScrollEl, ScrollM>(
     #[prop(optional)] _marker: PhantomData<(Err, ScrollM)>,
 ) -> impl IntoView
 where
-    Column: Eq + Ord + Copy + Send + Sync + 'static,
+    Column: Eq + Ord + Copy + Clone + Send + Sync + 'static,
     Row: TableRow<Column, ClassesProvider = ClsP> + Clone + Send + Sync + 'static,
     DataP: TableDataProvider<Row, Column, Err> + 'static,
     Err: Debug + 'static,
@@ -536,7 +544,13 @@ where
         }
     });
 
-    let thead_content = Row::render_head_row(sorting.into(), on_head_click).into_any();
+    let thead_content = Row::render_head_row(
+        sorting.into(),
+        on_head_click,
+        DragManager::new(drag_handler),
+        columns,
+    )
+    .into_any();
 
     let tbody_content = {
         let row_renderer = row_renderer.clone();
@@ -629,7 +643,7 @@ where
                                     false,
                                 );
                                 row_renderer
-                                    .run(class_signal, row, i, selected_signal, on_select.into(), PhantomData)
+                                    .run(class_signal, row, i, selected_signal, on_select.into(), columns)
                             }
                             RowState::Error(err) => {
                                 error_row_renderer.run(err, i, Row::COLUMN_COUNT)

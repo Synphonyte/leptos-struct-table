@@ -6,8 +6,6 @@ use ::uuid::Uuid;
 use leptos::prelude::*;
 use leptos::web_sys;
 use leptos_struct_table::*;
-use std::marker::PhantomData;
-
 
 /// Custom row renderer that adds a link to the end of the row
 #[allow(unused_variables, non_snake_case)]
@@ -22,12 +20,12 @@ pub fn CustomTableRowRenderer(
     selected: Signal<bool>,
     // Event handler callback when this row is selected
     on_select: EventHandler<web_sys::MouseEvent>,
-    _phantom: PhantomData<usize>
+    // Columns to show and their order.
+    columns: RwSignal<Vec<usize>>,
 ) -> impl IntoView {
-
     view! {
         <tr class=class on:click=move |mouse_event| on_select.run(mouse_event)>
-            {TableRow::render_row(row, index)}
+            {TableRow::render_row(row, index, columns)}
             <td>
                 <a href=move || format!("/some-path/{}", row.read().id)>"Some link"</a>
             </td>
