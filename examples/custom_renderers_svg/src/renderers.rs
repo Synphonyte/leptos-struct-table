@@ -109,7 +109,7 @@ pub fn SvgHeadCellRenderer<F, Column>(
     on_click: F,
     children: Children,
     /// unused here
-    drag_manager: DragManager<Column
+    drag_manager: DragManager<Column>
 ) -> impl IntoView
 where
     F: Fn(TableHeadEvent<usize>) + 'static,

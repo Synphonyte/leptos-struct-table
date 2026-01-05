@@ -37,15 +37,15 @@ impl<Column: Send + Sync + 'static> DragManager<Column> {
 
 /// Collection of event handlers needed to create a table-column dragging experience to reorder columns.
 pub trait DragHandler<Column>: Send + Sync {
-    /// Something fell out of the sky onto this column/table head element.
+    /// Cursor is above **column** and dropped the column it was dragging.
     fn received_drop(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent);
-    /// Something is above us still in the sky.
+    /// Cursor is moving above **column** while dragging.
     fn dragging_over(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent);
-    /// Something exited our airspace.
+    /// Cursor moves out of **column**
     fn drag_leave(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent);
-    /// Started dragging column.
+    /// Started dragging **column**.
     fn drag_start(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent);
-    /// Dragging ended, could be that drop did not go off
+    /// Dragging ended.
     fn drag_end(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent);
 
     /// Classes for columns.
