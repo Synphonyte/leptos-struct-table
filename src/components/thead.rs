@@ -36,53 +36,8 @@ impl<Column: Send + Sync + 'static> DragManager<Column> {
 }
 
 /// Collection of event handlers needed to create a table-column dragging experience to reorder columns.
-pub trait DragHandler<Column>: Send + Sync {
+pub trait DragHandler<Column: Clone + PartialEq + Send + Sync + 'static>: Send + Sync {
     /// Cursor is above **column** and dropped the column it was dragging.
-    fn received_drop(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent);
-    /// Cursor is moving above **column** while dragging.
-    fn dragging_over(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent);
-    /// Cursor moves out of **column**
-    fn drag_leave(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent);
-    /// Started dragging **column**.
-    fn drag_start(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent);
-    /// Dragging ended.
-    fn drag_end(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent);
-
-    /// Classes for columns.
-    /// Intended to react to drag events to show highlights via classes.
-    fn get_drag_classes(
-        &self,
-        drag_state: DragStateCarrier<Column>,
-        column: Column,
-    ) -> Signal<String>;
-}
-
-pub type DragStateCarrier<Column> = RwSignal<Option<DragState<Column>>>;
-#[derive(Clone, PartialEq)]
-pub struct DragState<Column> {
-    /// Column which is being dragged.
-    pub grabbed: Column,
-    /// Last column the cursor was over
-    pub hovering_over: Column,
-    /// On which column side of [hovering_over] the cursor is on.
-    /// Used for styling that side, e.g. as dropzone indicator.
-    pub hovering_side: DragSide,
-}
-
-/// The side of a column the cursor is in while dragging another column over it.
-/// Used for styling the matching side with a drop-zone highlight.
-#[derive(Clone, Copy, PartialEq)]
-pub enum DragSide {
-    Left,
-    Right,
-}
-
-#[derive(Clone, Copy)]
-pub struct DefaultHeadDragHandler;
-
-impl<Column: Clone + PartialEq + Send + Sync + 'static> DragHandler<Column>
-    for DefaultHeadDragHandler
-{
     fn received_drop(
         &self,
         drag_state: DragStateCarrier<Column>,
@@ -92,6 +47,7 @@ impl<Column: Clone + PartialEq + Send + Sync + 'static> DragHandler<Column>
         drag_state.set(None);
     }
 
+    /// Cursor is moving above **column** while dragging.
     fn dragging_over(
         &self,
         drag_state_carrier: DragStateCarrier<Column>,
@@ -132,14 +88,10 @@ impl<Column: Clone + PartialEq + Send + Sync + 'static> DragHandler<Column>
         }
     }
 
-    fn drag_leave(
-        &self,
-        _drag_state: DragStateCarrier<Column>,
-        _column: Column,
-        _event: DragEvent,
-    ) {
-    }
+    /// Cursor moves out of **column**
+    fn drag_leave(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent);
 
+    /// Started dragging **column**.
     fn drag_start(&self, drag_state: DragStateCarrier<Column>, column: Column, _event: DragEvent) {
         drag_state.set(Some(DragState {
             grabbed: column.clone(),
@@ -148,11 +100,13 @@ impl<Column: Clone + PartialEq + Send + Sync + 'static> DragHandler<Column>
         }));
     }
 
+    /// Dragging ended.
     fn drag_end(&self, drag_state: DragStateCarrier<Column>, _column: Column, _event: DragEvent) {
         drag_state.set(None);
     }
 
-    /// Compares column against the internal hovered element, if they match then css classes will be returned
+    /// Classes for columns.
+    /// Intended to react to drag events to show highlights via classes.
     fn get_drag_classes(
         &self,
         drag_state: DragStateCarrier<Column>,
@@ -171,6 +125,26 @@ impl<Column: Clone + PartialEq + Send + Sync + 'static> DragHandler<Column>
             String::new()
         })
     }
+}
+
+pub type DragStateCarrier<Column> = RwSignal<Option<DragState<Column>>>;
+#[derive(Clone, PartialEq)]
+pub struct DragState<Column> {
+    /// Column which is being dragged.
+    pub grabbed: Column,
+    /// Last column the cursor was over
+    pub hovering_over: Column,
+    /// On which column side of [hovering_over] the cursor is on.
+    /// Used for styling that side, e.g. as dropzone indicator.
+    pub hovering_side: DragSide,
+}
+
+/// The side of a column the cursor is in while dragging another column over it.
+/// Used for styling the matching side with a drop-zone highlight.
+#[derive(Clone, Copy, PartialEq)]
+pub enum DragSide {
+    Left,
+    Right,
 }
 
 /// The default table header renderer. Renders roughly
@@ -204,7 +178,7 @@ pub fn DefaultTableHeaderCellRenderer<F, Column>(
 ) -> impl IntoView
 where
     F: Fn(TableHeadEvent<Column>) + 'static,
-    Column: Copy + Send + Sync + 'static,
+    Column: PartialEq + Copy + Send + Sync + 'static,
 {
     let style = default_th_sorting_style(sort_priority, sort_direction);
 

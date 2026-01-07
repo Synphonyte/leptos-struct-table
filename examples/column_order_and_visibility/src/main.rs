@@ -4,6 +4,7 @@
 use ::chrono::NaiveDate;
 use derive_more::{Deref, DerefMut};
 use leptos::prelude::*;
+use leptos::wasm_bindgen::JsCast;
 use leptos_struct_table::*;
 use std::sync::{mpsc::Sender, Arc};
 use web_sys::DragEvent;
@@ -35,7 +36,6 @@ pub struct Book {
 pub struct ArcBook(Arc<Book>);
 
 struct CustomHeadDragHandler<Column> {
-    default_handler: DefaultHeadDragHandler,
     drop_tx: Sender<DragState<Column>>,
     trigger: Trigger,
 }
@@ -43,48 +43,14 @@ struct CustomHeadDragHandler<Column> {
 impl<Column: Clone + PartialEq + Send + Sync + 'static> DragHandler<Column>
     for CustomHeadDragHandler<Column>
 {
-    fn received_drop(
-        &self,
-        drag_state: DragStateCarrier<Column>,
-        column: Column,
-        event: DragEvent,
-    ) {
+    fn drag_end(&self, drag_state: DragStateCarrier<Column>, _column: Column, _event: DragEvent) {
         if let Some(drop_state) = drag_state.get() {
             self.drop_tx
                 .send(drop_state)
                 .expect("dnd channel died before eol.");
             self.trigger.notify();
         }
-        self.default_handler
-            .received_drop(drag_state, column, event);
-    }
-
-    fn dragging_over(
-        &self,
-        drag_state: DragStateCarrier<Column>,
-        column: Column,
-        event: DragEvent,
-    ) {
-        self.default_handler
-            .dragging_over(drag_state, column, event);
-    }
-
-    fn drag_leave(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent) {
-        self.default_handler.drag_leave(drag_state, column, event);
-    }
-
-    fn drag_start(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent) {
-        self.default_handler.drag_start(drag_state, column, event);
-    }
-
-    fn drag_end(&self, drag_state: DragStateCarrier<Column>, column: Column, event: DragEvent) {
-        if let Some(drop_state) = drag_state.get() {
-            self.drop_tx
-                .send(drop_state)
-                .expect("dnd channel died before eol.");
-            self.trigger.notify();
-        }
-        self.default_handler.drag_end(drag_state, column, event);
+        drag_state.set(None);
     }
 
     fn get_drag_classes(
@@ -105,6 +71,71 @@ impl<Column: Clone + PartialEq + Send + Sync + 'static> DragHandler<Column>
             String::new()
         })
     }
+
+    fn received_drop(
+        &self,
+        drag_state: DragStateCarrier<Column>,
+        _column: Column,
+        _event: DragEvent,
+    ) {
+        if let Some(drop_state) = drag_state.get() {
+            self.drop_tx
+                .send(drop_state)
+                .expect("dnd channel died before eol.");
+            self.trigger.notify();
+        }
+        drag_state.set(None);
+    }
+
+    fn dragging_over(
+        &self,
+        drag_state_carrier: DragStateCarrier<Column>,
+        column: Column,
+        event: DragEvent,
+    ) {
+        let Some(mut drag_state) = drag_state_carrier.get() else {
+            return;
+        };
+
+        // Prevent default stop to allow drop.
+        event.prevent_default();
+
+        let hovering_side = if let Some(target) = event.target() {
+            let Ok(thead) = target.dyn_into::<web_sys::HtmlTableCellElement>() else {
+                return;
+            };
+            let thead_rect = thead.get_bounding_client_rect();
+            let thead_center_x = thead_rect.x() + thead_rect.width() / 2.0;
+            let mouse_x = event.x();
+            if (mouse_x as f64) < thead_center_x {
+                DragSide::Left
+            } else {
+                DragSide::Right
+            }
+        } else {
+            // fallback
+            DragSide::Left
+        };
+
+        // Update state when the state changed.
+        if drag_state.hovering_over != column || drag_state.hovering_side != hovering_side {
+            drag_state.hovering_over = column;
+            drag_state.hovering_side = hovering_side;
+            drag_state_carrier.update(|mut_drag_state| {
+                *mut_drag_state = Some(drag_state);
+            });
+        }
+    }
+
+    fn drag_start(&self, drag_state: DragStateCarrier<Column>, column: Column, _event: DragEvent) {
+        drag_state.set(Some(DragState {
+            grabbed: column.clone(),
+            hovering_over: column,
+            hovering_side: DragSide::Left,
+        }));
+    }
+
+    fn drag_leave(&self, _drag_state: DragStateCarrier<Column>, _column: Column, _event: DragEvent) {}
 }
 
 fn main() {
@@ -141,13 +172,8 @@ fn main() {
             },
         ];
         let (drop_tx, drop_rx) = std::sync::mpsc::channel();
-        let default_handler = DefaultHeadDragHandler {};
         let trigger = Trigger::new();
-        let custom_handler = Arc::new(CustomHeadDragHandler {
-            default_handler,
-            drop_tx,
-            trigger,
-        });
+        let custom_handler = Arc::new(CustomHeadDragHandler { drop_tx, trigger });
         let columns = RwSignal::new(Vec::from(Book::columns()));
 
         // Drop watcher
