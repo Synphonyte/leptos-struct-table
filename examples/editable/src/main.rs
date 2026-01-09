@@ -20,7 +20,7 @@ pub struct Book {
     pub publish_date: NaiveDate,
 }
 
-impl TableDataProvider<Book> for RwSignal<Vec<Book>> {
+impl TableDataProvider<Book, usize> for RwSignal<Vec<Book>> {
     async fn get_rows(&self, _: Range<usize>) -> Result<(Vec<Book>, Range<usize>), String> {
         let books = self.get_untracked().to_vec();
         let len = books.len();

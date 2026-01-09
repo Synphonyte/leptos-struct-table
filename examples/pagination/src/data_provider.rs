@@ -52,7 +52,7 @@ impl BreweryDataProvider {
     }
 }
 
-impl PaginatedTableDataProvider<Brewery> for BreweryDataProvider {
+impl PaginatedTableDataProvider<Brewery, usize> for BreweryDataProvider {
     const PAGE_ROW_COUNT: usize = 200;
 
     async fn get_page(&self, page_index: usize) -> Result<Vec<Brewery>, String> {

@@ -13,11 +13,13 @@ pub enum SortingMode {
 }
 
 impl SortingMode {
-    pub fn update_sorting_from_event(
+    pub fn update_sorting_from_event<Column>(
         &self,
-        sorting: &mut VecDeque<(usize, ColumnSort)>,
-        event: TableHeadEvent,
-    ) {
+        sorting: &mut VecDeque<(Column, ColumnSort)>,
+        event: TableHeadEvent<Column>,
+    ) where
+        Column: Eq + Clone + Copy,
+    {
         let (i, &(_, mut sort)) = sorting
             .iter()
             .enumerate()

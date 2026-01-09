@@ -9,9 +9,9 @@ use crate::table_row::TableRow;
 use crate::{
     ChangeEvent, ColumnSort, DefaultErrorRowRenderer, DefaultLoadingRowRenderer,
     DefaultRowPlaceholderRenderer, DefaultTableBodyRenderer, DefaultTableHeadRenderer,
-    DefaultTableHeadRowRenderer, DefaultTableRowRenderer, DisplayStrategy, EventHandler,
-    ReloadController, RowReader, SelectionChangeEvent, SortingMode, TableClassesProvider,
-    TableDataProvider, TableHeadEvent,
+    DefaultTableHeadRowRenderer, DefaultTableRowRenderer, DisplayStrategy, DragHandler,
+    DragManager, EventHandler, ReloadController, RowReader, SelectionChangeEvent, SortingMode,
+    TableClassesProvider, TableDataProvider, TableHeadEvent,
 };
 use leptos::prelude::*;
 use leptos::tachys::view::any_view::AnyView;
@@ -32,15 +32,18 @@ use std::sync::Arc;
 const MAX_DISPLAY_ROW_COUNT: usize = 500;
 
 renderer_fn!(
-    RowRendererFn<Row>(
+    RowRendererFn<Row, Column>(
         class: Signal<String>,
         row: RwSignal<Row>,
         index: usize,
         selected: Signal<bool>,
-        on_select: EventHandler<web_sys::MouseEvent>
+        on_select: EventHandler<web_sys::MouseEvent>,
+        columns: RwSignal<Vec<Column>>
     )
     default DefaultTableRowRenderer
-    where Row: TableRow + 'static
+    where
+        Row: TableRow<Column> + 'static,
+        Column: Copy + Send + Sync + 'static
 );
 
 renderer_fn!(
@@ -70,7 +73,7 @@ renderer_fn!(
 
 /// Render the content of a table. This is the main component of this crate.
 #[component]
-pub fn TableContent<Row, DataP, Err, ClsP, ScrollEl, ScrollM>(
+pub fn TableContent<Row, Column, DataP, Err, ClsP, ScrollEl, ScrollM>(
     /// The data to be rendered in this table.
     /// This must implement [`TableDataProvider`] or [`PaginatedTableDataProvider`].
     rows: DataP,
@@ -108,7 +111,7 @@ pub fn TableContent<Row, DataP, Err, ClsP, ScrollEl, ScrollM>(
     /// The row renderer. Defaults to [`DefaultTableRowRenderer`]. For a full example see the
     /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
     #[prop(optional, into)]
-    row_renderer: RowRendererFn<Row>,
+    row_renderer: RowRendererFn<Row, Column>,
     /// The row renderer for when that row is currently being loaded.
     /// Defaults to [`DefaultLoadingRowRenderer`]. For a full example see the
     /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
@@ -146,12 +149,16 @@ pub fn TableContent<Row, DataP, Err, ClsP, ScrollEl, ScrollM>(
     /// For this to work you have add `#[table(sortable)]` to your struct.
     /// Please see the [simple example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs).
     #[prop(default = RwSignal::new(VecDeque::new()), into)]
-    sorting: RwSignal<VecDeque<(usize, ColumnSort)>>,
+    sorting: RwSignal<VecDeque<(Column, ColumnSort)>>,
     /// The sorting mode to use. Defaults to `MultiColumn`. Please note that
     /// this to have any effect you have to add the macro attribute `#[table(sortable)]`
     /// to your struct.
     #[prop(optional)]
     sorting_mode: SortingMode,
+    /// The to-be rendered columns and their order.
+    /// Used for hiding and ordering columns.
+    #[prop(default = RwSignal::new(Row::columns().into()), into)]
+    columns: RwSignal<Vec<Column>>,
     /// This is called once the number of rows is known.
     /// It will only be executed if [`TableDataProvider::row_count`] returns `Some(...)`.
     ///
@@ -159,6 +166,10 @@ pub fn TableContent<Row, DataP, Err, ClsP, ScrollEl, ScrollM>(
     /// for how to use.
     #[prop(optional, into)]
     on_row_count: EventHandler<usize>,
+    /// Drag and drop handlers for head cells, works with [DefaultTableHeadRenderer].
+    /// A possible use-case is reordering columns.
+    #[prop(optional)]
+    drag_handler: Option<Arc<dyn DragHandler<Column> + Send + Sync + 'static>>,
     /// Allows to manually trigger a reload.
     ///
     /// See the [paginated_rest_datasource example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/paginated_rest_datasource/src/main.rs)
@@ -186,8 +197,9 @@ pub fn TableContent<Row, DataP, Err, ClsP, ScrollEl, ScrollM>(
     #[prop(optional)] _marker: PhantomData<(Err, ScrollM)>,
 ) -> impl IntoView
 where
-    Row: TableRow<ClassesProvider = ClsP> + Clone + Send + Sync + 'static,
-    DataP: TableDataProvider<Row, Err> + 'static,
+    Column: Eq + Ord + Copy + Clone + Send + Sync + 'static,
+    Row: TableRow<Column, ClassesProvider = ClsP> + Clone + Send + Sync + 'static,
+    DataP: TableDataProvider<Row, Column, Err> + 'static,
     Err: Debug + 'static,
     ClsP: TableClassesProvider + Send + Sync + Copy + 'static,
     ScrollEl: IntoElementMaybeSignal<web_sys::Element, ScrollM> + 'static,
@@ -274,7 +286,7 @@ where
         }
     };
 
-    let on_head_click = move |event: TableHeadEvent| {
+    let on_head_click = move |event: TableHeadEvent<Column>| {
         sorting_mode.update_sorting_from_event(&mut sorting.write(), event);
     };
 
@@ -532,7 +544,13 @@ where
         }
     });
 
-    let thead_content = Row::render_head_row(sorting.into(), on_head_click).into_any();
+    let thead_content = Row::render_head_row(
+        sorting.into(),
+        on_head_click,
+        DragManager::new(drag_handler),
+        columns,
+    )
+    .into_any();
 
     let tbody_content = {
         let row_renderer = row_renderer.clone();
@@ -625,7 +643,7 @@ where
                                     false,
                                 );
                                 row_renderer
-                                    .run(class_signal, row, i, selected_signal, on_select.into())
+                                    .run(class_signal, row, i, selected_signal, on_select.into(), columns)
                             }
                             RowState::Error(err) => {
                                 error_row_renderer.run(err, i, Row::COLUMN_COUNT)
@@ -679,7 +697,7 @@ where
     }
 }
 
-fn compute_average_row_height_from_loaded<Row, ClsP>(
+fn compute_average_row_height_from_loaded<Row, Column, ClsP>(
     tbody_ref: RwSignal<Option<web_sys::Element>, LocalStorage>,
     display_range: ReadSignal<Range<usize>>,
     y: Signal<f64>,
@@ -688,7 +706,8 @@ fn compute_average_row_height_from_loaded<Row, ClsP>(
     placeholder_height_before: Signal<f64>,
     loaded_rows: RwSignal<LoadedRows<Row>>,
 ) where
-    Row: TableRow<ClassesProvider = ClsP> + Send + Sync + Clone + 'static,
+    Row: TableRow<Column, ClassesProvider = ClsP> + Send + Sync + Clone + 'static,
+    Column: Copy + Send + Sync + 'static,
 {
     if let Some(el) = tbody_ref.get_untracked() {
         let el: &web_sys::Element = &el;

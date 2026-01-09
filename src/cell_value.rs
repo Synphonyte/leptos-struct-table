@@ -16,7 +16,7 @@ pub trait CellValue<M: ?Sized = ()> {
     fn render_value(self, options: Self::RenderOptions) -> impl IntoView;
 }
 
-impl<V> CellValue<()> for V
+impl<V> CellValue for V
 where
     V: IntoView,
 {
