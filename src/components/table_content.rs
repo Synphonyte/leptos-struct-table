@@ -9,8 +9,8 @@ use crate::table_row::TableRow;
 use crate::{
     ChangeEvent, ColumnSort, DefaultErrorRowRenderer, DefaultLoadingRowRenderer,
     DefaultRowPlaceholderRenderer, DefaultTableBodyRenderer, DefaultTableHeadRenderer,
-    DefaultTableHeadRowRenderer, DefaultTableRowRenderer, DisplayStrategy, DragHandler,
-    DragManager, EventHandler, ReloadController, RowReader, SelectionChangeEvent, SortingMode,
+    DefaultTableHeadRowRenderer, DefaultTableRowRenderer, DisplayStrategy, EventHandler,
+    HeadDragHandler, ReloadController, RowReader, SelectionChangeEvent, SortingMode,
     TableClassesProvider, TableDataProvider, TableHeadEvent,
 };
 use leptos::prelude::*;
@@ -166,10 +166,13 @@ pub fn TableContent<Row, Column, DataP, Err, ClsP, ScrollEl, ScrollM>(
     /// for how to use.
     #[prop(optional, into)]
     on_row_count: EventHandler<usize>,
-    /// Drag and drop handlers for head cells, works with [DefaultTableHeadRenderer].
-    /// A possible use-case is reordering columns.
+    /// Drag and drop handlers for head cells.
+    /// The main (and default) use-case is reordering columns.
+    ///
+    /// See the [column_order_and_visibility example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/column_order_and_visibility/src/main.rs)
+    /// for how to use.
     #[prop(optional)]
-    drag_handler: Option<Arc<dyn DragHandler<Column> + Send + Sync + 'static>>,
+    drag_handler: HeadDragHandler<Column>,
     /// Allows to manually trigger a reload.
     ///
     /// See the [paginated_rest_datasource example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/paginated_rest_datasource/src/main.rs)
@@ -544,13 +547,8 @@ where
         }
     });
 
-    let thead_content = Row::render_head_row(
-        sorting.into(),
-        on_head_click,
-        DragManager::new(drag_handler),
-        columns,
-    )
-    .into_any();
+    let thead_content =
+        Row::render_head_row(sorting.into(), on_head_click, drag_handler, columns).into_any();
 
     let tbody_content = {
         let row_renderer = row_renderer.clone();

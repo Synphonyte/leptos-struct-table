@@ -33,6 +33,8 @@ jobs:
       matrix:
         example:
           - bootstrap
+          - column_index_type
+          - column_order_and_visibility
           - custom_renderers_svg
           - custom_row_renderer
           - editable

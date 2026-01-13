@@ -1,4 +1,4 @@
-use crate::{ColumnSort, DragManager, TableClassesProvider, TableHeadEvent};
+use crate::{ColumnSort, HeadDragHandler, TableClassesProvider, TableHeadEvent};
 use leptos::prelude::*;
 use std::collections::VecDeque;
 
@@ -27,7 +27,7 @@ pub trait TableRow<Column: Copy + Send + Sync + 'static>: Sized {
     fn render_head_row<F>(
         sorting: Signal<VecDeque<(Column, ColumnSort)>>,
         on_head_click: F,
-        drag_handlers: DragManager<Column>,
+        drag_handlers: HeadDragHandler<Column>,
         columns: RwSignal<Vec<Column>>,
     ) -> impl IntoView
     where

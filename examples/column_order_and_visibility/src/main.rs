@@ -1,13 +1,14 @@
 #![deny(missing_docs)]
 //! Column order, reordering and visibility showcase example.
 
+mod tailwind;
+
+use crate::tailwind::TailwindClassesPreset;
 use ::chrono::NaiveDate;
 use derive_more::{Deref, DerefMut};
 use leptos::prelude::*;
-use leptos::wasm_bindgen::JsCast;
 use leptos_struct_table::*;
-use std::sync::{mpsc::Sender, Arc};
-use web_sys::DragEvent;
+use std::sync::Arc;
 
 /// This generates the component BookTable
 #[derive(TableRow, Clone)]
@@ -35,107 +36,20 @@ pub struct Book {
 
 pub struct ArcBook(Arc<Book>);
 
-struct CustomHeadDragHandler<Column> {
-    drop_tx: Sender<DragState<Column>>,
-    trigger: Trigger,
-}
+struct CustomHeadDragHandler;
 
-impl<Column: Clone + PartialEq + Send + Sync + 'static> DragHandler<Column>
-    for CustomHeadDragHandler<Column>
-{
-    fn drag_end(&self, drag_state: DragStateCarrier<Column>, _column: Column, _event: DragEvent) {
-        if let Some(drop_state) = drag_state.get() {
-            self.drop_tx
-                .send(drop_state)
-                .expect("dnd channel died before eol.");
-            self.trigger.notify();
-        }
-        drag_state.set(None);
+impl DragHandler<BookColumn> for CustomHeadDragHandler {
+    fn grabbed_class(&self) -> &'static str {
+        "outline outline-blue-500 outline-dashed -outline-offset-1 bg-blue-500/10"
     }
 
-    fn get_drag_classes(
-        &self,
-        drag_state: DragStateCarrier<Column>,
-        column: Column,
-    ) -> Signal<String> {
-        Signal::derive(move || {
-            let Some(drag_state) = drag_state.get() else {
-                return String::new();
-            };
-            if drag_state.hovering_over == column {
-                return match drag_state.hovering_side {
-                    DragSide::Left => String::from("border-l border-blue"),
-                    DragSide::Right => String::from("border-r border-blue"),
-                };
-            }
-            String::new()
-        })
+    fn hover_left_class(&self) -> &'static str {
+        "relative border-l-2 border-blue-500 after:content-[''] after:absolute after:left-0 after:top-0 after:w-0 after:h-0 after:border-l-[6px] after:border-l-transparent after:border-r-[6px] after:border-r-transparent after:border-t-[8px] after:border-t-blue-500 after:-translate-x-[7px]"
     }
 
-    fn received_drop(
-        &self,
-        drag_state: DragStateCarrier<Column>,
-        _column: Column,
-        _event: DragEvent,
-    ) {
-        if let Some(drop_state) = drag_state.get() {
-            self.drop_tx
-                .send(drop_state)
-                .expect("dnd channel died before eol.");
-            self.trigger.notify();
-        }
-        drag_state.set(None);
+    fn hover_right_class(&self) -> &'static str {
+        "relative border-r-2 border-blue-500 after:content-[''] after:absolute after:right-0 after:top-0 after:w-0 after:h-0 after:border-r-[6px] after:border-r-transparent after:border-l-[6px] after:border-l-transparent after:border-t-[8px] after:border-t-blue-500 after:translate-x-[7px]"
     }
-
-    fn dragging_over(
-        &self,
-        drag_state_carrier: DragStateCarrier<Column>,
-        column: Column,
-        event: DragEvent,
-    ) {
-        let Some(mut drag_state) = drag_state_carrier.get() else {
-            return;
-        };
-
-        // Prevent default stop to allow drop.
-        event.prevent_default();
-
-        let hovering_side = if let Some(target) = event.target() {
-            let Ok(thead) = target.dyn_into::<web_sys::HtmlTableCellElement>() else {
-                return;
-            };
-            let thead_rect = thead.get_bounding_client_rect();
-            let thead_center_x = thead_rect.x() + thead_rect.width() / 2.0;
-            let mouse_x = event.x();
-            if (mouse_x as f64) < thead_center_x {
-                DragSide::Left
-            } else {
-                DragSide::Right
-            }
-        } else {
-            // fallback
-            DragSide::Left
-        };
-
-        // Update state when the state changed.
-        if drag_state.hovering_over != column || drag_state.hovering_side != hovering_side {
-            drag_state.hovering_over = column;
-            drag_state.hovering_side = hovering_side;
-            drag_state_carrier.update(|mut_drag_state| {
-                *mut_drag_state = Some(drag_state);
-            });
-        }
-    }
-
-    fn drag_start(&self, drag_state: DragStateCarrier<Column>, column: Column, _event: DragEvent) {
-        drag_state.set(Some(DragState {
-            grabbed: column.clone(),
-            hovering_over: column,
-            hovering_side: DragSide::Left,
-        }));
-    }
-
-    fn drag_leave(&self, _drag_state: DragStateCarrier<Column>, _column: Column, _event: DragEvent) {}
 }
 
 fn main() {
@@ -171,71 +85,41 @@ fn main() {
                 description: None,
             },
         ];
-        let (drop_tx, drop_rx) = std::sync::mpsc::channel();
-        let trigger = Trigger::new();
-        let custom_handler = Arc::new(CustomHeadDragHandler { drop_tx, trigger });
+
         let columns = RwSignal::new(Vec::from(Book::columns()));
 
-        // Drop watcher
-        Effect::watch(
-            move || {
-                trigger.track();
-            },
-            move |_, _, _| {
-                let drop_event = drop_rx
-                    .try_recv()
-                    .expect("trigger should only be called when drop_tx sent an event.");
-                if drop_event.grabbed == drop_event.hovering_over {
-                    return;
-                }
-
-                let mut cs = columns.get_untracked();
-                let mut column_iter1 = cs.iter();
-
-                if let Some(grab_pos) = column_iter1.position(|s| s == &drop_event.grabbed) {
-                    cs.remove(grab_pos);
-                    let mut column_iter2 = cs.iter();
-                    let drop_pos = column_iter2
-                        .position(|s| s == &drop_event.hovering_over)
-                        .unwrap_or(grab_pos);
-
-                    cs.insert(
-                        match drop_event.hovering_side {
-                            DragSide::Left => drop_pos,
-                            DragSide::Right => std::cmp::min(drop_pos + 1, cs.len()),
-                        },
-                        drop_event.grabbed,
-                    );
-                }
-                columns.set(cs);
-            },
-            false,
-        );
         view! {
-            <fieldset>
-                <legend>Visible Columns:</legend>
-                {Book::columns().iter().map(|book| view! {
-                    <label>{ format!("{book:?}") }</label>
-                    <input
-                        type="checkbox"
-                        checked
-                        on:click=move |_| {
-                            let mut columns_internal = columns.get();
-                            if !columns_internal.contains(book) {
-                                let idx = columns_internal.iter().filter(|c| *c < book).count();
-                                columns_internal.insert(idx, *book);
-                            } else {
-                                columns_internal.retain(|c| c != book)
-                            }
-                            columns.set(columns_internal);
-                        }/>
-                    <br/>
-                }).collect_view()}
-            </fieldset>
-            <div class="float-left m-10 rounded-md border dark:border-gray-700 overflow-clip">
-                <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
-                    <TableContent rows scroll_container="html" columns drag_handler=custom_handler />
-                </table>
+            <div class="m-10">
+                <fieldset class="float-left mb-5 mr-5 border border-gray-300 dark:border-gray-700 rounded-md px-5">
+                    <legend class="text-sm font-semibold text-gray-700 dark:text-gray-300 px-2">Visible Columns:</legend>
+                    {Book::columns().iter().enumerate().map(|(idx, book)| view! {
+                        <div class="flex items-center my-4">
+                            <input
+                                id=format!("column-checkbox-{idx}")
+                                class="w-4 h-4 border border-default-medium rounded-xs bg-neutral-secondary-medium focus:ring-2 focus:ring-brand-soft"
+                                type="checkbox"
+                                checked
+                                on:click=move |_| {
+                                    let mut columns_internal = columns.get();
+                                    if !columns_internal.contains(book) {
+                                        let idx = columns_internal.iter().filter(|c| *c < book).count();
+                                        columns_internal.insert(idx, *book);
+                                    } else {
+                                        columns_internal.retain(|c| c != book)
+                                    }
+                                    columns.set(columns_internal);
+                                }/>
+                                <label for=format!("column-checkbox-{idx}") class="ms-2 text-sm text-heading select-none">{ format!("{book:?}") }</label>
+
+                        </div>
+                    }).collect_view()}
+                </fieldset>
+
+                <div class="float-left rounded-md border border-gray-300 dark:border-gray-700 overflow-clip">
+                    <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
+                        <TableContent rows scroll_container="html" columns drag_handler=HeadDragHandler::new(CustomHeadDragHandler) />
+                    </table>
+                </div>
             </div>
         }
     })

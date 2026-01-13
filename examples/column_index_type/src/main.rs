@@ -4,9 +4,9 @@
 use ::chrono::NaiveDate;
 use derive_more::{Deref, DerefMut};
 use leptos::prelude::*;
+use leptos::web_sys;
 use leptos_struct_table::*;
 use std::sync::Arc;
-use leptos::web_sys;
 
 /// Custom row renderer that adds a link to the end of the row
 #[allow(unused_variables, non_snake_case)]
@@ -22,9 +22,8 @@ pub fn CustomTableRowRenderer(
     // Event handler callback when this row is selected
     on_select: EventHandler<web_sys::MouseEvent>,
     // Columns to show and their order.
-    columns: RwSignal<Vec<BookColumn>>
+    columns: RwSignal<Vec<BookColumn>>,
 ) -> impl IntoView {
-
     view! {
         <tr class=class on:click=move |mouse_event| on_select.run(mouse_event)>
             {TableRow::render_row(row, index, columns)}
@@ -35,12 +34,12 @@ pub fn CustomTableRowRenderer(
     }
 }
 
-
 #[component]
 #[allow(unused_variables)]
 pub fn ColorCellRenderer(
     /// Base cell rendere classes
-    #[prop(into)] class: String,
+    #[prop(into)]
+    class: String,
     /// Value of this cell
     value: Signal<String>,
     /// Row containing this cell
@@ -52,10 +51,9 @@ pub fn ColorCellRenderer(
         BookColumn::Title => view! { <span style="color: blue;">{ value }</span> },
         BookColumn::Author => view! { <span style="color: red;">{ value }</span> },
         BookColumn::PublishDate => view! { <span style="color: green;">{ value }</span> },
-        BookColumn::Description => view! { <span style="color: yellow;">{ value }</span> }
+        BookColumn::Description => view! { <span style="color: yellow;">{ value }</span> },
     }
 }
-
 
 /// This generates the component BookTable
 #[derive(TableRow, Clone)]

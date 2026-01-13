@@ -56,14 +56,14 @@ fn Demo() -> impl IntoView {
 
 ## Leptos Compatibility
 
-| Crate version | Compatible Leptos version |
-|---------------|---------------------------|
-| <= 0.2        | 0.3                       |
-| 0.3           | 0.4                       |
-| 0.4, 0.5, 0.6 | 0.5                       |
-| 0.7 – 0.12    | 0.6                       |
-| 0.14.0-beta   | 0.7                       |
-| 0.15, 0.16    | 0.8                       |
+| Crate version        | Compatible Leptos version |
+|----------------------|---------------------------|
+| <= 0.2               | 0.3                       |
+| 0.3                  | 0.4                       |
+| 0.4, 0.5, 0.6        | 0.5                       |
+| 0.7 – 0.12           | 0.6                       |
+| 0.14.0-beta          | 0.7                       |
+| 0.15, 0.16, 0.17     | 0.8                       |
 
 ## Server-Side Rendering
 
@@ -128,7 +128,6 @@ These attributes can be applied to the struct itself.
   for easy local data use. See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) for more information.
 - **`row_type`** - Specifies the type of the rows in the table. Defaults to the struct that this is applied to. See the [custom_type example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/custom_type/src/main.rs) for more information.
 - **`column_index_type`** - A type by which the columns are indexed, "usize" is the default. "enum" will generate an enum with the row-struct's field names as variants. See the [column_index_type example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/column_index_type/src/main.rs) for more information.
-
 - **`i18n`** - Allows to specify the i18n scope for all fields of the struct as well as the `i18n` module path which defaults to `crate::i18n`. See [I18n](#i18n) for more information.
 
 ### Field attributes
@@ -343,8 +342,7 @@ pub fn App() -> impl IntoView {
 
 Please have a look at the [editable example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/editable/src/main.rs) for a fully working example.
 
-
-# Column index type
+## Column index type
 Configured via the table annotation on a TableRow struct.
 
 ```rust
@@ -353,13 +351,13 @@ Configured via the table annotation on a TableRow struct.
 
 Current supported column index type **values**: `"usize"` or `"enum"`.\
 The column type is used to refer to columns in various places, some of which listed below:
- - Custom cell renderers via [`DefaultTableCellRendererProps#index`]
- - Custom header cell renderers via [`DefaultTableHeaderCellRendererProps#index`]
- - Head events via [`TableHeadEvent#index`]
- - In [`TableRow#col_name`] as `col_index` parameter type.
+ - Custom cell renderers via [`DefaultTableCellRendererProps#index`](DefaultTableCellRendererProps#structfield.index)
+ - Custom header cell renderers via [`DefaultTableHeaderCellRendererProps#index`](DefaultTableHeaderCellRendererProps#structfield.index)
+ - Head events via [`TableHeadEvent#index`](TableHeadEvent#structfield.index)
+ - In [`TableRow#col_name`](TableRow#tymethod.col_name) as `col_index` parameter type.
  - In [`get_sorting_for_column`] in both parameters.
 
-## usize column index type
+### usize column index type
 This is the default index type.
 
 It can be set explicitely:
@@ -375,7 +373,7 @@ pub struct Book {
 ```
 Usize indexes start at 0 at the first relevant struct field. Fields marked `skip` do not have an index.
 
-## Enum column index type
+### Enum column index type
 
 Used as follows:
 ```rust
@@ -391,8 +389,7 @@ pub struct Book {
 ```
 
 Fields are converted to UpperCammelCase for their generated enum variant.
-See the [column_index_type example](./examples/column_index_type/src/main.rs) for more information.
-
+See the [column_index_type example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/column_index_type/src/main.rs) for more information.
 
 ## Pagination / Virtualization / InfiniteScroll
 
