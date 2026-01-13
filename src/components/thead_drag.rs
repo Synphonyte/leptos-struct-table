@@ -149,7 +149,7 @@ where
 
                 drag_state.reorder_columns(&mut resorted_cols);
 
-                if &resorted_cols == &*columns.read() {
+                if resorted_cols == *columns.read() {
                     String::new()
                 } else {
                     match drag_state.hovering_side {
