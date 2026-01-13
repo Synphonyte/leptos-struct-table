@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.17.0] - 2026-01-13
+
+### Breaking Changes 🛠️
+
+- Updated dependencies `leptos-use` to version 0.18.
+
+### New Features 🚀
+
+- Selectively hide columns (thanks to @ToxicMushroom).
+- Reorder columns by dragging them (thanks to @ToxicMushroom).
+- Choose between `usize` or generated `enum` column types (thanks to @ToxicMushroom).
+
+### Special thanks to our sponsor
+- @benwis
+
 ## [0.16.0] - 2025-12-18
 
 ### Breaking Changes 🛠️
