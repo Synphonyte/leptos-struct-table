@@ -59,7 +59,7 @@ fn main() {
         let (selected_row, set_selected_row) = signal(None);
 
         view! {
-            <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 float-left">
+            <div class="rounded-md overflow-clip m-10 border border-gray-300 dark:border-gray-700 float-left">
                 <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
                     <TableContent
                         rows=rows
@@ -78,7 +78,7 @@ fn main() {
                 let selected_row = selected_row.get();
 
                 view! {
-                    <div class="rounded-md overflow-clip m-10 border dark:border-gray-700 float-left px-5 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-400">
+                    <div class="rounded-md overflow-clip m-10 border border-gray-300 dark:border-gray-700 float-left px-5 py-3 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-400">
                         <pre>
                             "          Id:  " {selected_row.id} "\n"
                             "       Title:  " {selected_row.title} "\n"

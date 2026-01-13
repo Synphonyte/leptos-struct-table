@@ -47,7 +47,7 @@ impl TableClassesProvider for TailwindClassesPreset {
 
         format!(
             "{} {} {}",
-            "border-b dark:border-gray-700", bg_color, template_classes
+            "border-b border-gray-300 dark:border-gray-700", bg_color, template_classes
         )
     }
 

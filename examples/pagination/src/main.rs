@@ -13,7 +13,7 @@ pub fn App() -> impl IntoView {
     let pagination_controller = PaginationController::default();
 
     view! {
-        <div class="rounded-md overflow-clip m-10 border dark:border-gray-700".to_string()>
+        <div class="rounded-md overflow-clip m-10 border border-gray-300 dark:border-gray-700".to_string()>
             <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px] w-[calc(100vw-5rem)]">
                 <TableContent
                     rows=rows
