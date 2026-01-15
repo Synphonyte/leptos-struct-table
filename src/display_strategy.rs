@@ -39,7 +39,11 @@ impl DisplayStrategy {
             } => {
                 controller
                     .page_count_signal
-                    .set(Some(row_count / *page_row_count + 1));
+                    .set(if *page_row_count != 0 {
+                        Some((row_count + *page_row_count - 1) / *page_row_count) 
+                    } else {
+                        None
+                    });
             }
             _ => {
                 // do nothing
