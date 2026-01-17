@@ -550,6 +550,16 @@ where
     let thead_content =
         Row::render_head_row(sorting.into(), on_head_click, drag_handler, columns).into_any();
 
+    fn clamp_range(range: Range<usize>, len: usize) -> Range<usize> {
+        let start = range.start.min(len);
+        let end = range.end.min(len);
+
+        if start > end {
+            return end..start;
+        }
+        start..end
+    }
+
     let tbody_content = {
         let row_renderer = row_renderer.clone();
         let loading_row_renderer = loading_row_renderer.clone();
@@ -564,7 +574,7 @@ where
                     let loaded_rows = loaded_rows.read();
                     let display_range = display_range.read();
 
-                    let iter = loaded_rows[display_range.clone()]
+                    let iter = loaded_rows[clamp_range(display_range.clone(), loaded_rows.len())]
                         .iter()
                         .cloned()
                         .enumerate()
