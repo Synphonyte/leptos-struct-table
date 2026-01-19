@@ -318,7 +318,10 @@ pub struct TemperatureMeasurement {
 //! ```
 //!
 //! For more detailed information please have a look at the [custom_renderers_svg example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs) for a complete customization.
-//!
+//! 
+//! For custom row renderers, you may want to have a look at [table_grouping example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/table_grouping/src/grouping.rs), this example reuses existing 
+//! cell renders via `Row::cell_renderer_for_column` (useful for hiding cells in a column-grouping context).
+//! 
 //!
 //! ## Editable Cells
 //!

@@ -33,6 +33,14 @@ pub trait TableRow<Column: Copy + Send + Sync + 'static>: Sized {
     where
         F: Fn(TableHeadEvent<Column>) + Send + Clone + 'static;
 
+    /// Returns the cell renderer for a **column**
+    /// Allows to create custom row renders while still using the annotation configured cell renderers.
+    fn cell_renderer_for_column(
+        row: RwSignal<Self>,
+        column: Column,
+        class: String,
+    ) -> impl IntoView;
+
     /// All columns this row can show in their default order.
     fn columns() -> &'static [Column];
 
