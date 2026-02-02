@@ -33,7 +33,6 @@ pub struct Book {
 
 /// New-type pattern because otherwise the impl TableRow doesn't work because of orphan rules.
 #[derive(Deref, DerefMut, Clone)]
-
 pub struct ArcBook(Arc<Book>);
 
 struct CustomHeadDragHandler;

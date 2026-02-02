@@ -11,8 +11,8 @@ console_error_panic_hook = "0.1"
 console_log = "1"
 log = "0.4"
 web-sys = "0.3"
-derive_more = { version = "0.99" }
+derive_more = { version = "2", features = ["deref", "deref_mut"] }
 
 [dev-dependencies]
 wasm-bindgen = "0.2"
-wasm-bindgen-test = "0.3.0"
+wasm-bindgen-test = "0.3"
