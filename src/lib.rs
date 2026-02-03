@@ -47,14 +47,14 @@
 //!
 //! # Leptos Compatibility
 //!
-//! | Crate version        | Compatible Leptos version |
-//! |----------------------|---------------------------|
-//! | <= 0.2               | 0.3                       |
-//! | 0.3                  | 0.4                       |
-//! | 0.4, 0.5, 0.6        | 0.5                       |
-//! | 0.7 – 0.12           | 0.6                       |
-//! | 0.14.0-beta          | 0.7                       |
-//! | 0.15, 0.16, 0.17     | 0.8                       |
+//! | Crate version                 | Compatible Leptos version |
+//! |-------------------------------|---------------------------|
+//! | <= 0.2                        | 0.3                       |
+//! | 0.3                           | 0.4                       |
+//! | 0.4, 0.5, 0.6                 | 0.5                       |
+//! | 0.7 – 0.12                    | 0.6                       |
+//! | 0.14.0-beta                   | 0.7                       |
+//! | 0.15 – 0.18                   | 0.8                       |
 //!
 //! # Server-Side Rendering
 //!
@@ -318,10 +318,10 @@ pub struct TemperatureMeasurement {
 //! ```
 //!
 //! For more detailed information please have a look at the [custom_renderers_svg example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs) for a complete customization.
-//! 
-//! For custom row renderers, you may want to have a look at [table_grouping example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/table_grouping/src/grouping.rs), this example reuses existing 
+//!
+//! For custom row renderers, you may want to have a look at [table_grouping example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/table_grouping/src/grouping.rs), this example reuses existing
 //! cell renders via `Row::cell_renderer_for_column` (useful for hiding cells in a column-grouping context).
-//! 
+//!
 //!
 //! ## Editable Cells
 //!

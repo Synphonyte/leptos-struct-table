@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.18.0] - 2026-02-03
+
+### Breaking Changes 🛠️
+
+- trait `TableRow` has now a method `cell_renderer_for_column` which allows things like grouping.
+  See the example `table_grouping`. (thanks to @ToxicMushroom)
+
+### Fixes 🐛
+
+- Make sure the cache is not accessed outside it's range (thanks to @ToxicMushroom).
+
+### Special thanks to our sponsor
+- @benwis
+
 ## [0.17.0] - 2026-01-13
 
 ### Breaking Changes 🛠️

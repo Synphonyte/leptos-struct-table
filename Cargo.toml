@@ -1,6 +1,6 @@
 [package]
 name = "leptos-struct-table"
-version = "0.17.0"
+version = "0.18.0"
 edition = "2024"
 categories = ["gui", "web-programming", "wasm"]
 description = "Generate a complete batteries included leptos data table component from a struct definition."
@@ -15,7 +15,7 @@ all-features = true
 
 [dependencies]
 leptos = { version = "0.8" }
-leptos-struct-table-macro = { version = "0.15.0", path = "../leptos-struct-table-macro/" }
+leptos-struct-table-macro = { version = "0.15.0" }
 leptos-use = { version = "0.18", default-features = false, features = [
   "element",
   "use_debounce_fn",
