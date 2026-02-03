@@ -3,16 +3,9 @@ use gloo_net::http::Request;
 use leptos_struct_table::{ColumnSort, PaginatedTableDataProvider};
 use std::collections::VecDeque;
 
+#[derive(Default)]
 pub struct BreweryDataProvider {
     sorting: VecDeque<(usize, ColumnSort)>,
-}
-
-impl Default for BreweryDataProvider {
-    fn default() -> Self {
-        Self {
-            sorting: VecDeque::new(),
-        }
-    }
 }
 
 impl BreweryDataProvider {
