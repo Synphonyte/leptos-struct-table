@@ -37,13 +37,11 @@ impl DisplayStrategy {
                 row_count: page_row_count,
                 controller,
             } => {
-                controller
-                    .page_count_signal
-                    .set(if *page_row_count != 0 {
-                        Some((row_count + *page_row_count - 1) / *page_row_count) 
-                    } else {
-                        None
-                    });
+                controller.page_count_signal.set(if *page_row_count != 0 {
+                    Some(row_count.div_ceil(*page_row_count))
+                } else {
+                    None
+                });
             }
             _ => {
                 // do nothing
