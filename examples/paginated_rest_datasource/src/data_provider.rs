@@ -28,30 +28,45 @@ impl BreweryDataProvider {
         }
     }
 
-    fn url_sort_param_for_sort_pair(&self, pair: &(usize, ColumnSort)) -> String {
+    fn url_sort_param_for_sort_pair(&self, pair: &(usize, ColumnSort)) -> Option<(&str, String)> {
         let col = self.url_sort_param_for_column(pair.0);
 
         let dir = match pair.1 {
             ColumnSort::Ascending => "asc",
             ColumnSort::Descending => "desc",
-            ColumnSort::None => return "".to_string(),
+            ColumnSort::None => return None,
         };
 
-        format!("&sort={}:{}", col, dir)
+        Some(("sort", format!("{}:{}", col, dir)))
     }
 
-    fn get_url(&self, page_index: usize) -> String {
-        let mut sort = String::new();
+    fn get_search_query_pair(&self) -> Option<(&str, String)> {
+        let search = self.search.get_untracked();
+
+        if !search.is_empty() {
+            Some(("by_name", search))
+        } else {
+            None
+        }
+    }
+
+    fn get_url(&self, page_index: usize) -> (&str, impl IntoIterator<Item = (&str, String)>) {
+        let mut query = vec![];
+
         for pair in &self.sorting {
-            sort.push_str(&self.url_sort_param_for_sort_pair(pair));
+            if let Some(query_pair) = self.url_sort_param_for_sort_pair(pair) {
+                query.push(query_pair);
+            }
         }
 
-        format!(
-            "https://api.openbrewerydb.org/v1/breweries?by_name={}{sort}&page={}&per_page={}",
-            self.search.get_untracked(),
-            page_index + 1,
-            Self::PAGE_ROW_COUNT,
-        )
+        if let Some(query_pair) = self.get_search_query_pair() {
+            query.push(query_pair);
+        }
+
+        query.push(("page", format!("{}", page_index + 1)));
+        query.push(("per_page", format!("{}", Self::PAGE_ROW_COUNT)));
+
+        ("https://api.openbrewerydb.org/v1/breweries", query)
     }
 }
 
@@ -63,9 +78,10 @@ impl PaginatedTableDataProvider<Brewery, usize> for BreweryDataProvider {
             return Ok(vec![]);
         }
 
-        let url = self.get_url(page_index);
+        let (url, query) = self.get_url(page_index);
 
-        let resp: Vec<Brewery> = Request::get(&url)
+        let resp: Vec<Brewery> = Request::get(url)
+            .query(query)
             .send()
             .await
             .map_err(|e| e.to_string())?
@@ -77,20 +93,24 @@ impl PaginatedTableDataProvider<Brewery, usize> for BreweryDataProvider {
     }
 
     async fn row_count(&self) -> Option<usize> {
-        let url = format!("https://api.openbrewerydb.org/v1/breweries/meta?by_name={}", self.search.get_untracked());
-        let resp: Option<MetaResponse> = Request::get(&url)
+        let mut query = Vec::new();
+
+        if let Some(query_pair) = self.get_search_query_pair() {
+            query.push(query_pair);
+        }
+
+        let resp: MetaResponse = Request::get("https://api.openbrewerydb.org/v1/breweries/meta")
+            .query(query)
             .send()
             .await
-            .map_err(|e| e.to_string())
+            .map_err(|e| leptos::logging::error!("{e}"))
             .ok()?
             .json()
             .await
-            .map_err(|e| e.to_string())
+            .map_err(|e| leptos::logging::error!("{e}"))
             .ok()?;
 
-        let count = resp.map(|r| r.total)?.parse::<usize>().ok()?;
-
-        Some(count)
+        Some(resp.total)
     }
 
     fn set_sorting(&mut self, sorting: &VecDeque<(usize, ColumnSort)>) {
