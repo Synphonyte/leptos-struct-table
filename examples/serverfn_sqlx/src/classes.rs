@@ -32,7 +32,7 @@ impl TableClassesProvider for ClassesPreset {
     }
 
     fn row(&self, row_index: usize, selected: bool, template_classes: &str) -> String {
-        let bg_color = if row_index % 2 == 0 {
+        let bg_color = if row_index.is_multiple_of(2) {
             if selected {
                 "bg-sky-300 text-gray-700 dark:bg-sky-700 dark:text-gray-400"
             } else {
