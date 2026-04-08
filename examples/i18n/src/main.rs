@@ -98,7 +98,7 @@ pub fn App() -> impl IntoView {
     view! {
         <button on:click=on_switch>{t!(i18n, click_to_change_lang)}</button>
         <table>
-            <TableContent rows=rows scroll_container="html" />
+            <TableContent rows=rows scroll_container="" />
         </table>
     }
 }

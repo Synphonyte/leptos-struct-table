@@ -189,7 +189,7 @@ fn main() {
                 <TableContent
                     rows=rows
                     row_renderer=GroupTableRowRenderer
-                    scroll_container="html"
+                    scroll_container=""
                 />
             </table>
         }
