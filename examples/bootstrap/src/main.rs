@@ -51,7 +51,7 @@ fn main() {
         view! {
             <div class="container".to_string()>
                 <table class="table-hover">
-                    <TableContent rows scroll_container="html" />
+                    <TableContent rows scroll_container="" />
                 </table>
             </div>
         }

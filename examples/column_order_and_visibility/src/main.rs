@@ -116,7 +116,7 @@ fn main() {
 
                 <div class="float-left rounded-md border border-gray-300 dark:border-gray-700 overflow-clip">
                     <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
-                        <TableContent rows scroll_container="html" columns drag_handler=HeadDragHandler::new(CustomHeadDragHandler) />
+                        <TableContent rows scroll_container="" columns drag_handler=HeadDragHandler::new(CustomHeadDragHandler) />
                     </table>
                 </div>
             </div>

@@ -39,7 +39,7 @@
 //!
 //!     view! {
 //!         <table>
-//!             <TableContent rows scroll_container="html" />
+//!             <TableContent rows scroll_container="" />
 //!         </table>
 //!     }
 //! }
@@ -370,7 +370,7 @@ pub struct TemperatureMeasurement {
 //!
 //!     view! {
 //!         <table>
-//!             <TableContent rows on_change scroll_container="html" />
+//!             <TableContent rows on_change scroll_container="" />
 //!         </table>
 //!     }
 //! }

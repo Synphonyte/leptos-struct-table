@@ -72,7 +72,7 @@ fn main() {
             <div class="rounded-md overflow-clip m-10 border border-gray-300 dark:border-gray-700 w-[50%]"
                 .to_string()>
                 <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px]">
-                    <TableContent rows on_change scroll_container="html" />
+                    <TableContent rows on_change scroll_container="" />
                 </table>
             </div>
 

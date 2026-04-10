@@ -17,7 +17,7 @@ pub fn App() -> impl IntoView {
             <table class="text-sm text-left text-gray-500 dark:text-gray-400 mb-[-1px] w-[calc(100vw-5rem)]">
                 <TableContent
                     rows=rows
-                    scroll_container="html"
+                    scroll_container=""
                     sorting_mode=SortingMode::SingleColumn
                     display_strategy=DisplayStrategy::Pagination {
                         controller: pagination_controller,

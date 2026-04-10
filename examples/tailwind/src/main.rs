@@ -59,7 +59,7 @@ fn main() {
         view! {
             <div class="float-left m-10 rounded-md border border-gray-300 dark:border-gray-700 overflow-clip">
                 <table class="text-sm text-left text-gray-500 dark:text-gray-400 -mb-px">
-                    <TableContent rows=rows scroll_container="html" />
+                    <TableContent rows=rows scroll_container="" />
                 </table>
             </div>
         }

@@ -107,7 +107,7 @@ fn main() {
                 <TableContent
                     rows=rows
                     row_renderer=CustomTableRowRenderer
-                    scroll_container="html"
+                    scroll_container=""
                 />
             </table>
         }
