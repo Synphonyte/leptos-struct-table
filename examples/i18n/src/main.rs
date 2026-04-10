@@ -5,7 +5,7 @@ use i18n::*;
 use leptos::prelude::*;
 use leptos_struct_table::*;
 
-leptos_i18n::load_locales!();
+include!(concat!(env!("OUT_DIR"), "/i18n/mod.rs"));
 
 /// This generates the component BookTable
 #[derive(TableRow, Clone)]
