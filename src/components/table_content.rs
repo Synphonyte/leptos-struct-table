@@ -508,7 +508,9 @@ where
                     let set_known_row_count = set_known_row_count.clone();
 
                     async move {
-                        let latest_reload_count = reload_count.get_untracked();
+                        let Some(latest_reload_count) = reload_count.try_get_untracked() else {
+                            return;
+                        };
 
                         // TODO: can we avoid this?
                         let result = rows
