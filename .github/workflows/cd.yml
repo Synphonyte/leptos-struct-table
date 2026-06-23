@@ -7,13 +7,19 @@ on:
       - '*'           # Push events to every tag not containing /
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
   cargo_checks:
     name: Cargo Checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/rust_toolchain/
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly
+          components: rustfmt, clippy
       - name: Check formatting
         run: cargo fmt --check
       - name: Clippy
