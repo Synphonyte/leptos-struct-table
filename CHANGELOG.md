@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.19.0] - 2026-06-23
+
+### Breaking Change 🛠️
+
+- Updated dependency `leptos-use` to version 0.19
+
+### Fixes 🐛
+
+- `scroll_container` defaults to `""` instead of `"html"` which fixes some scroll issues (thanks to @ToxicMushroom)
+
 ## [0.18.0] - 2026-02-03
 
 ### Breaking Changes 🛠️

@@ -1,39 +1,39 @@
 [package]
-name = "leptos-struct-table"
-version = "0.18.0"
-edition = "2024"
-categories = ["gui", "web-programming", "wasm"]
+categories = ["gui", "wasm", "web-programming"]
 description = "Generate a complete batteries included leptos data table component from a struct definition."
+edition = "2024"
 exclude = ["examples/", "tests/"]
-keywords = ["leptos", "table", "data-sheet", "data-grid"]
+keywords = ["data-grid", "data-sheet", "leptos", "table"]
 license = "MIT OR Apache-2.0"
+name = "leptos-struct-table"
 readme = "README.md"
 repository = "https://github.com/Synphonyte/leptos-struct-table"
+version = "0.19.0"
 
 [package.metadata."docs.rs"]
 all-features = true
 
 [dependencies]
+chrono = { version = "0.4", optional = true }
 leptos = { version = "0.8" }
 leptos-struct-table-macro = { version = "0.15.0" }
-leptos-use = { version = "0.18", default-features = false, features = [
-  "element",
-  "use_debounce_fn",
-  "use_element_size",
-  "use_scroll",
+leptos-use = { version = "0.19", default-features = false, features = [
+    "element",
+    "use_debounce_fn",
+    "use_element_size",
+    "use_scroll",
 ] }
 rust_decimal = { version = "1", optional = true }
-chrono = { version = "0.4", optional = true }
 send_wrapper = "0.6"
 serde = "1"
 time = { version = "0.3", optional = true, features = ["formatting"] }
 uuid = { version = "1", optional = true, features = [] }
-web-sys = { version = "0.3", features = ["DomRect", "Element"] }
 wasm-bindgen = "0.2"
+web-sys = { version = "0.3", features = ["DomRect", "Element"] }
 
 [features]
 chrono = ["dep:chrono"]
-uuid = ["dep:uuid"]
+i18n = ["leptos-struct-table-macro/i18n"]
 rust_decimal = ["dep:rust_decimal"]
 time = ["dep:time"]
-i18n = ["leptos-struct-table-macro/i18n"]
+uuid = ["dep:uuid"]

@@ -1,17 +1,16 @@
 [package]
+edition = "2021"
 name = "generic"
 version = "0.1.0"
-edition = "2021"
 
 [dependencies]
-leptos = { version = "0.8", features = ["csr"] }
-leptos-struct-table = { path = "../..", features = ["chrono", "uuid"] }
 chrono = { version = "0.4" }
-uuid = { version = "1.19", features = ["v4", "js"] }
 console_error_panic_hook = "0.1"
 console_log = "1"
+leptos = { version = "0.8", features = ["csr"] }
+leptos-struct-table = { path = "../..", features = ["chrono", "uuid"] }
 log = "0.4"
-getrandom = { version = "0.2", features = ["js"] }
+uuid = { version = "1.19", features = ["js", "v4"] }
 
 [dev-dependencies]
 wasm-bindgen = "0.2"
