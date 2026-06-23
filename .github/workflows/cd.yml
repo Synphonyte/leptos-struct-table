@@ -55,7 +55,10 @@ jobs:
           - tailwind
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/rust_toolchain/
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly
       - name: Build example ${{ matrix.example }}
         run: |
           cd ${{ github.workspace }}/examples/${{ matrix.example }}/
@@ -68,7 +71,10 @@ jobs:
     needs: [ cargo_checks, test_examples ]
     steps:
       - uses: actions/checkout@v7
-      - uses: ./.github/actions/rust_toolchain/
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: nightly
       - name: Publish crate leptos-struct-table
         uses: katyo/publish-crates@v2
         with:
