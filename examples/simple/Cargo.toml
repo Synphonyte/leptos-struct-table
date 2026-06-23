@@ -17,6 +17,3 @@ uuid = { version = "1", features = ["js", "v4"] }
 wasm-bindgen = "0.2"
 wasm-bindgen-test = "0.3"
 web-sys = "0.3"
-
-[patch.crates-io]
-leptos-use.path = "../../../leptos-use"
