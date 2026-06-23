@@ -116,6 +116,6 @@ pub fn default_th_sorting_style(
             None => "--sort-priority: '';".to_string(),
         };
 
-        format!("{} {}", sort, &priority)
+        format!("{} {}", sort, priority)
     })
 }

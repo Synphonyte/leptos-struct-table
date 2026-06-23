@@ -28,7 +28,7 @@ impl CellValue<Date> for Date {
 
     fn render_value(self, options: Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
-            let format = format_description::parse(value)
+            let format = format_description::parse_borrowed::<3>(value)
                 .expect("Unable to construct a format description given the format string");
             self.format(&format)
                 .expect("Unable to format given the format description")
@@ -54,7 +54,7 @@ impl CellValue<Time> for Time {
 
     fn render_value(self, options: Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
-            let format = format_description::parse(value)
+            let format = format_description::parse_borrowed::<3>(value)
                 .expect("Unable to construct a format description given the format string");
             self.format(&format)
                 .expect("Unable to format given the format description")
@@ -81,7 +81,7 @@ impl CellValue<PrimitiveDateTime> for PrimitiveDateTime {
 
     fn render_value(self, options: Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
-            let format = format_description::parse(value)
+            let format = format_description::parse_borrowed::<3>(value)
                 .expect("Unable to construct a format description given the format string");
             self.format(&format)
                 .expect("Unable to format given the format description")
@@ -108,7 +108,7 @@ impl CellValue<OffsetDateTime> for OffsetDateTime {
 
     fn render_value(self, options: Self::RenderOptions) -> impl IntoView {
         if let Some(value) = options.string.as_ref() {
-            let format = format_description::parse(value)
+            let format = format_description::parse_borrowed::<3>(value)
                 .expect("Unable to construct a format description given the format string");
             self.format(&format)
                 .expect("Unable to format given the format description")

@@ -2,9 +2,10 @@
 
 ## [0.19.0] - 2026-06-23
 
-### Breaking Change 🛠️
+### Breaking Changes 🛠️
 
 - Updated dependency `leptos-use` to version 0.19
+- Instead of using the deprecated `time::format_description::parse` we're now using `parse_borrowed::<3>` which is recommended
 
 ### Fixes 🐛
 

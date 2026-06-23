@@ -17,6 +17,7 @@ pub struct Brewery {
     pub country: String,
 }
 
+#[expect(dead_code)]
 #[derive(Deserialize, Debug)]
 pub struct MetaResponse {
     pub total: String,
