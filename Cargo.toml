@@ -16,7 +16,7 @@ all-features = true
 [dependencies]
 leptos = { version = "0.8" }
 leptos-struct-table-macro = { version = "0.15.0" }
-leptos-use = { version = "0.18", default-features = false, features = [
+leptos-use = { version = "0.19", default-features = false, features = [
   "element",
   "use_debounce_fn",
   "use_element_size",
