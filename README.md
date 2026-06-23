@@ -94,13 +94,13 @@ for a working project with SSR.
 
 As shown in the initial usage example, when you add `#[table(impl_vec_data_provider)]` to your struct,
 the table will automatically generate a data provider for you. You can then directly pass a `Vec<T>` to the `rows` prop.
-Internally this implements the trait [`TableDataProvider`] for `Vec<T>`.
+Internally this implements the trait [`TableDataProvider`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/data_provider/trait.TableDataProvider.html) for `Vec<T>`.
 
 To leverage the full power of async partial data loading with caching you should implement the trait
-[`PaginatedTableDataProvider`] or the trait [`TableDataProvider`] yourself. It's quite easy to do so.
+[`PaginatedTableDataProvider`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/data_provider/trait.PaginatedTableDataProvider.html) or the trait [`TableDataProvider`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/data_provider/trait.TableDataProvider.html) yourself. It's quite easy to do so.
 Which of the two traits you choose depends on your data source. If your data source provides
-paginated data, as is the case for many REST APIs, you should implement [`PaginatedTableDataProvider`].
-Otherwise you should probably implement [`TableDataProvider`].
+paginated data, as is the case for many REST APIs, you should implement [`PaginatedTableDataProvider`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/data_provider/trait.PaginatedTableDataProvider.html).
+Otherwise you should probably implement [`TableDataProvider`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/data_provider/trait.TableDataProvider.html).
 
 See the [paginated_rest_datasource example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/paginated_rest_datasource/src/data_provider.rs)
 and the [serverfn_sqlx example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/serverfn_sqlx/src/data_provider.rs)
@@ -122,9 +122,9 @@ These attributes can be applied to the struct itself.
   See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) and the
   [selectable example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/selectable/src/main.rs) for more information.
 - **`classes_provider`** - Specifies the name of the class provider. Used to quickly customize all of the classes that are applied to the table.
-  For convenience sensible presets for major CSS frameworks are provided. See [`TableClassesProvider`] and [tailwind example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/tailwind/src/main.rs) for more information.
+  For convenience sensible presets for major CSS frameworks are provided. See [`TableClassesProvider`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/class_providers/trait.TableClassesProvider.html) and [tailwind example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/tailwind/src/main.rs) for more information.
 - **`head_cell_renderer`** - Specifies the name of the header cell renderer component. Used to customize the rendering of header cells. Defaults to [`DefaultTableHeaderRenderer`]. See the [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs) for more information.
-- **`impl_vec_data_provider`** - If given, then [`TableDataProvider`] is automatically implemented for `Vec<ThisStruct>` to allow
+- **`impl_vec_data_provider`** - If given, then [`TableDataProvider`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/data_provider/trait.TableDataProvider.html) is automatically implemented for `Vec<ThisStruct>` to allow
   for easy local data use. See the [simple example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/simple/src/main.rs) for more information.
 - **`row_type`** - Specifies the type of the rows in the table. Defaults to the struct that this is applied to. See the [custom_type example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/custom_type/src/main.rs) for more information.
 - **`column_index_type`** - A type by which the columns are indexed, "usize" is the default. "enum" will generate an enum with the row-struct's field names as variants. See the [column_index_type example](https://github.com/synphonyte/leptos-struct-table/blob/master/examples/column_index_type/src/main.rs) for more information.
@@ -142,7 +142,7 @@ These attributes can be applied to any field in the struct.
 - **`skip_header`** - Makes the title of the field not be displayed in the head row.
 - **`title`** - Specifies the title that is displayed in the header cell. Defaults to the field name converted to title case (`this_field` becomes `"This Field"`).
 - **`renderer`** - Specifies the name of the cell renderer component. Used to customize the rendering of cells.
-  Defaults to [`DefaultTableCellRenderer`].
+  Defaults to [`DefaultTableCellRenderer`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/cell/fn.DefaultTableCellRenderer.html).
  - **`format`** - Quick way to customize the formatting of cells without having to create a custom renderer. See [Formatting](#formatting) below for more information.
 - **`getter`** - Specifies a method that returns the value of the field instead of accessing the field directly when rendering.
 - **`none_value`** - Specifies a display value for `Option` types when they are `None`. Defaults to empty string
@@ -151,10 +151,10 @@ These attributes can be applied to any field in the struct.
 #### Formatting
 
 The `format` attribute can be used to customize the formatting of cells. It is an easier alternative to creating a custom renderer when you just want to customize some basic formatting.
-It is type safe and tied to the type the formatting is applied on. see [`CellValue`] and the associated type for the type you are rendering to see a list of options
+It is type safe and tied to the type the formatting is applied on. see [`CellValue`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/cell_value/trait.CellValue.html) and the associated type for the type you are rendering to see a list of options
 
 See:
-- [`cell_value::NumberRenderOptions`]
+- [`cell_value::NumberRenderOptions`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/cell_value/struct.NumberRenderOptions.html)
 
 
 ## Features
@@ -167,8 +167,8 @@ See:
 ## Classes Customization
 
 Classes can be easily customized by using the `classes_provider` attribute on the struct.
-You can specify any type that implements the trait [`TableClassesProvider`]. Please see the documentation for that trait for more information.
-You can also look at [`TailwindClassesPreset`] for an example how this can be implemented.
+You can specify any type that implements the trait [`TableClassesProvider`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/class_providers/trait.TableClassesProvider.html). Please see the documentation for that trait for more information.
+You can also look at [`TailwindClassesPreset`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/class_providers/tailwind/struct.TailwindClassesPreset.html) for an example how this can be implemented.
 
 Example:
 
@@ -184,10 +184,10 @@ pub struct Book {
 ## Field Getters
 
 Sometimes you want to display a field that is not part of the struct but a derived value either
-from other fields or sth entirely different. For this you can use either the [`FieldGetter`] type
+from other fields or sth entirely different. For this you can use either the [`FieldGetter`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/struct.FieldGetter.html) type
 or the `getter` attribute.
 
-Let's start with [`FieldGetter`] and see an example:
+Let's start with [`FieldGetter`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/struct.FieldGetter.html) and see an example:
 
 ```rust
 #[derive(TableRow, Clone)]
@@ -239,26 +239,26 @@ value you want to modify before it's rendered.
 ## Custom Renderers
 
 Custom renderers can be used to customize almost every aspect of the table.
-They are specified by using the various `...renderer` attributes on the struct or fields or props of the [`TableContent`] component.
+They are specified by using the various `...renderer` attributes on the struct or fields or props of the [`TableContent`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/table_content/fn.TableContent.html) component.
 To implement a custom renderer please have a look at the default renderers listed below.
 
 On the struct level you can use this attribute:
-- **`thead_cell_renderer`** - Defaults to [`DefaultTableHeaderCellRenderer`] which renders `<th><span>Title</span></th>`
+- **`thead_cell_renderer`** - Defaults to [`DefaultTableHeaderCellRenderer`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/thead/fn.DefaultTableHeaderCellRenderer.html) which renders `<th><span>Title</span></th>`
   together with sorting functionality (if enabled).
 
-As props of the [`TableContent`] component you can use the following:
-- **`thead_renderer`** - Defaults to [`DefaultTableHeadRenderer`] which just renders the tag `thead`.
-- **`thead_row_renderer`** - Defaults to [`DefaultTableHeadRowRenderer`] which just renders the tag `tr`.
+As props of the [`TableContent`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/table_content/fn.TableContent.html) component you can use the following:
+- **`thead_renderer`** - Defaults to [`DefaultTableHeadRenderer`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/thead/fn.DefaultTableHeadRenderer.html) which just renders the tag `thead`.
+- **`thead_row_renderer`** - Defaults to [`DefaultTableHeadRowRenderer`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/thead/fn.DefaultTableHeadRowRenderer.html) which just renders the tag `tr`.
 - **`tbody_renderer`** - Defaults to the tag `tbody`. Takes no attributes.
-- **`row_renderer`** - Defaults to [`DefaultTableRowRenderer`].
-- **`loading_row_renderer`** - Defaults to [`DefaultLoadingRowRenderer`].
-- **`error_row_renderer`** - Defaults to [`DefaultErrorRowRenderer`].
-- **`row_placeholder_renderer`** - Defaults to [`DefaultRowPlaceholderRenderer`].
+- **`row_renderer`** - Defaults to [`DefaultTableRowRenderer`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/row/fn.DefaultTableRowRenderer.html).
+- **`loading_row_renderer`** - Defaults to [`DefaultLoadingRowRenderer`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/row/fn.DefaultLoadingRowRenderer.html).
+- **`error_row_renderer`** - Defaults to [`DefaultErrorRowRenderer`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/row/fn.DefaultErrorRowRenderer.html).
+- **`row_placeholder_renderer`** - Defaults to [`DefaultRowPlaceholderRenderer`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/row/fn.DefaultRowPlaceholderRenderer.html).
 
 On the field level you can use the **`renderer`** attribute.
 
-It defaults to [`DefaultTableCellRenderer`]
-Works for any type that implements the [`CellValue`] trait that is implemented for types in the standard library, popular crates with feature flags and for your own type if you implement this trait for them.
+It defaults to [`DefaultTableCellRenderer`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/cell/fn.DefaultTableCellRenderer.html)
+Works for any type that implements the [`CellValue`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/cell_value/trait.CellValue.html) trait that is implemented for types in the standard library, popular crates with feature flags and for your own type if you implement this trait for them.
 
 Example:
 
@@ -354,11 +354,11 @@ Configured via the table annotation on a TableRow struct.
 
 Current supported column index type **values**: `"usize"` or `"enum"`.\
 The column type is used to refer to columns in various places, some of which listed below:
- - Custom cell renderers via [`DefaultTableCellRendererProps#index`](DefaultTableCellRendererProps#structfield.index)
- - Custom header cell renderers via [`DefaultTableHeaderCellRendererProps#index`](DefaultTableHeaderCellRendererProps#structfield.index)
- - Head events via [`TableHeadEvent#index`](TableHeadEvent#structfield.index)
- - In [`TableRow#col_name`](TableRow#tymethod.col_name) as `col_index` parameter type.
- - In [`get_sorting_for_column`] in both parameters.
+ - Custom cell renderers via [`DefaultTableCellRendererProps#index`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/cell/struct.DefaultTableCellRendererProps.html#structfield.index)
+ - Custom header cell renderers via [`DefaultTableHeaderCellRendererProps#index`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/thead/struct.DefaultTableHeaderCellRendererProps.html#structfield.index)
+ - Head events via [`TableHeadEvent#index`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/events/struct.TableHeadEvent.html#structfield.index)
+ - In [`TableRow#col_name`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/table_row/trait.TableRow.html#tymethod.col_name) as `col_index` parameter type.
+ - In [`get_sorting_for_column`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/table_row/fn.get_sorting_for_column.html) in both parameters.
 
 ### usize column index type
 This is the default index type.
@@ -397,12 +397,12 @@ See the [column_index_type example](https://github.com/synphonyte/leptos-struct-
 ## Pagination / Virtualization / InfiniteScroll
 
 This table component supports different display acceleration strategies. You can set them through the `display_strategy` prop of
-the [`TableContent`] component.
+the [`TableContent`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/components/table_content/fn.TableContent.html) component.
 
 The following options are available. Check their docs for more details.
-- [`DisplayStrategy::Virtualization`] (default)
-- [`DisplayStrategy::InfiniteScroll`]
-- [`DisplayStrategy::Pagination`]
+- [`DisplayStrategy::Virtualization`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/display_strategy/enum.DisplayStrategy.html#variant.Virtualization) (default)
+- [`DisplayStrategy::InfiniteScroll`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/display_strategy/enum.DisplayStrategy.html#variant.InfiniteScroll)
+- [`DisplayStrategy::Pagination`](https://docs.rs/leptos-struct-table/latest/leptos_struct_table/display_strategy/enum.DisplayStrategy.html#variant.Pagination)
 
 Please have a look at the [pagination example](https://github.com/Synphonyte/leptos-struct-table/tree/master/examples/pagination/src/main.rs) for more information on how to use pagination.
 

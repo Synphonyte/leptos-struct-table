@@ -24,10 +24,11 @@ jobs:
         run: cargo fmt --check
       - name: Clippy
         run: cargo clippy --tests -- -D warnings
-      - name: Check if the README is up to date.
-        run: |
-          cargo install cargo-rdme
-          cargo rdme --check
+      # TODO : wait for cargo-rdme to catch up with rustdoc
+      # - name: Check if the README is up to date.
+      #   run: |
+      #     cargo install cargo-rdme
+      #     cargo rdme --check
       - name: Run tests
         run: cargo test --features chrono,uuid,rust_decimal,time
 
