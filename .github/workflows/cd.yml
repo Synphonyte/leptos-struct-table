@@ -25,9 +25,12 @@ jobs:
       - name: Clippy
         run: cargo clippy --tests -- -D warnings
       # TODO : wait for cargo-rdme to catch up with rustdoc
+      # - name: Install Cargo Rdme
+      #   uses: taiki-e/install-action@v2
+      #   with:
+      #     tool: cargo-rdme
       # - name: Check if the README is up to date.
       #   run: |
-      #     cargo install cargo-rdme
       #     cargo rdme --check
       - name: Run tests
         run: cargo test --features chrono,uuid,rust_decimal,time
