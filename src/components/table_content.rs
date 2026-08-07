@@ -260,9 +260,6 @@ where
                     if let Some(row_count) = row_count {
                         set_known_row_count(row_count);
                     }
-
-                    // force update to trigger sorting effect below
-                    sorting.notify();
                 }
             })
         }
@@ -410,18 +407,22 @@ where
         50.0,
     );
 
-    Effect::new(move || {
-        // with this a reload triggers this effect
-        reload_count.track();
+    Effect::watch(
+        move || {
+            // with this a reload triggers this effect
+            reload_count.track();
 
-        // 1. Get all values *atomically* within a single .with() call
-        let (first_visible, visible_count, row_count_opt) = loaded_rows.with(|_| {
+            // 1. Get all values.
             (
                 first_visible_row_index.get(),
                 visible_row_count.get(),
                 row_count.get(),
             )
-        });
+        },
+        move |(first_visible, visible_count, row_count_opt), _, _| {
+        let visible_count = *visible_count;
+        let row_count_opt = *row_count_opt;
+        let first_visible = *first_visible;
 
         let visible_count = visible_count.min(MAX_DISPLAY_ROW_COUNT);
 
@@ -439,16 +440,15 @@ where
             // Ensure start is within valid bounds *after* clamping end
             start = start.min(end); // Crucial: prevent start > end
         } else {
-            //If total number of rows is unknown, we don't clamp,
-            // but limit to MAX_DISPLAY_ROW_COUNT
-            if !matches!(display_strategy, DisplayStrategy::Pagination { .. }) {
-                end = end.min(start + MAX_DISPLAY_ROW_COUNT);
-            }
+            return;
         }
 
         if let Some(chunk_size) = DataP::CHUNK_SIZE {
             start = (start / chunk_size) * chunk_size;
-            end = end.div_ceil(chunk_size) * chunk_size; // Round end *up* to nearest chunk size
+            // Skip when the current end is expected to be the end of all fetchable data.
+            if Some(end) != row_count_opt {
+                end = end.div_ceil(chunk_size) * chunk_size; // Round end *up* to nearest chunk size
+            }
         }
 
         let range = start..end;
@@ -483,22 +483,8 @@ where
 
             loaded_rows.write().write_loading(missing_range.clone());
 
-            let mut loading_ranges = vec![];
-            if let Some(chunk_size) = DataP::CHUNK_SIZE {
-                let start = missing_range.start / chunk_size * chunk_size;
-                let mut current_range = start..start + chunk_size;
-                while current_range.end <= missing_range.end {
-                    loading_ranges.push(current_range.clone());
-                    current_range = current_range.end..current_range.end + chunk_size;
-                }
-                // when we got a missing_range which size is less than the chunk_size, add current_range to loading_ranges
-                if current_range.end > missing_range.end && current_range.start < missing_range.end
-                {
-                    loading_ranges.push(current_range);
-                }
-            } else {
-                loading_ranges.push(missing_range);
-            }
+            let loading_ranges =
+                compute_ranges_to_load::<DataP, Row, Column, Err>(missing_range);
 
             // TODO : implement max concurrent requests
             for missing_range in loading_ranges {
@@ -546,8 +532,10 @@ where
                     }
                 });
             }
-        }
-    });
+            }
+        },
+        false,
+    );
 
     let thead_content =
         Row::render_head_row(sorting.into(), on_head_click, drag_handler, columns).into_any();
@@ -707,6 +695,29 @@ where
     }
 }
 
+fn compute_ranges_to_load<DataP, Row, Column, Err>(missing_range: Range<usize>) -> Vec<Range<usize>>
+where
+    DataP: TableDataProvider<Row, Column, Err> + 'static,
+    Err: Debug,
+{
+    let mut loading_ranges = vec![];
+    if let Some(chunk_size) = DataP::CHUNK_SIZE {
+        let start = missing_range.start / chunk_size * chunk_size;
+        let mut current_range = start..start + chunk_size;
+        while current_range.end <= missing_range.end {
+            loading_ranges.push(current_range.clone());
+            current_range = current_range.end..current_range.end + chunk_size;
+        }
+        // when we got a missing_range which size is less than the chunk_size, add current_range to loading_ranges
+        if current_range.end > missing_range.end && current_range.start < missing_range.end {
+            loading_ranges.push(current_range);
+        }
+    } else {
+        loading_ranges.push(missing_range);
+    }
+    loading_ranges
+}
+
 fn compute_average_row_height_from_loaded<Row, Column, ClsP>(
     tbody_ref: RwSignal<Option<web_sys::Element>, LocalStorage>,
     display_range: ReadSignal<Range<usize>>,
@@ -839,5 +850,67 @@ fn update_selection(
                 first_selected_index.set(Some(i));
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::ops::Range;
+    use crate::{TableDataProvider, components::table_content::compute_ranges_to_load};
+
+    type Row = ();
+    type Column = ();
+    type Err = ();
+
+    // Provider with chunk size 10
+    struct MockProviderChunk10;
+    impl TableDataProvider<Row, Column, Err> for MockProviderChunk10 {
+        const CHUNK_SIZE: Option<usize> = Some(10);
+
+        async fn get_rows(&self, _: Range<usize>) -> Result<(Vec<Row>, Range<usize>), ()> {
+            unreachable!()
+        }
+    }
+
+    // Provider with no chunk size
+    struct MockProviderNoChunk;
+    impl TableDataProvider<Row, Column, Err> for MockProviderNoChunk {
+        const CHUNK_SIZE: Option<usize> = None;
+
+        async fn get_rows(&self, _: Range<usize>) -> Result<(Vec<Row>, Range<usize>), ()> {
+            unreachable!()
+        }
+    }
+
+    #[test]
+    fn test_exact_chunk_alignment() {
+        let missing = 10..30;
+        let result = compute_ranges_to_load::<MockProviderChunk10, Row, Column, _>(missing);
+
+        assert_eq!(result, vec![10..20, 20..30]);
+    }
+
+    #[test]
+    fn test_missing_range_starts_mid_chunk() {
+        let missing = 5..25;
+        let result = compute_ranges_to_load::<MockProviderChunk10, Row, Column, _>(missing);
+
+        assert_eq!(result, vec![0..10, 10..20, 20..30]);
+    }
+
+    #[test]
+    fn test_missing_range_smaller_than_chunk() {
+        let missing = 12..15;
+        let result = compute_ranges_to_load::<MockProviderChunk10, Row, Column, _>(missing);
+
+        assert_eq!(result, vec![10..20]);
+    }
+
+    #[test]
+    fn test_chunk_size_none() {
+        let missing = 42..99;
+        let result = compute_ranges_to_load::<MockProviderNoChunk, Row, Column, _>(missing.clone());
+
+        assert_eq!(result, vec![missing]);
     }
 }
