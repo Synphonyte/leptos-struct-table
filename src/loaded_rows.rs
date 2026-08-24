@@ -131,3 +131,18 @@ impl<T: Send + Sync> Index<usize> for LoadedRows<T> {
         &self.rows[index]
     }
 }
+
+#[cfg(test)]
+mod test {
+    use crate::loaded_rows::LoadedRows;
+
+    // Tests the case of a last-page in a paginated context, where the number of loaded rows: 0 < loaded_rows < PAGE_ROWS.
+    #[test]
+    fn missing_range_test_with_partial_page_load() {
+        let mut float_rows: LoadedRows<f32> = LoadedRows::new();
+        float_rows.write_loading(0..10);
+        assert_eq!(float_rows.missing_range(0..10), None);
+        float_rows.write_loaded(Ok((vec![0.1, 0.2, 0.3, 0.4], 0..3)), 4..10);
+        assert_eq!(float_rows.missing_range(0..10), None);
+    }
+}
