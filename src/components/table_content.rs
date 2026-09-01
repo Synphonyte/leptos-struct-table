@@ -390,7 +390,7 @@ where
         .into()
     };
 
-    let tbody_el = RwSignal::new_local(None::<web_sys::Element>);
+    let tbody_el = RwSignal::new(None::<web_sys::Element>);
 
     let compute_average_row_height = use_debounce_fn(
         move || {
@@ -683,7 +683,7 @@ where
     };
 
     let tbody_directive = Arc::new(move |el: web_sys::Element, _: ()| {
-        tbody_el.set(Some(el));
+        tbody_el.update(|tbody_el_mut| *tbody_el_mut = Some(el));
     });
 
     let tbody = tbody_renderer.run(tbody_content, tbody_class, tbody_directive);
@@ -719,7 +719,7 @@ where
 }
 
 fn compute_average_row_height_from_loaded<Row, Column, ClsP>(
-    tbody_ref: RwSignal<Option<web_sys::Element>, LocalStorage>,
+    tbody_ref: RwSignal<Option<web_sys::Element>>,
     display_range: ReadSignal<Range<usize>>,
     y: Signal<f64>,
     set_y: &impl Fn(f64),
