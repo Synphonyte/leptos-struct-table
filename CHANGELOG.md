@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.19.1] - 2026-09-02
+
+### Fixes 🐛
+
+- Fixed unnecessary row loading and lingering placeholders (thanks to @ToxicMushroom)
+- Fixed rare panics from `SendWrapper` on SSR (thanks to @ToxicMushroom)
+
 ## [0.19.0] - 2026-06-23
 
 ### Breaking Changes 🛠️
