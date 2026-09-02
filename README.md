@@ -348,8 +348,8 @@ Please have a look at the [editable example](https://github.com/Synphonyte/lepto
 ## Column index type
 Configured via the table annotation on a TableRow struct.
 
-```rust
-#[table(columne_index_type = value)]
+```ignore
+#[table(column_index_type = value)]
 ```
 
 Current supported column index type **values**: `"usize"` or `"enum"`.\
