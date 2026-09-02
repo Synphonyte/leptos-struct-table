@@ -2,6 +2,10 @@
 
 ## [0.19.1] - 2026-09-02
 
+### New Features 🚀
+
+- Added `jiff` feature for `jiff` types (`Date`, `Time`, `DateTime`, `Timestamp`, `Zoned`)
+
 ### Fixes 🐛
 
 - Fixed unnecessary row loading and lingering placeholders (thanks to @ToxicMushroom)

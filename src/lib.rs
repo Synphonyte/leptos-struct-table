@@ -147,10 +147,12 @@
 //! See:
 //! - [`cell_value::NumberRenderOptions`]
 #![cfg_attr(feature = "chrono", doc = r##"- [`chrono::RenderChronoOptions`]"##)]
+#![cfg_attr(feature = "jiff", doc = r##"- [`jiff::RenderJiffOptions`]"##)]
 #![cfg_attr(
     feature = "rust_decimal",
     doc = r##"- [`rust_decimal::DecimalNumberRenderOptions`]"##
 )]
+#![cfg_attr(feature = "time", doc = r##"- [`time::RenderTimeOptions`]"##)]
 //!
 //!
 #![cfg_attr(
@@ -177,6 +179,7 @@ pub struct TemperatureMeasurement {
 //! # Features
 //!
 //! - **`chrono`** - Adds support for types from the crate `chrono`.
+//! - **`jiff`** - Adds support for types from the crate `jiff`.
 //! - **`rust_decimal`** - Adds support for types from the crate `rust_decimal`.
 //! - **`time`** - Adds support for types from the crate `time`.
 //! - **`uuid`** - Adds support for types from the crate `uuid`.
@@ -469,6 +472,8 @@ mod components;
 mod data_provider;
 mod display_strategy;
 mod events;
+#[cfg(feature = "jiff")]
+pub mod jiff;
 mod loaded_rows;
 mod reload_controller;
 mod row_reader;

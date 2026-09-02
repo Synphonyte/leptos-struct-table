@@ -33,7 +33,7 @@ jobs:
       #   run: |
       #     cargo rdme --check
       - name: Run tests
-        run: cargo test --features chrono,uuid,rust_decimal,time
+        run: cargo test --features chrono,uuid,rust_decimal,time,jiff
 
   test_examples:
     name: Test Examples

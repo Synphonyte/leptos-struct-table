@@ -15,8 +15,9 @@ all-features = true
 
 [dependencies]
 chrono = { version = "0.4", optional = true }
+jiff = { version = "0.2", optional = true }
 leptos = { version = "0.8" }
-leptos-struct-table-macro = { version = "0.15.0" }
+leptos-struct-table-macro = { version = "0.15.1" }
 leptos-use = { version = "0.19", default-features = false, features = [
     "element",
     "use_debounce_fn",
@@ -32,6 +33,7 @@ web-sys = { version = "0.3", features = ["DomRect", "Element"] }
 
 [features]
 chrono = ["dep:chrono"]
+jiff = ["dep:jiff"]
 i18n = ["leptos-struct-table-macro/i18n"]
 rust_decimal = ["dep:rust_decimal"]
 time = ["dep:time"]
