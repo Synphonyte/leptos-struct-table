@@ -16,7 +16,7 @@ use crate::{
 use leptos::prelude::*;
 use leptos::tachys::view::any_view::AnyView;
 use leptos::task::spawn_local;
-use leptos_use::core::IntoElementMaybeSignal;
+use leptos_use::core::{IntoElementMaybeSignal, OptionLocalRwSignal};
 use leptos_use::{
     UseElementSizeOptions, UseElementSizeReturn, UseScrollOptions, UseScrollReturn,
     use_debounce_fn, use_element_size_with_options, use_scroll_with_options,
@@ -390,7 +390,7 @@ where
         .into()
     };
 
-    let tbody_el = RwSignal::new(None::<web_sys::Element>);
+    let tbody_el = OptionLocalRwSignal::<web_sys::Element>::new();
 
     let compute_average_row_height = use_debounce_fn(
         move || {
@@ -420,118 +420,118 @@ where
             )
         },
         move |(first_visible, visible_count, row_count_opt), _, _| {
-        let visible_count = *visible_count;
-        let row_count_opt = *row_count_opt;
-        let first_visible = *first_visible;
+            let visible_count = *visible_count;
+            let row_count_opt = *row_count_opt;
+            let first_visible = *first_visible;
 
-        let visible_count = visible_count.min(MAX_DISPLAY_ROW_COUNT);
+            let visible_count = visible_count.min(MAX_DISPLAY_ROW_COUNT);
 
-        if visible_count == 0 {
-            return;
-        }
-
-        let mut start = first_visible.saturating_sub(visible_count * 2);
-        let mut end = start + visible_count * 5;
-
-        if let Some(row_count) = row_count_opt {
-            // Clamp end to row_count if we know it
-            end = end.min(row_count);
-
-            // Ensure start is within valid bounds *after* clamping end
-            start = start.min(end); // Crucial: prevent start > end
-        } else {
-            return;
-        }
-
-        if let Some(chunk_size) = DataP::CHUNK_SIZE {
-            start = (start / chunk_size) * chunk_size;
-            // Skip when the current end is expected to be the end of all fetchable data.
-            if Some(end) != row_count_opt {
-                end = end.div_ceil(chunk_size) * chunk_size; // Round end *up* to nearest chunk size
-            }
-        }
-
-        let range = start..end;
-
-        set_display_range.set(match display_strategy {
-            DisplayStrategy::Virtualization | DisplayStrategy::InfiniteScroll => range.clone(),
-            DisplayStrategy::Pagination { row_count, .. } => {
-                first_visible..(first_visible + row_count).min(end)
-            }
-        });
-
-        loaded_rows.update_untracked(|loaded_rows| {
-            if end > loaded_rows.len() {
-                loaded_rows.resize(end);
-            }
-        });
-
-        let missing_range =
-            loaded_rows.with_untracked(|loaded_rows| loaded_rows.missing_range(range.clone()));
-
-        if let Some(missing_range) = missing_range {
-            // Ensure missing_range is valid *after* all calculations
-            let missing_start = missing_range.start.min(missing_range.end);
-            let missing_end = missing_range.end; // Already correct
-
-            let missing_range = missing_start..missing_end;
-
-            if missing_range.is_empty() {
-                // Don't proceed with empty ranges
+            if visible_count == 0 {
                 return;
             }
 
-            loaded_rows.write().write_loading(missing_range.clone());
+            let mut start = first_visible.saturating_sub(visible_count * 2);
+            let mut end = start + visible_count * 5;
 
-            let loading_ranges =
-                compute_ranges_to_load::<DataP, Row, Column, Err>(missing_range);
+            if let Some(row_count) = row_count_opt {
+                // Clamp end to row_count if we know it
+                end = end.min(row_count);
 
-            // TODO : implement max concurrent requests
-            for missing_range in loading_ranges {
-                let compute_average_row_height = compute_average_row_height.clone();
-                spawn_local({
-                    let rows = Rc::clone(&rows);
-                    let set_known_row_count = set_known_row_count.clone();
+                // Ensure start is within valid bounds *after* clamping end
+                start = start.min(end); // Crucial: prevent start > end
+            } else {
+                return;
+            }
 
-                    async move {
-                        let Some(latest_reload_count) = reload_count.try_get_untracked() else {
-                            return;
-                        };
+            if let Some(chunk_size) = DataP::CHUNK_SIZE {
+                start = (start / chunk_size) * chunk_size;
+                // Skip when the current end is expected to be the end of all fetchable data.
+                if Some(end) != row_count_opt {
+                    end = end.div_ceil(chunk_size) * chunk_size; // Round end *up* to nearest chunk size
+                }
+            }
 
-                        // TODO: can we avoid this?
-                        let result = rows
-                            .borrow()
-                            .get_rows(missing_range.clone())
-                            .await
-                            .map_err(|err| format!("{err:?}"));
+            let range = start..end;
 
-                        if let Some(reload_count) = reload_count.try_get_untracked() {
-                            // make sure the loaded data is still valid
-                            if reload_count != latest_reload_count {
+            set_display_range.set(match display_strategy {
+                DisplayStrategy::Virtualization | DisplayStrategy::InfiniteScroll => range.clone(),
+                DisplayStrategy::Pagination { row_count, .. } => {
+                    first_visible..(first_visible + row_count).min(end)
+                }
+            });
+
+            loaded_rows.update_untracked(|loaded_rows| {
+                if end > loaded_rows.len() {
+                    loaded_rows.resize(end);
+                }
+            });
+
+            let missing_range =
+                loaded_rows.with_untracked(|loaded_rows| loaded_rows.missing_range(range.clone()));
+
+            if let Some(missing_range) = missing_range {
+                // Ensure missing_range is valid *after* all calculations
+                let missing_start = missing_range.start.min(missing_range.end);
+                let missing_end = missing_range.end; // Already correct
+
+                let missing_range = missing_start..missing_end;
+
+                if missing_range.is_empty() {
+                    // Don't proceed with empty ranges
+                    return;
+                }
+
+                loaded_rows.write().write_loading(missing_range.clone());
+
+                let loading_ranges =
+                    compute_ranges_to_load::<DataP, Row, Column, Err>(missing_range);
+
+                // TODO : implement max concurrent requests
+                for missing_range in loading_ranges {
+                    let compute_average_row_height = compute_average_row_height.clone();
+                    spawn_local({
+                        let rows = Rc::clone(&rows);
+                        let set_known_row_count = set_known_row_count.clone();
+
+                        async move {
+                            let Some(latest_reload_count) = reload_count.try_get_untracked() else {
                                 return;
-                            }
+                            };
 
-                            if let Ok((_, loaded_range)) = &result
-                                && loaded_range.end < missing_range.end
-                            {
-                                match row_count_opt {
-                                    // Use pre-fetched value!
-                                    Some(row_count) => {
-                                        if loaded_range.end < row_count {
+                            // TODO: can we avoid this?
+                            let result = rows
+                                .borrow()
+                                .get_rows(missing_range.clone())
+                                .await
+                                .map_err(|err| format!("{err:?}"));
+
+                            if let Some(reload_count) = reload_count.try_get_untracked() {
+                                // make sure the loaded data is still valid
+                                if reload_count != latest_reload_count {
+                                    return;
+                                }
+
+                                if let Ok((_, loaded_range)) = &result
+                                    && loaded_range.end < missing_range.end
+                                {
+                                    match row_count_opt {
+                                        // Use pre-fetched value!
+                                        Some(row_count) => {
+                                            if loaded_range.end < row_count {
+                                                set_known_row_count(loaded_range.end);
+                                            }
+                                        }
+                                        None => {
                                             set_known_row_count(loaded_range.end);
                                         }
                                     }
-                                    None => {
-                                        set_known_row_count(loaded_range.end);
-                                    }
                                 }
+                                loaded_rows.write().write_loaded(result, missing_range);
+                                compute_average_row_height();
                             }
-                            loaded_rows.write().write_loaded(result, missing_range);
-                            compute_average_row_height();
                         }
-                    }
-                });
-            }
+                    });
+                }
             }
         },
         false,
@@ -683,7 +683,7 @@ where
     };
 
     let tbody_directive = Arc::new(move |el: web_sys::Element, _: ()| {
-        tbody_el.update(|tbody_el_mut| *tbody_el_mut = Some(el));
+        tbody_el.set(Some(el));
     });
 
     let tbody = tbody_renderer.run(tbody_content, tbody_class, tbody_directive);
@@ -719,7 +719,7 @@ where
 }
 
 fn compute_average_row_height_from_loaded<Row, Column, ClsP>(
-    tbody_ref: RwSignal<Option<web_sys::Element>>,
+    tbody_ref: OptionLocalRwSignal<web_sys::Element>,
     display_range: ReadSignal<Range<usize>>,
     y: Signal<f64>,
     set_y: &impl Fn(f64),
@@ -855,8 +855,8 @@ fn update_selection(
 
 #[cfg(test)]
 mod tests {
-    use std::ops::Range;
     use crate::{TableDataProvider, components::table_content::compute_ranges_to_load};
+    use std::ops::Range;
 
     type Row = ();
     type Column = ();
