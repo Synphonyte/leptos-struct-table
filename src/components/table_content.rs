@@ -51,15 +51,11 @@ renderer_fn!(
     default DefaultRowPlaceholderRenderer
 );
 
-renderer_fn!(
-    WrapperRendererFn(view: AnyView, class: Signal<String>)
-);
+renderer_fn!(WrapperRendererFn(view: AnyView, class: Signal<String>));
 
 pub type BodyRef = Arc<dyn Fn(web_sys::Element, ())>;
 
-renderer_fn!(
-    TbodyRendererFn(view: AnyView, class: Signal<String>, body_ref: BodyRef)
-);
+renderer_fn!(TbodyRendererFn(view: AnyView, class: Signal<String>, body_ref: BodyRef));
 
 renderer_fn!(
     ErrorRowRendererFn(err: String, index: usize, col_count: usize)
