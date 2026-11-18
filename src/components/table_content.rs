@@ -10,8 +10,8 @@ use crate::{
     ChangeEvent, ColumnSort, DefaultErrorRowRenderer, DefaultLoadingRowRenderer,
     DefaultRowPlaceholderRenderer, DefaultTableBodyRenderer, DefaultTableHeadRenderer,
     DefaultTableHeadRowRenderer, DefaultTableRowRenderer, DisplayStrategy, EventHandler,
-    HeadDragHandler, ReloadController, RowReader, SelectionChangeEvent, SortingMode,
-    TableClassesProvider, TableDataProvider, TableHeadEvent,
+    HeadDragHandler, ReloadController, RowContextMenuEvent, RowReader, SelectionChangeEvent,
+    SortingMode, TableClassesProvider, TableDataProvider, TableHeadEvent,
 };
 use leptos::prelude::*;
 use leptos::tachys::view::any_view::AnyView;
@@ -19,7 +19,7 @@ use leptos::task::spawn_local;
 use leptos_use::core::{IntoElementMaybeSignal, OptionLocalRwSignal};
 use leptos_use::{
     UseElementSizeOptions, UseElementSizeReturn, UseScrollOptions, UseScrollReturn,
-    use_debounce_fn, use_element_size_with_options, use_scroll_with_options,
+    use_debounce_fn, use_element_size_with_options, use_event_listener, use_scroll_with_options,
 };
 use std::cell::RefCell;
 use std::collections::{HashSet, VecDeque};
@@ -92,6 +92,12 @@ pub fn TableContent<Row, Column, DataP, Err, ClsP, ScrollEl, ScrollM>(
     /// See the [selectable example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/selectable/src/main.rs) for details.
     #[prop(optional, into)]
     on_selection_change: EventHandler<SelectionChangeEvent<Row>>,
+    /// Event handler for the context menu (right click) on a row.
+    /// Call `evt.mouse_event.prevent_default()` to suppress the browser's context menu.
+    /// Requires the row element to carry the attribute `data-row-index`. The default
+    /// row renderer sets it, custom row renderers have to do so themselves.
+    #[prop(optional, into)]
+    on_row_context_menu: EventHandler<RowContextMenuEvent<Row>>,
     /// Renderer function for the table head. Defaults to [`DefaultTableHeadRenderer`]. For a full example see the
     /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
     #[prop(default = DefaultTableHeadRenderer.into(), into)]
@@ -106,6 +112,8 @@ pub fn TableContent<Row, Column, DataP, Err, ClsP, ScrollEl, ScrollM>(
     thead_row_renderer: WrapperRendererFn,
     /// The row renderer. Defaults to [`DefaultTableRowRenderer`]. For a full example see the
     /// [custom_renderers_svg example](https://github.com/Synphonyte/leptos-struct-table/blob/master/examples/custom_renderers_svg/src/main.rs).
+    /// on_row_context_menu requires the row element to carry the attribute `data-row-index`. The default
+    /// row renderer sets it, custom row renderers have to do so themselves.
     #[prop(optional, into)]
     row_renderer: RowRendererFn<Row, Column>,
     /// The row renderer for when that row is currently being loaded.
@@ -387,6 +395,32 @@ where
     };
 
     let tbody_el = OptionLocalRwSignal::<web_sys::Element>::new();
+
+    let _ = use_event_listener(
+        tbody_el,
+        leptos::ev::contextmenu,
+        move |evt: web_sys::MouseEvent| {
+            let Some(tbody) = tbody_el.get_untracked() else {
+                return;
+            };
+            let Some(i) = row_index_from_event(&evt, &tbody) else {
+                return;
+            };
+            if i >= loaded_rows.read_untracked().len() {
+                return;
+            }
+            let RowState::Loaded(row) = loaded_rows.read_untracked()[i].clone() else {
+                return;
+            };
+
+            on_row_context_menu.run(RowContextMenuEvent {
+                row_index: i,
+                row: row.into(),
+                selected: selected_indices.with_untracked(|s| s.contains(&i)),
+                mouse_event: evt,
+            });
+        },
+    );
 
     let compute_average_row_height = use_debounce_fn(
         move || {
@@ -793,6 +827,19 @@ fn get_keyboard_modifiers(evt: &web_sys::MouseEvent) -> (bool, bool) {
     let meta_pressed = evt.meta_key() || evt.ctrl_key();
     let shift_pressed = evt.shift_key();
     (meta_pressed, shift_pressed)
+}
+
+fn row_index_from_event(evt: &web_sys::MouseEvent, tbody: &web_sys::Element) -> Option<usize> {
+    use wasm_bindgen::JsCast;
+    let mut el = evt.target()?.dyn_into::<web_sys::Element>().ok()?;
+    loop {
+        let tr = el.closest("tr[data-row-index]").ok()??;
+        if tr.parent_element().as_ref() == Some(tbody) {
+            return tr.get_attribute("data-row-index")?.parse().ok();
+        }
+        // gehört zu einer inneren Tabelle: von dort aus weiter nach oben suchen
+        el = tr.parent_element()?;
+    }
 }
 
 fn update_selection(

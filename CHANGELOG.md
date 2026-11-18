@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+### New Features 🚀
+
+- `TableContent` prop `on_row_context_menu` with the new `RowContextMenuEvent` to add possibility for contextmenu to rows
+- the default row renderer sets `data-row-index` on the `<tr>`.
+
 ## [0.19.1] - 2026-09-02
 
 ### New Features 🚀

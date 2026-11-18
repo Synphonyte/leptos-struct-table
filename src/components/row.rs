@@ -24,7 +24,7 @@ where
     Column: Copy + Send + Sync + 'static,
 {
     view! {
-        <tr class=class on:click=move |mouse_event| on_select.run(mouse_event)>
+        <tr class=class data-row-index=index on:click=move |mouse_event| on_select.run(mouse_event)>
             {TableRow::render_row(row, index, columns)}
         </tr>
     }
