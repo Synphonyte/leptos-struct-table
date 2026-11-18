@@ -24,7 +24,7 @@ pub fn CustomTableRowRenderer(
     columns: RwSignal<Vec<usize>>,
 ) -> impl IntoView {
     view! {
-        <tr class=class on:click=move |mouse_event| on_select.run(mouse_event)>
+        <tr class=class data-row-index=index on:click=move |mouse_event| on_select.run(mouse_event)>
             {TableRow::render_row(row, index, columns)}
             <td>
                 <a href=move || format!("/some-path/{}", row.read().id)>"Some link"</a>

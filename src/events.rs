@@ -77,7 +77,7 @@ impl<T> EventHandler<T> {
 }
 
 /// Event data for a context menu (right click) on a row.
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct RowContextMenuEvent<Row: Send + Sync + 'static> {
     /// Index of the row, starting at 0 for the first body row.
     pub row_index: usize,
@@ -86,5 +86,5 @@ pub struct RowContextMenuEvent<Row: Send + Sync + 'static> {
     /// Whether the row is part of the current selection.
     pub selected: bool,
     /// The original DOM event. Call `prevent_default()` to suppress the browser's own context menu.
-    pub mouse_event: web_sys::MouseEvent,
+    pub mouse_event: MouseEvent,
 }
