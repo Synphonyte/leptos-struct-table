@@ -1,0 +1,17 @@
+[package]
+name = "context_menu"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+leptos = { version = "0.8", features = ["csr"] }
+leptos-struct-table = { path = "../..", features = ["chrono"] }
+chrono = { version = "0.4" }
+console_error_panic_hook = "0.1"
+console_log = "1"
+log = "0.4"
+
+[dev-dependencies]
+wasm-bindgen = "0.2"
+wasm-bindgen-test = "0.3.0"
+web-sys = "0.3"
