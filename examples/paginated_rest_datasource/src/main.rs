@@ -5,7 +5,7 @@ mod renderer;
 use crate::data_provider::BreweryDataProvider;
 use leptos::prelude::*;
 use leptos_struct_table::*;
-use leptos_use::use_debounce_fn_with_arg;
+use leptos_use_fn_debounce_throttle::use_debounce_fn_with_arg;
 
 #[component]
 pub fn App() -> impl IntoView {

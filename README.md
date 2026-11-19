@@ -67,14 +67,9 @@ fn Demo() -> impl IntoView {
 
 ## Server-Side Rendering
 
-To use this with Leptos' server-side rendering, you can have to add `leptos-use` as a dependency to your `Cargo.toml` and
-then configure it for SSR like the following.
+To use this with Leptos' server-side rendering, enable the `ssr` feature of `leptos-struct-table` like the following.
 
 ```toml
-[dependencies]
-leptos-use = "<current version>"
-# ...
-
 [features]
 hydrate = [
     "leptos/hydrate",
@@ -83,7 +78,7 @@ hydrate = [
 ssr = [
     "leptos/ssr",
     # ...
-    "leptos-use/ssr",
+    "leptos-struct-table/ssr",
 ]
 ```
 

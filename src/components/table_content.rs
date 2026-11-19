@@ -16,11 +16,14 @@ use crate::{
 use leptos::prelude::*;
 use leptos::tachys::view::any_view::AnyView;
 use leptos::task::spawn_local;
-use leptos_use::core::{IntoElementMaybeSignal, OptionLocalRwSignal};
-use leptos_use::{
-    UseElementSizeOptions, UseElementSizeReturn, UseScrollOptions, UseScrollReturn,
-    use_debounce_fn, use_element_size_with_options, use_event_listener, use_scroll_with_options,
+use leptos_use_element::IntoElementMaybeSignal;
+use leptos_use_element_size::{
+    UseElementSizeOptions, UseElementSizeReturn, use_element_size_with_options,
 };
+use leptos_use_event_listener::use_event_listener;
+use leptos_use_fn_debounce_throttle::use_debounce_fn;
+use leptos_use_option_local_signal::OptionLocalRwSignal;
+use leptos_use_scroll::{UseScrollOptions, UseScrollReturn, use_scroll_with_options};
 use std::cell::RefCell;
 use std::collections::{HashSet, VecDeque};
 use std::fmt::Debug;

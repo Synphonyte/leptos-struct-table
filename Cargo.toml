@@ -8,7 +8,7 @@ license = "MIT OR Apache-2.0"
 name = "leptos-struct-table"
 readme = "README.md"
 repository = "https://github.com/Synphonyte/leptos-struct-table"
-version = "0.19.1"
+version = "0.20.0"
 
 [package.metadata."docs.rs"]
 all-features = true
@@ -18,12 +18,12 @@ chrono = { version = "0.4", optional = true }
 jiff = { version = "1", optional = true }
 leptos = { version = "0.8" }
 leptos-struct-table-macro = { version = "0.15.1" }
-leptos-use = { version = "0.19", default-features = false, features = [
-    "element",
-    "use_debounce_fn",
-    "use_element_size",
-    "use_scroll",
-] }
+leptos-use-element = "0.20"
+leptos-use-element-size = "0.20"
+leptos-use-event-listener = "0.20"
+leptos-use-fn-debounce-throttle = "0.20"
+leptos-use-option-local-signal = "0.20"
+leptos-use-scroll = "0.20"
 rust_decimal = { version = "1", optional = true }
 serde = "1"
 time = { version = "0.3", optional = true, features = ["formatting"] }
@@ -36,5 +36,13 @@ chrono = ["dep:chrono"]
 jiff = ["dep:jiff"]
 i18n = ["leptos-struct-table-macro/i18n"]
 rust_decimal = ["dep:rust_decimal"]
+ssr = [
+    "leptos-use-element/ssr",
+    "leptos-use-element-size/ssr",
+    "leptos-use-event-listener/ssr",
+    "leptos-use-fn-debounce-throttle/ssr",
+    "leptos-use-option-local-signal/ssr",
+    "leptos-use-scroll/ssr",
+]
 time = ["dep:time"]
 uuid = ["dep:uuid"]

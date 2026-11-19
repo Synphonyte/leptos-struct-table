@@ -1,9 +1,15 @@
 # Changelog
 
-## Unreleased
+## [0.20.0] - 2026-11-19
+
+### Breaking Changes 🛠️
+
+- Updated dependency `leptos-use` to version `0.20`, which is now split into micro crates. The monolithic `leptos-use` dependency has been replaced by `leptos-use-element`, `leptos-use-element-size`, `leptos-use-event-listener`, `leptos-use-fn-debounce-throttle`, `leptos-use-option-local-signal` and `leptos-use-scroll`.
+- Updated jiff to version `1`
 
 ### New Features 🚀
 
+- Added the `ssr` feature, which forwards to the `ssr` features of the `leptos-use-*` micro crates. Enable `leptos-struct-table/ssr` instead of `leptos-use/ssr`.
 - `TableContent` prop `on_row_context_menu` with the new `RowContextMenuEvent` to add possibility for contextmenu to rows
 - the default row renderer sets `data-row-index` on the `<tr>`.
 

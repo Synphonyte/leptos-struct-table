@@ -12,7 +12,6 @@ console_error_panic_hook = "0.1"
 http = "1"
 leptos = { version = "0.8" }
 leptos-struct-table = { path = "../.." }
-leptos-use = { version = "0.19" }
 leptos_axum = { version = "0.8", optional = true }
 leptos_meta = { version = "0.8" }
 leptos_router = { version = "0.8" }
@@ -37,8 +36,8 @@ ssr = [
     "dep:tower",
     "dep:tower-http",
     "dep:tracing",
-    "leptos-use/ssr",
     "leptos/ssr",
+    "leptos-struct-table/ssr",
     "leptos_meta/ssr",
     "leptos_router/ssr",
 ]
