@@ -17,7 +17,7 @@ all-features = true
 chrono = { version = "0.4", optional = true }
 jiff = { version = "1", optional = true }
 leptos = { version = "0.8" }
-leptos-struct-table-macro = { version = "0.15.1" }
+leptos-struct-table-macro = { version = "0.15.3" }
 leptos-use-element = "0.20"
 leptos-use-element-size = "0.20"
 leptos-use-event-listener = "0.20"

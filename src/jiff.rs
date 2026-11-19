@@ -2,7 +2,7 @@
 
 use crate::*;
 use ::jiff::{
-    Timestamp, Zoned,
+    Timestamp, ZonedDateTime,
     civil::{Date, DateTime, Time},
 };
 use leptos::prelude::*;
@@ -98,17 +98,17 @@ jiff_cell_value_impl!(
 );
 
 jiff_cell_value_impl!(
-    /// Implementation for [`Zoned`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
+    /// Implementation for [`ZonedDateTime`] to work with the [`TableRow`] derive and the [`DefaultTableCellRenderer`]
     /// ```
     /// # use leptos_struct_table::*;
     /// # use leptos::prelude::*;
-    /// # use ::jiff::Zoned;
+    /// # use ::jiff::ZonedDateTime;
     /// #[derive(TableRow, Clone)]
     /// #[table]
     /// struct SomeStruct {
     ///     #[table(format(string = "%Y-%m-%d %H:%M:%S %:Q"))]
-    ///     my_field: Zoned
+    ///     my_field: ZonedDateTime
     /// }
     /// ```
-    Zoned
+    ZonedDateTime
 );
